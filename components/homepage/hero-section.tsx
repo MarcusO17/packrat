@@ -8,18 +8,20 @@ import {
   Maximize2,
   BedDouble,
   Bath,
+  ChevronDown,
+  Calendar as CalendarIcon,
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Calendar } from "@/components/ui/calendar"
+import { Slider } from "@/components/ui/slider"
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 
 const rotatingPhrases = [
   {
@@ -41,6 +43,45 @@ const rotatingPhrases = [
     text: "days, not leases.",
     className:
       "font-[family-name:var(--font-editorial)] italic font-normal text-primary text-[1.1em]",
+  },
+]
+
+const suggestedLocations = [
+  {
+    name: "Nearby",
+    subtitle: "Find available storage around you",
+    image:
+      "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=120&q=80",
+  },
+  {
+    name: "Kuala Lumpur",
+    subtitle: "City center commercial & shoplot bays",
+    image:
+      "https://images.unsplash.com/photo-1596422846543-75c6fc197f07?auto=format&fit=crop&w=120&q=80",
+  },
+  {
+    name: "Petaling Jaya, Selangor",
+    subtitle: "Popular for e-commerce & SME fulfillment",
+    image:
+      "https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=120&q=80",
+  },
+  {
+    name: "Shah Alam, Selangor",
+    subtitle: "High-ceiling pallet & industrial warehouses",
+    image:
+      "https://images.unsplash.com/photo-1565891741441-64926e441838?auto=format&fit=crop&w=120&q=80",
+  },
+  {
+    name: "George Town, Penang",
+    subtitle: "Northern hub residential & retail overflow",
+    image:
+      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=120&q=80",
+  },
+  {
+    name: "Johor Bahru, Johor",
+    subtitle: "Cross-border logistics & Southern storage",
+    image:
+      "https://images.unsplash.com/photo-1580674285054-bed31e145f59?auto=format&fit=crop&w=120&q=80",
   },
 ]
 
@@ -95,10 +136,24 @@ const floatingMarkers = [
   },
 ]
 
+function formatShortDate(date?: Date) {
+  if (!date) return "MM/DD"
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+  })
+}
+
 export function HeroSection() {
-  const [location, setLocation] = React.useState("all")
-  const [propertyType, setPropertyType] = React.useState("all")
-  const [budget, setBudget] = React.useState("500-1200")
+  const [location, setLocation] = React.useState("All Locations")
+  const [locationOpen, setLocationOpen] = React.useState(false)
+  const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(
+    undefined
+  )
+  const [dateOpen, setDateOpen] = React.useState(false)
+  const [budgetRange, setBudgetRange] = React.useState<number[]>([500, 1200])
+  const [budgetOpen, setBudgetOpen] = React.useState(false)
   const [wordIndex, setWordIndex] = React.useState(0)
   const [isVisible, setIsVisible] = React.useState(true)
 
@@ -119,7 +174,7 @@ export function HeroSection() {
   return (
     <section className="relative overflow-hidden border-b border-zinc-200/80 bg-white dark:border-zinc-800 dark:bg-zinc-950">
       {/* Top Heading & Search Bar */}
-      <div className="relative z-20 mx-auto flex max-w-5xl flex-col items-center px-4 pt-12 pb-6 text-center sm:px-6 lg:pt-16">
+      <div className="relative z-30 mx-auto flex max-w-5xl flex-col items-center px-4 pt-12 pb-6 text-center sm:px-6 lg:pt-16">
         {/* Top Pill Badge */}
         <button
           type="button"
@@ -149,77 +204,154 @@ export function HeroSection() {
 
         {/* Search Filter Pill Bar */}
         <div className="mt-8 flex w-full max-w-2xl flex-col items-stretch gap-2 rounded-3xl border border-zinc-200/90 bg-white p-2 shadow-[0_10px_40px_rgba(0,0,0,0.06)] sm:flex-row sm:items-center sm:rounded-full sm:py-2 sm:pr-2 sm:pl-6 dark:border-zinc-800 dark:bg-zinc-900">
-          {/* Location Select */}
-          <div className="flex flex-1 flex-col items-start text-left">
-            <span className="px-1 text-[11px] font-medium text-zinc-400">
-              Location
-            </span>
-            <Select value={location} onValueChange={setLocation}>
-              <SelectTrigger
-                size="sm"
-                className="h-7 w-full border-0 bg-transparent px-1 py-0 text-xs font-semibold text-zinc-900 shadow-none focus-visible:ring-0 dark:text-white"
+          {/* Location Popover with Suggested Destination Banner */}
+          <Popover open={locationOpen} onOpenChange={setLocationOpen}>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                className="flex flex-1 flex-col items-start text-left outline-none"
               >
-                <SelectValue placeholder="All Locations" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Locations</SelectItem>
-                <SelectItem value="kl">Kuala Lumpur</SelectItem>
-                <SelectItem value="selangor">Petaling Jaya, Selangor</SelectItem>
-                <SelectItem value="penang">George Town, Penang</SelectItem>
-                <SelectItem value="jb">Johor Bahru, Johor</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+                <span className="px-1 text-[11px] font-medium text-zinc-400">
+                  Location
+                </span>
+                <span className="flex h-7 w-full items-center justify-between px-1 text-xs font-semibold text-zinc-900 dark:text-white">
+                  <span className="truncate">{location}</span>
+                  <ChevronDown className="size-4 shrink-0 opacity-50" />
+                </span>
+              </button>
+            </PopoverTrigger>
+            <PopoverContent
+              align="start"
+              sideOffset={14}
+              className="w-80 rounded-3xl border-zinc-200/80 bg-white p-4 shadow-[0_20px_60px_rgba(0,0,0,0.12)] dark:border-zinc-800 dark:bg-zinc-900"
+            >
+              <p className="mb-3 px-1 text-xs font-medium text-zinc-400">
+                Suggested destination
+              </p>
+              <div className="flex flex-col gap-1">
+                {suggestedLocations.map((loc) => (
+                  <button
+                    key={loc.name}
+                    type="button"
+                    onClick={() => {
+                      setLocation(loc.name)
+                      setLocationOpen(false)
+                    }}
+                    className="hover:bg-zinc-100/80 dark:hover:bg-zinc-800 flex items-center gap-3 rounded-2xl p-2 text-left transition-colors"
+                  >
+                    <img
+                      src={loc.image}
+                      alt={loc.name}
+                      className="size-10 shrink-0 rounded-full object-cover ring-1 ring-black/5"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-semibold text-zinc-900 dark:text-white">
+                        {loc.name}
+                      </p>
+                      <p className="truncate text-xs text-zinc-400">
+                        {loc.subtitle}
+                      </p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
 
           <div className="hidden h-8 w-px bg-zinc-200 sm:block dark:bg-zinc-800" />
 
-          {/* Property Type Select */}
-          <div className="flex flex-1 flex-col items-start text-left sm:pl-2">
-            <span className="px-1 text-[11px] font-medium text-zinc-400">
-              Space Type
-            </span>
-            <Select value={propertyType} onValueChange={setPropertyType}>
-              <SelectTrigger
-                size="sm"
-                className="h-7 w-full border-0 bg-transparent px-1 py-0 text-xs font-semibold text-zinc-900 shadow-none focus-visible:ring-0 dark:text-white"
+          {/* Middle Column: Date with Date Picker Popover */}
+          <Popover open={dateOpen} onOpenChange={setDateOpen}>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                className="flex flex-1 flex-col items-start text-left outline-none sm:pl-2"
               >
-                <SelectValue placeholder="All" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Spaces</SelectItem>
-                <SelectItem value="warehouse">Warehouse Bay</SelectItem>
-                <SelectItem value="commercial">Commercial Shoplot</SelectItem>
-                <SelectItem value="residential">Spare Home Room</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+                <span className="px-1 text-[11px] font-medium text-zinc-400">
+                  Date
+                </span>
+                <span className="flex h-7 w-full items-center justify-between px-1 text-xs font-semibold text-zinc-900 dark:text-white">
+                  <span className="truncate">
+                    {formatShortDate(selectedDate)}
+                  </span>
+                  <CalendarIcon className="size-3.5 shrink-0 opacity-50" />
+                </span>
+              </button>
+            </PopoverTrigger>
+            <PopoverContent
+              align="center"
+              sideOffset={14}
+              className="w-auto rounded-3xl border-zinc-200/80 bg-white p-2 shadow-[0_20px_60px_rgba(0,0,0,0.12)] dark:border-zinc-800 dark:bg-zinc-900"
+            >
+              <Calendar
+                selected={selectedDate}
+                onSelect={(date) => {
+                  setSelectedDate(date)
+                  setDateOpen(false)
+                }}
+              />
+            </PopoverContent>
+          </Popover>
 
           <div className="hidden h-8 w-px bg-zinc-200 sm:block dark:bg-zinc-800" />
 
-          {/* Budget Select */}
-          <div className="flex flex-1 flex-col items-start text-left sm:pl-2">
-            <span className="px-1 text-[11px] font-medium text-zinc-400">
-              Budget
-            </span>
-            <Select value={budget} onValueChange={setBudget}>
-              <SelectTrigger
-                size="sm"
-                className="h-7 w-full border-0 bg-transparent px-1 py-0 text-xs font-semibold text-zinc-900 shadow-none focus-visible:ring-0 dark:text-white"
+          {/* Budget Column with Dual-Thumb Range Slider Popover */}
+          <Popover open={budgetOpen} onOpenChange={setBudgetOpen}>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                className="flex flex-1 flex-col items-start text-left outline-none sm:pl-2"
               >
-                <SelectValue placeholder="RM 500 - RM 1,200" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="500-1200">RM 500 - RM 1,200</SelectItem>
-                <SelectItem value="1200-5000">RM 1,200 - RM 5,000</SelectItem>
-                <SelectItem value="5000+">RM 5,000+</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+                <span className="px-1 text-[11px] font-medium text-zinc-400">
+                  Budget
+                </span>
+                <span className="flex h-7 w-full items-center justify-between px-1 text-xs font-semibold text-zinc-900 dark:text-white">
+                  <span className="truncate">
+                    RM {budgetRange[0].toLocaleString()} - RM{" "}
+                    {budgetRange[1].toLocaleString()}
+                  </span>
+                  <ChevronDown className="size-4 shrink-0 opacity-50" />
+                </span>
+              </button>
+            </PopoverTrigger>
+            <PopoverContent
+              align="end"
+              sideOffset={14}
+              className="w-72 rounded-3xl border-zinc-200/80 bg-white p-5 shadow-[0_20px_60px_rgba(0,0,0,0.12)] dark:border-zinc-800 dark:bg-zinc-900"
+            >
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                    Price Range
+                  </span>
+                  <span className="text-primary text-xs font-bold">
+                    RM {budgetRange[0].toLocaleString()} – RM{" "}
+                    {budgetRange[1].toLocaleString()}
+                  </span>
+                </div>
+
+                <Slider
+                  value={budgetRange}
+                  min={50}
+                  max={5000}
+                  step={50}
+                  onValueChange={setBudgetRange}
+                  className="py-2"
+                />
+
+                <div className="flex items-center justify-between text-[11px] text-zinc-400">
+                  <span>RM 50</span>
+                  <span>RM 2,500</span>
+                  <span>RM 5,000+</span>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
 
           {/* Search Button */}
           <Button
             size="icon"
-            aria-label="Search spaces"
+            aria-label="Search properties"
             className="size-10 shrink-0 self-end rounded-full sm:self-center"
           >
             <Search className="size-4" />
@@ -231,7 +363,7 @@ export function HeroSection() {
       <div className="relative h-[470px] w-full sm:h-[510px]">
         {/* OpenStreetMap iframe centered on Kuala Lumpur / Klang Valley, Malaysia */}
         <iframe
-          title="OpenStreetMap Malaysia Storage Explorer"
+          title="OpenStreetMap Malaysia Real Estate Explorer"
           src="https://www.openstreetmap.org/export/embed.html?bbox=101.58%2C3.08%2C101.78%2C3.20&layer=mapnik"
           className="pointer-events-none size-full border-0 opacity-75 grayscale contrast-95 filter dark:invert dark:hue-rotate-180 dark:opacity-40"
           loading="lazy"
@@ -272,7 +404,7 @@ export function HeroSection() {
         ))}
 
         {/* Center Featured Property Card Overlay */}
-        <div className="absolute top-1/2 left-1/2 z-30 w-[300px] -translate-x-1/2 -translate-y-[54%] sm:w-[320px]">
+        <div className="absolute top-1/2 left-1/2 z-20 w-[300px] -translate-x-1/2 -translate-y-[54%] sm:w-[320px]">
           <div className="rounded-3xl border border-zinc-200/80 bg-white p-3 shadow-[0_20px_50px_rgba(0,0,0,0.12)] dark:border-zinc-800 dark:bg-zinc-900">
             {/* Property Image */}
             <div className="relative h-40 w-full overflow-hidden rounded-2xl bg-zinc-100">
