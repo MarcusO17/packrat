@@ -8,9 +8,9 @@ import {
   Maximize2,
   BedDouble,
   Bath,
-  TrendingUp,
 } from "lucide-react"
 
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -20,6 +20,29 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+
+const rotatingPhrases = [
+  {
+    text: "overflow.",
+    className:
+      "font-[family-name:var(--font-mono)] font-bold tracking-tighter text-primary",
+  },
+  {
+    text: "everyone.",
+    className:
+      "font-[family-name:var(--font-editorial)] italic font-normal tracking-normal text-primary text-[1.15em]",
+  },
+  {
+    text: "growth.",
+    className:
+      "font-[family-name:var(--font-display)] font-bold uppercase tracking-wider text-primary",
+  },
+  {
+    text: "days, not leases.",
+    className:
+      "font-[family-name:var(--font-editorial)] italic font-normal text-primary text-[1.1em]",
+  },
+]
 
 const floatingMarkers = [
   {
@@ -76,6 +99,22 @@ export function HeroSection() {
   const [location, setLocation] = React.useState("all")
   const [propertyType, setPropertyType] = React.useState("all")
   const [budget, setBudget] = React.useState("500-1200")
+  const [wordIndex, setWordIndex] = React.useState(0)
+  const [isVisible, setIsVisible] = React.useState(true)
+
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setIsVisible(false)
+      setTimeout(() => {
+        setWordIndex((prev) => (prev + 1) % rotatingPhrases.length)
+        setIsVisible(true)
+      }, 220)
+    }, 3000)
+
+    return () => clearInterval(interval)
+  }, [])
+
+  const currentPhrase = rotatingPhrases[wordIndex]
 
   return (
     <section className="relative overflow-hidden border-b border-zinc-200/80 bg-white dark:border-zinc-800 dark:bg-zinc-950">
@@ -92,31 +131,21 @@ export function HeroSection() {
           <span>What is Packrat?</span>
         </button>
 
-        {/* Main Headline with Inline Pill Graphic */}
-        <h1 className="max-w-3xl text-3xl font-semibold tracking-tight text-zinc-950 sm:text-5xl sm:leading-[1.15] dark:text-white">
-          Easily Invest in Real Estate
-          <br />
-          <span className="inline-flex flex-wrap items-center justify-center gap-2.5">
-            <span>to Grow</span>
-            <span className="border-primary/40 relative inline-flex h-9 w-16 items-center justify-center overflow-hidden rounded-full border bg-zinc-900 shadow-inner sm:h-11 sm:w-20">
-              <img
-                src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=240&q=80"
-                alt="Property growth"
-                className="size-full object-cover opacity-75"
-              />
-              <span className="absolute inset-0 flex items-center justify-center bg-black/30">
-                <TrendingUp className="text-primary size-4 sm:size-5" />
-              </span>
-            </span>
-            <span>Your Future</span>
+        {/* Main Headline with Dynamic Font-Swapping Word */}
+        <h1 className="max-w-4xl text-3xl font-semibold tracking-tight text-zinc-950 sm:text-5xl sm:leading-[1.18] dark:text-white">
+          <span>Storage, redefined for </span>
+          <span
+            className={cn(
+              "inline-block transition-all duration-200 ease-out",
+              isVisible
+                ? "translate-y-0 opacity-100 blur-none"
+                : "translate-y-2 opacity-0 blur-[2px]",
+              currentPhrase.className
+            )}
+          >
+            {currentPhrase.text}
           </span>
         </h1>
-
-        {/* Subtitle */}
-        <p className="mt-4 max-w-lg text-sm leading-relaxed text-zinc-500 sm:text-base dark:text-zinc-400">
-          Take control of your financial future by diversifying your portfolio
-          with secure and high-yield real estate properties.
-        </p>
 
         {/* Search Filter Pill Bar */}
         <div className="mt-8 flex w-full max-w-2xl flex-col items-stretch gap-2 rounded-3xl border border-zinc-200/90 bg-white p-2 shadow-[0_10px_40px_rgba(0,0,0,0.06)] sm:flex-row sm:items-center sm:rounded-full sm:py-2 sm:pr-2 sm:pl-6 dark:border-zinc-800 dark:bg-zinc-900">
@@ -147,7 +176,7 @@ export function HeroSection() {
           {/* Property Type Select */}
           <div className="flex flex-1 flex-col items-start text-left sm:pl-2">
             <span className="px-1 text-[11px] font-medium text-zinc-400">
-              Property Type
+              Space Type
             </span>
             <Select value={propertyType} onValueChange={setPropertyType}>
               <SelectTrigger
@@ -157,10 +186,10 @@ export function HeroSection() {
                 <SelectValue placeholder="All" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All</SelectItem>
-                <SelectItem value="bungalow">Bungalow</SelectItem>
-                <SelectItem value="residential">Residential</SelectItem>
-                <SelectItem value="commercial">Commercial</SelectItem>
+                <SelectItem value="all">All Spaces</SelectItem>
+                <SelectItem value="warehouse">Warehouse Bay</SelectItem>
+                <SelectItem value="commercial">Commercial Shoplot</SelectItem>
+                <SelectItem value="residential">Spare Home Room</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -177,12 +206,12 @@ export function HeroSection() {
                 size="sm"
                 className="h-7 w-full border-0 bg-transparent px-1 py-0 text-xs font-semibold text-zinc-900 shadow-none focus-visible:ring-0 dark:text-white"
               >
-                <SelectValue placeholder="$500 - $1200" />
+                <SelectValue placeholder="RM 500 - RM 1,200" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="500-1200">$500 - $1200</SelectItem>
-                <SelectItem value="1200-5000">$1,200 - $5,000</SelectItem>
-                <SelectItem value="5000+">$5,000+</SelectItem>
+                <SelectItem value="500-1200">RM 500 - RM 1,200</SelectItem>
+                <SelectItem value="1200-5000">RM 1,200 - RM 5,000</SelectItem>
+                <SelectItem value="5000+">RM 5,000+</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -190,7 +219,7 @@ export function HeroSection() {
           {/* Search Button */}
           <Button
             size="icon"
-            aria-label="Search properties"
+            aria-label="Search spaces"
             className="size-10 shrink-0 self-end rounded-full sm:self-center"
           >
             <Search className="size-4" />
@@ -202,7 +231,7 @@ export function HeroSection() {
       <div className="relative h-[470px] w-full sm:h-[510px]">
         {/* OpenStreetMap iframe centered on Kuala Lumpur / Klang Valley, Malaysia */}
         <iframe
-          title="OpenStreetMap Malaysia Real Estate Explorer"
+          title="OpenStreetMap Malaysia Storage Explorer"
           src="https://www.openstreetmap.org/export/embed.html?bbox=101.58%2C3.08%2C101.78%2C3.20&layer=mapnik"
           className="pointer-events-none size-full border-0 opacity-75 grayscale contrast-95 filter dark:invert dark:hue-rotate-180 dark:opacity-40"
           loading="lazy"
