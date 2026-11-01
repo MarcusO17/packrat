@@ -34,7 +34,7 @@ export function Navbar() {
           href="/"
           className="flex items-center gap-2.5 text-zinc-950 transition-opacity hover:opacity-90 dark:text-white"
         >
-          <div className="flex size-8 items-center justify-center rounded-lg bg-zinc-950 text-white dark:bg-white dark:text-zinc-950">
+          <div className="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-lg shadow-xs">
             <Building2 className="size-4.5" />
           </div>
           <span className="text-lg font-bold tracking-tight">Packrat</span>
@@ -58,7 +58,7 @@ export function Navbar() {
               >
                 {link.title}
                 {isActive && (
-                  <span className="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-zinc-950 dark:bg-white" />
+                  <span className="bg-primary absolute inset-x-0 bottom-0 h-0.5 rounded-full" />
                 )}
               </Link>
             )
@@ -79,7 +79,7 @@ export function Navbar() {
           <Button
             size="sm"
             asChild
-            className="hidden h-9 gap-1 rounded-full bg-zinc-950 px-5 text-xs font-semibold text-white shadow-none hover:bg-zinc-800 sm:inline-flex dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200"
+            className="hidden h-9 gap-1 rounded-full px-5 text-xs font-semibold shadow-none sm:inline-flex"
           >
             <Link href="#join">
               <span>Join Now</span>
@@ -102,7 +102,7 @@ export function Navbar() {
             <SheetContent side="right" className="w-72">
               <SheetHeader className="text-left">
                 <SheetTitle className="flex items-center gap-2">
-                  <div className="flex size-7 items-center justify-center rounded-md bg-zinc-950 text-white dark:bg-white dark:text-zinc-950">
+                  <div className="bg-primary text-primary-foreground flex size-7 items-center justify-center rounded-md">
                     <Building2 className="size-4" />
                   </div>
                   <span className="font-bold tracking-tight">Packrat</span>
@@ -122,7 +122,7 @@ export function Navbar() {
                       className={cn(
                         "rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                         isActive
-                          ? "bg-zinc-100 text-zinc-950 dark:bg-zinc-800 dark:text-white"
+                          ? "bg-primary/10 text-primary"
                           : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
                       )}
                     >
@@ -145,7 +145,7 @@ export function Navbar() {
                   </Button>
                   <Button
                     asChild
-                    className="h-9 w-full gap-1 rounded-full bg-zinc-950 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-950"
+                    className="h-9 w-full gap-1 rounded-full"
                   >
                     <Link
                       href="#join"

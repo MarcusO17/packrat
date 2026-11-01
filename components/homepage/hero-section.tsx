@@ -86,7 +86,7 @@ export function HeroSection() {
           type="button"
           className="mb-5 inline-flex items-center gap-2 rounded-full border border-zinc-200/80 bg-white px-3.5 py-1.5 text-xs font-medium text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300"
         >
-          <span className="flex size-4 items-center justify-center rounded-full bg-[#ff5e4d] text-white">
+          <span className="bg-primary text-primary-foreground flex size-4 items-center justify-center rounded-full">
             <Play className="size-2 fill-current" />
           </span>
           <span>What is Packrat?</span>
@@ -98,14 +98,14 @@ export function HeroSection() {
           <br />
           <span className="inline-flex flex-wrap items-center justify-center gap-2.5">
             <span>to Grow</span>
-            <span className="relative inline-flex h-9 w-16 items-center justify-center overflow-hidden rounded-full border border-zinc-300 bg-zinc-900 shadow-inner sm:h-11 sm:w-20">
+            <span className="border-primary/40 relative inline-flex h-9 w-16 items-center justify-center overflow-hidden rounded-full border bg-zinc-900 shadow-inner sm:h-11 sm:w-20">
               <img
                 src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=240&q=80"
                 alt="Property growth"
                 className="size-full object-cover opacity-75"
               />
               <span className="absolute inset-0 flex items-center justify-center bg-black/30">
-                <TrendingUp className="size-4 text-emerald-400 sm:size-5" />
+                <TrendingUp className="text-primary size-4 sm:size-5" />
               </span>
             </span>
             <span>Your Future</span>
@@ -134,9 +134,10 @@ export function HeroSection() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Locations</SelectItem>
-                <SelectItem value="ny">New York, NY</SelectItem>
-                <SelectItem value="md">Catonsville, MD</SelectItem>
-                <SelectItem value="nj">Jersey City, NJ</SelectItem>
+                <SelectItem value="kl">Kuala Lumpur</SelectItem>
+                <SelectItem value="selangor">Petaling Jaya, Selangor</SelectItem>
+                <SelectItem value="penang">George Town, Penang</SelectItem>
+                <SelectItem value="jb">Johor Bahru, Johor</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -190,7 +191,7 @@ export function HeroSection() {
           <Button
             size="icon"
             aria-label="Search properties"
-            className="size-10 shrink-0 self-end rounded-full bg-zinc-950 text-white hover:bg-zinc-800 sm:self-center dark:bg-white dark:text-zinc-950"
+            className="size-10 shrink-0 self-end rounded-full sm:self-center"
           >
             <Search className="size-4" />
           </Button>
@@ -199,10 +200,10 @@ export function HeroSection() {
 
       {/* Interactive OpenStreetMap Canvas Area */}
       <div className="relative h-[470px] w-full sm:h-[510px]">
-        {/* OpenStreetMap iframe with subtle grayscale aesthetic filter */}
+        {/* OpenStreetMap iframe centered on Kuala Lumpur / Klang Valley, Malaysia */}
         <iframe
-          title="OpenStreetMap Real Estate Explorer"
-          src="https://www.openstreetmap.org/export/embed.html?bbox=-74.28%2C40.68%2C-73.88%2C40.84&layer=mapnik"
+          title="OpenStreetMap Malaysia Real Estate Explorer"
+          src="https://www.openstreetmap.org/export/embed.html?bbox=101.58%2C3.08%2C101.78%2C3.20&layer=mapnik"
           className="pointer-events-none size-full border-0 opacity-75 grayscale contrast-95 filter dark:invert dark:hue-rotate-180 dark:opacity-40"
           loading="lazy"
         />
@@ -251,13 +252,13 @@ export function HeroSection() {
                 alt="Luxury Oceanfront Bungalow"
                 className="size-full object-cover"
               />
-              <Badge className="absolute top-2.5 right-2.5 rounded-full bg-white/95 px-2.5 py-0.5 text-[11px] font-semibold text-zinc-900 shadow-xs hover:bg-white">
+              <Badge className="bg-primary text-primary-foreground hover:bg-primary/90 absolute top-2.5 right-2.5 rounded-full border-0 px-2.5 py-0.5 text-[11px] font-semibold shadow-xs">
                 New
               </Badge>
 
               {/* Carousel Dots */}
               <div className="absolute bottom-2.5 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full bg-black/35 px-2 py-1 backdrop-blur-xs">
-                <span className="h-1 w-3 rounded-full bg-white" />
+                <span className="bg-primary h-1 w-3 rounded-full" />
                 <span className="size-1 rounded-full bg-white/60" />
                 <span className="size-1 rounded-full bg-white/60" />
                 <span className="size-1 rounded-full bg-white/60" />
@@ -270,8 +271,8 @@ export function HeroSection() {
                 Luxury Oceanfront Bungalow
               </h3>
               <p className="mt-1 flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400">
-                <MapPin className="size-3.5 text-zinc-400" />
-                <span>Catonsville, MD</span>
+                <MapPin className="text-primary size-3.5" />
+                <span>Kuala Lumpur, Malaysia</span>
               </p>
 
               {/* Specs Row */}
@@ -294,14 +295,13 @@ export function HeroSection() {
                   <span className="text-sm font-bold text-zinc-950 dark:text-white">
                     $520,000
                   </span>
-                  <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                  <span className="text-primary text-[11px] font-semibold">
                     (10.8%)
                   </span>
                 </div>
                 <Button
-                  variant="outline"
                   size="sm"
-                  className="h-7 rounded-full border-zinc-200 px-3 text-[11px] font-semibold text-zinc-800 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-200"
+                  className="h-7 rounded-full px-3 text-[11px] font-semibold"
                 >
                   Invest Now
                 </Button>
@@ -311,14 +311,13 @@ export function HeroSection() {
 
           {/* Map Cluster Pin Indicator ("20") below card */}
           <div className="mt-3 flex flex-col items-center">
-            <div className="flex size-10 items-center justify-center rounded-full border-2 border-white bg-zinc-950 text-xs font-bold text-white shadow-lg dark:border-zinc-800 dark:bg-white dark:text-zinc-950">
+            <div className="bg-primary text-primary-foreground flex size-10 items-center justify-center rounded-full border-2 border-white text-xs font-bold shadow-lg dark:border-zinc-800">
               20
             </div>
-            <div className="h-2 w-0.5 bg-zinc-950/40 dark:bg-white/40" />
+            <div className="bg-primary/50 h-2 w-0.5" />
           </div>
         </div>
       </div>
     </section>
   )
 }
-

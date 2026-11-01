@@ -14,7 +14,7 @@ export function FeaturesSection() {
           {/* Left Column: Editorial Value Proposition */}
           <div className="flex flex-col justify-between lg:col-span-5">
             <div>
-              <span className="text-xs font-semibold tracking-wide text-[#ff5e4d]">
+              <span className="text-primary text-xs font-semibold tracking-wide">
                 • Reason to choose us
               </span>
               <h2 className="mt-3 text-3xl leading-[1.18] font-semibold tracking-tight text-zinc-950 sm:text-4xl dark:text-white">
@@ -28,7 +28,7 @@ export function FeaturesSection() {
                 analyzing the numbers, and finding high-performing properties
                 for you.
               </p>
-              <Button className="mt-6 h-10 gap-1.5 rounded-full bg-zinc-950 px-6 text-xs font-semibold text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200">
+              <Button className="mt-6 h-10 gap-1.5 rounded-full px-6 text-xs font-semibold">
                 <span>Find the best for you</span>
                 <ChevronRight className="size-3.5" />
               </Button>
@@ -41,7 +41,7 @@ export function FeaturesSection() {
             <div className="flex flex-col justify-between rounded-3xl border border-zinc-100 bg-zinc-50/80 p-6 dark:border-zinc-800/80 dark:bg-zinc-900/60">
               {/* Mock AI Search Pill */}
               <div className="mb-8 flex items-center gap-2 rounded-full border border-zinc-200/80 bg-white px-4 py-2.5 shadow-2xs dark:border-zinc-800 dark:bg-zinc-950">
-                <Search className="size-3.5 text-zinc-400" />
+                <Search className="text-primary size-3.5" />
                 <span className="text-xs text-zinc-400">
                   Search with &quot;AI&quot;
                 </span>
@@ -59,7 +59,7 @@ export function FeaturesSection() {
 
             {/* Top-Right Card: 99% Trusted Investor */}
             <div className="flex flex-col justify-between rounded-3xl border border-zinc-100 bg-zinc-50/80 p-6 dark:border-zinc-800/80 dark:bg-zinc-900/60">
-              <div className="mb-8 flex size-11 items-center justify-center rounded-2xl bg-zinc-950 text-white shadow-sm dark:bg-white dark:text-zinc-950">
+              <div className="bg-primary text-primary-foreground mb-8 flex size-11 items-center justify-center rounded-2xl shadow-sm">
                 <ShieldCheck className="size-5" />
               </div>
 
@@ -89,14 +89,14 @@ export function FeaturesSection() {
               <div className="relative z-10 flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
                 {/* Left Content + Floating Price Pill */}
                 <div className="flex flex-col justify-between space-y-8 sm:max-w-[55%]">
-                  {/* Coral Price Marker & Dashed Trajectory */}
+                  {/* Primary Price Marker & Dashed Trajectory */}
                   <div className="relative flex items-center pt-2 pl-6">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-[#ff5e4d] px-2.5 py-1 text-[11px] font-bold text-white shadow-sm">
+                    <span className="bg-primary text-primary-foreground inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold shadow-sm">
                       <span className="size-1.5 rounded-full bg-white" />
                       $ 147
                     </span>
                     <svg
-                      className="ml-2 h-8 w-28 text-zinc-400 dark:text-zinc-600"
+                      className="text-primary/60 ml-2 h-8 w-28"
                       viewBox="0 0 120 32"
                       fill="none"
                     >
@@ -124,7 +124,7 @@ export function FeaturesSection() {
                 <div className="relative self-center sm:self-end">
                   {/* Back Tilted Card */}
                   <div className="absolute -top-2 -left-4 h-36 w-44 -rotate-6 rounded-2xl border border-zinc-200/70 bg-white/80 p-1.5 shadow-sm dark:border-zinc-700 dark:bg-zinc-800/80">
-                    <div className="size-full rounded-xl bg-emerald-900/20" />
+                    <div className="bg-primary/15 size-full rounded-xl" />
                   </div>
 
                   {/* Front Property Mini Card */}
@@ -141,8 +141,8 @@ export function FeaturesSection() {
                         Modern Architectural Mar...
                       </p>
                       <p className="mt-0.5 flex items-center gap-1 text-[10px] text-zinc-400">
-                        <MapPin className="size-2.5" />
-                        <span>Catonsville, MD</span>
+                        <MapPin className="text-primary size-2.5" />
+                        <span>Kuala Lumpur, Malaysia</span>
                       </p>
                     </div>
                   </div>
@@ -155,4 +155,3 @@ export function FeaturesSection() {
     </section>
   )
 }
-
