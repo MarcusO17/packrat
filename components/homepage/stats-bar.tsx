@@ -2,20 +2,20 @@ import * as React from "react"
 
 const stats = [
   {
-    value: "$1B+",
-    label: "TOTAL\nINVESTED",
+    value: "2.5M+",
+    label: "SQ.FT SPACE\nBOOKED",
   },
   {
     value: "20K+",
-    label: "HAPPY\nCUSTOMERS",
+    label: "ACTIVE\nRENTERS & SMES",
   },
   {
-    value: "150K+",
-    label: "PROPERTY\nLISTED",
+    value: "1,200+",
+    label: "LOCATIONS\nLISTED",
   },
   {
-    value: "8-12%",
-    label: "AVERAGE\nRETURN VALUE",
+    value: "0 Days",
+    label: "LEASE\nLOCK-IN",
   },
 ]
 
@@ -42,4 +42,3 @@ export function StatsBar() {
     </section>
   )
 }
-
