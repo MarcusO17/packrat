@@ -359,18 +359,18 @@ export function HeroSection() {
         </div>
       </div>
 
-      {/* Interactive OpenStreetMap Canvas Area */}
-      <div className="relative h-[470px] w-full sm:h-[510px]">
+      {/* Interactive OpenStreetMap Canvas Area (Pulled up with taller top gradient fade) */}
+      <div className="relative -mt-20 h-[550px] w-full pt-16 sm:-mt-24 sm:h-[590px] sm:pt-20">
         {/* OpenStreetMap iframe centered on Kuala Lumpur / Klang Valley, Malaysia */}
         <iframe
           title="OpenStreetMap Malaysia Real Estate Explorer"
           src="https://www.openstreetmap.org/export/embed.html?bbox=101.58%2C3.08%2C101.78%2C3.20&layer=mapnik"
-          className="pointer-events-none size-full border-0 opacity-75 grayscale contrast-95 filter dark:invert dark:hue-rotate-180 dark:opacity-40"
+          className="pointer-events-none absolute inset-0 size-full border-0 opacity-75 grayscale contrast-95 filter dark:invert dark:hue-rotate-180 dark:opacity-40"
           loading="lazy"
         />
 
-        {/* Soft Top & Side Radial/Linear Fade Overlays so map blends seamlessly */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-white via-white/75 to-transparent dark:from-zinc-950 dark:via-zinc-950/75" />
+        {/* Soft Top & Side Radial/Linear Fade Overlays so map blends higher behind the search bar */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-white via-white/80 to-transparent sm:h-56 dark:from-zinc-950 dark:via-zinc-950/80" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white/90 to-transparent dark:from-zinc-950/90" />
         <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-white/80 to-transparent dark:from-zinc-950/80" />
         <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-white/80 to-transparent dark:from-zinc-950/80" />
