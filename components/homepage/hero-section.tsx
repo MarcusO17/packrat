@@ -24,6 +24,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { CoordMap, type CoordMapMarker } from "@/components/renter/coord-map"
 
 const rotatingPhrases = [
   {
@@ -87,60 +88,61 @@ const suggestedLocations = [
   },
 ]
 
-const floatingMarkers = [
+// Real GPS coordinates on Penang Island & Mainland Seberang Perai
+const heroCoordMarkers: CoordMapMarker[] = [
   {
-    id: 1,
-    spaceId: "bayan-lepas-ftz-sme-bay",
-    top: "38%",
-    left: "14%",
+    id: "bayan-lepas-ftz-sme-bay",
+    lat: 5.3185,
+    lng: 100.287,
     image:
       "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=160&q=80",
-    label: "Bayan Lepas FTZ Bay • RM 28/day",
+    title: "Bayan Lepas FTZ Bay • RM 28/day",
+    href: "/spaces/bayan-lepas-ftz-sme-bay",
   },
   {
-    id: 2,
-    spaceId: "george-town-shoplot-hub",
-    top: "32%",
-    left: "29%",
+    id: "george-town-shoplot-hub",
+    lat: 5.4145,
+    lng: 100.3385,
     image:
       "https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=160&q=80",
-    label: "George Town Shoplot • RM 22/day",
+    title: "George Town Shoplot • RM 22/day",
+    href: "/spaces/george-town-shoplot-hub",
   },
   {
-    id: 3,
-    spaceId: "tanjung-tokong-spare-room",
-    top: "68%",
-    left: "21%",
+    id: "tanjung-tokong-spare-room",
+    lat: 5.4535,
+    lng: 100.3065,
     image:
       "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=160&q=80",
-    label: "Tanjung Tokong Room • RM 12/day",
+    title: "Tanjung Tokong Room • RM 12/day",
+    href: "/spaces/tanjung-tokong-spare-room",
   },
   {
-    id: 4,
-    spaceId: "kl-pj-commercial-bay",
-    top: "58%",
-    left: "32%",
+    id: "jelutong-sme-hub",
+    lat: 5.3895,
+    lng: 100.3145,
     image:
       "https://images.unsplash.com/photo-1565891741441-64926e441838?auto=format&fit=crop&w=160&q=80",
-    label: "PJ Section 13 Hub • RM 32/day",
+    title: "Jelutong SME Hub • RM 20/day",
+    href: "/spaces/jelutong-sme-hub",
   },
   {
-    id: 5,
-    spaceId: "butterworth-pallet-unit",
-    top: "36%",
-    left: "82%",
+    id: "butterworth-pallet-unit",
+    lat: 5.368,
+    lng: 100.402,
     image:
       "https://images.unsplash.com/photo-1580674285054-bed31e145f59?auto=format&fit=crop&w=160&q=80",
-    label: "Butterworth Pallet Unit • RM 18/day",
+    title: "Butterworth Pallet Unit • RM 18/day",
+    href: "/spaces/butterworth-pallet-unit",
   },
   {
-    id: 6,
-    spaceId: "bukit-mertajam-locker",
-    top: "66%",
-    left: "81%",
+    id: "bukit-mertajam-locker",
+    lat: 5.3522,
+    lng: 100.4468,
     image:
       "https://images.unsplash.com/photo-1590247813693-5541d1c609fd?auto=format&fit=crop&w=160&q=80",
-    label: "Bukit Mertajam Locker • RM 14/day",
+    title: "Bukit Mertajam Locker • RM 14/day",
+    href: "/spaces/bukit-mertajam-locker",
   },
 ]
 
@@ -379,141 +381,121 @@ export function HeroSection() {
         </div>
       </div>
 
-      {/* Interactive OpenStreetMap Canvas Area (Pulled up with taller top gradient fade) */}
+      {/* Coordinate-Projected OpenStreetMap Canvas Area */}
       <div className="relative -mt-20 h-[550px] w-full pt-16 sm:-mt-24 sm:h-[590px] sm:pt-20">
-        {/* OpenStreetMap iframe centered on Penang (George Town & Seberang Perai), Malaysia */}
-        <iframe
-          title="OpenStreetMap Penang Storage Hub Explorer"
-          src="https://www.openstreetmap.org/export/embed.html?bbox=100.25%2C5.32%2C100.43%2C5.45&layer=mapnik"
-          className="pointer-events-none absolute inset-0 size-full border-0 opacity-75 grayscale contrast-95 filter dark:invert dark:hue-rotate-180 dark:opacity-40"
-          loading="lazy"
-        />
-
-        {/* Soft Top & Side Radial/Linear Fade Overlays matching #f9fafb / #0c0d0e */}
-        <div className="from-background via-background/80 pointer-events-none absolute inset-x-0 top-0 h-48 bg-gradient-to-b to-transparent sm:h-56" />
-        <div className="from-background/90 pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t to-transparent" />
-        <div className="from-background/80 pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r to-transparent" />
-        <div className="from-background/80 pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l to-transparent" />
-
-        {/* Subtle Attribution Pill */}
-        <a
-          href="https://www.openstreetmap.org"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="absolute right-3 bottom-2 z-20 rounded bg-white/80 px-2 py-0.5 text-[10px] text-zinc-500 backdrop-blur-xs hover:text-zinc-800 dark:bg-zinc-900/80 dark:text-zinc-400"
+        <CoordMap
+          centerLat={5.388}
+          centerLng={100.36}
+          zoom={12}
+          markers={heroCoordMarkers}
+          markerStyle="photo-pin"
+          showControls={false}
+          className="absolute inset-0 size-full"
         >
-          © OpenStreetMap
-        </a>
+          {/* Soft Top & Side Radial/Linear Fade Overlays matching #f9fafb / #0c0d0e */}
+          <div className="from-background via-background/80 pointer-events-none absolute inset-x-0 top-0 z-20 h-48 bg-gradient-to-b to-transparent sm:h-56" />
+          <div className="from-background/90 pointer-events-none absolute inset-x-0 bottom-0 z-20 h-16 bg-gradient-to-t to-transparent" />
+          <div className="from-background/80 pointer-events-none absolute inset-y-0 left-0 z-20 w-16 bg-gradient-to-r to-transparent" />
+          <div className="from-background/80 pointer-events-none absolute inset-y-0 right-0 z-20 w-16 bg-gradient-to-l to-transparent" />
 
-        {/* Circular Storage Hub Thumbnail Markers on Map */}
-        {floatingMarkers.map((marker) => (
-          <Link
-            key={marker.id}
-            href={`/spaces/${marker.spaceId}`}
-            style={{ top: marker.top, left: marker.left }}
-            className="group absolute z-20 hidden -translate-x-1/2 -translate-y-1/2 cursor-pointer md:block"
+          {/* Center Featured Storage Hub Card Overlay */}
+          <div
+            data-map-interactive="true"
+            className="absolute top-1/2 left-1/2 z-30 w-[300px] -translate-x-1/2 -translate-y-[44%] sm:w-[320px]"
           >
-            <div className="relative size-11 overflow-hidden rounded-full border-2 border-white bg-zinc-100 shadow-md transition-transform duration-200 group-hover:scale-110 dark:border-zinc-800">
-              <img
-                src={marker.image}
-                alt={marker.label}
-                className="size-full object-cover"
-              />
-            </div>
-            <span className="pointer-events-none absolute -bottom-1 left-1/2 size-2 -translate-x-1/2 rotate-45 bg-white shadow-xs dark:bg-zinc-800" />
-            <div className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 rounded-full bg-zinc-900/90 px-2.5 py-0.5 text-[10px] font-medium whitespace-nowrap text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100">
-              {marker.label}
-            </div>
-          </Link>
-        ))}
-
-        {/* Center Featured Storage Hub Card Overlay */}
-        <div className="absolute top-1/2 left-1/2 z-20 w-[300px] -translate-x-1/2 -translate-y-[54%] sm:w-[320px]">
-          <div className="rounded-3xl border border-zinc-200/80 bg-white p-3 shadow-[0_20px_50px_rgba(0,0,0,0.12)] dark:border-zinc-800 dark:bg-zinc-900">
-            {/* Storage Hub Image */}
-            <Link
-              href="/spaces/bayan-lepas-ftz-sme-bay"
-              className="relative block h-40 w-full overflow-hidden rounded-2xl bg-zinc-100"
-            >
-              <img
-                src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=700&q=80"
-                alt="Climate-Controlled SME Warehouse Bay"
-                className="size-full object-cover transition-transform duration-300 hover:scale-105"
-              />
-              <Badge className="bg-primary text-primary-foreground hover:bg-primary/90 absolute top-2.5 right-2.5 rounded-full border-0 px-2.5 py-0.5 text-[11px] font-semibold shadow-xs">
-                Instant Book
-              </Badge>
-
-              {/* Carousel Dots */}
-              <div className="absolute bottom-2.5 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full bg-black/35 px-2 py-1 backdrop-blur-xs">
-                <span className="bg-primary h-1 w-3 rounded-full" />
-                <span className="size-1 rounded-full bg-white/60" />
-                <span className="size-1 rounded-full bg-white/60" />
-                <span className="size-1 rounded-full bg-white/60" />
-              </div>
-            </Link>
-
-            {/* Card Details */}
-            <div className="mt-3 px-1">
+            <div className="rounded-3xl border border-zinc-200/80 bg-white p-3 shadow-[0_20px_50px_rgba(0,0,0,0.12)] dark:border-zinc-800 dark:bg-zinc-900">
+              {/* Storage Hub Image */}
               <Link
                 href="/spaces/bayan-lepas-ftz-sme-bay"
-                className="text-sm font-bold text-zinc-950 hover:underline dark:text-white"
+                className="relative block h-40 w-full overflow-hidden rounded-2xl bg-zinc-100"
               >
-                Climate-Controlled SME Bay
+                <img
+                  src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=700&q=80"
+                  alt="Climate-Controlled SME Warehouse Bay"
+                  className="size-full object-cover transition-transform duration-300 hover:scale-105"
+                />
+                <Badge className="bg-primary text-primary-foreground hover:bg-primary/90 absolute top-2.5 right-2.5 rounded-full border-0 px-2.5 py-0.5 text-[11px] font-semibold shadow-xs">
+                  Instant Book
+                </Badge>
+
+                {/* Carousel Dots */}
+                <div className="absolute bottom-2.5 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full bg-black/35 px-2 py-1 backdrop-blur-xs">
+                  <span className="bg-primary h-1 w-3 rounded-full" />
+                  <span className="size-1 rounded-full bg-white/60" />
+                  <span className="size-1 rounded-full bg-white/60" />
+                  <span className="size-1 rounded-full bg-white/60" />
+                </div>
               </Link>
-              <p className="mt-1 flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400">
-                <MapPin className="size-3.5 text-lime-600 dark:text-lime-400" />
-                <span>Bayan Lepas, Penang</span>
-              </p>
 
-              {/* Storage Specs Row */}
-              <div className="mt-2.5 flex items-center gap-3 border-b border-zinc-100 pb-3 text-[11px] text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
-                <span className="inline-flex items-center gap-1">
-                  <Maximize2 className="size-3 text-zinc-400" />
-                  350 sq.ft
-                </span>
-                <span className="inline-flex items-center gap-1">
-                  <Truck className="size-3 text-zinc-400" />
-                  Loading Bay
-                </span>
-                <span className="inline-flex items-center gap-1">
-                  <ShieldCheck className="size-3 text-zinc-400" />
-                  24/7 Access
-                </span>
-              </div>
-
-              {/* Price & CTA Row */}
-              <div className="mt-3 flex items-center justify-between">
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-sm font-bold text-zinc-950 dark:text-white">
-                    RM 28 / day
+              {/* Card Details */}
+              <div className="mt-3 px-1">
+                <Link
+                  href="/spaces/bayan-lepas-ftz-sme-bay"
+                  className="text-sm font-bold text-zinc-950 hover:underline dark:text-white"
+                >
+                  Climate-Controlled SME Bay
+                </Link>
+                <p className="mt-1 flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
+                  <span className="inline-flex items-center gap-1">
+                    <MapPin className="size-3.5 text-lime-600 dark:text-lime-400" />
+                    <span>Bayan Lepas, Penang</span>
                   </span>
-                  <span className="text-[11px] font-semibold text-lime-700 dark:text-lime-400">
-                    (0 Lock-in)
+                  <span className="font-mono text-[10px] text-zinc-400">
+                    5.3185°N, 100.2870°E
+                  </span>
+                </p>
+
+                {/* Storage Specs Row */}
+                <div className="mt-2.5 flex items-center gap-3 border-b border-zinc-100 pb-3 text-[11px] text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
+                  <span className="inline-flex items-center gap-1">
+                    <Maximize2 className="size-3 text-zinc-400" />
+                    350 sq.ft
+                  </span>
+                  <span className="inline-flex items-center gap-1">
+                    <Truck className="size-3 text-zinc-400" />
+                    Loading Bay
+                  </span>
+                  <span className="inline-flex items-center gap-1">
+                    <ShieldCheck className="size-3 text-zinc-400" />
+                    24/7 Access
                   </span>
                 </div>
-                <Button
-                  size="sm"
-                  asChild
-                  className="h-7 rounded-full px-3 text-[11px] font-semibold"
-                >
-                  <Link href="/spaces/bayan-lepas-ftz-sme-bay">Book Space</Link>
-                </Button>
+
+                {/* Price & CTA Row */}
+                <div className="mt-3 flex items-center justify-between">
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-sm font-bold text-zinc-950 dark:text-white">
+                      RM 28 / day
+                    </span>
+                    <span className="text-[11px] font-semibold text-lime-700 dark:text-lime-400">
+                      (0 Lock-in)
+                    </span>
+                  </div>
+                  <Button
+                    size="sm"
+                    asChild
+                    className="h-7 rounded-full px-3 text-[11px] font-semibold"
+                  >
+                    <Link href="/spaces/bayan-lepas-ftz-sme-bay">
+                      Book Space
+                    </Link>
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Map Cluster Pin Indicator ("20") below card */}
-          <Link
-            href="/explore"
-            className="mt-3 flex flex-col items-center transition-transform hover:scale-105"
-          >
-            <div className="bg-primary text-primary-foreground flex size-10 items-center justify-center rounded-full border-2 border-white text-xs font-bold shadow-lg dark:border-zinc-800">
-              20
-            </div>
-            <div className="bg-primary/60 h-2 w-0.5" />
-          </Link>
-        </div>
+            {/* Map Cluster Pin Indicator ("20") below card */}
+            <Link
+              href="/explore"
+              className="mt-3 flex flex-col items-center transition-transform hover:scale-105"
+            >
+              <div className="bg-primary text-primary-foreground flex size-10 items-center justify-center rounded-full border-2 border-white text-xs font-bold shadow-lg dark:border-zinc-800">
+                20
+              </div>
+              <div className="bg-primary/60 h-2 w-0.5" />
+            </Link>
+          </div>
+        </CoordMap>
       </div>
     </section>
   )

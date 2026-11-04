@@ -4,7 +4,6 @@ import * as React from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import {
-  Box,
   Check,
   ChevronRight,
   Columns2,
@@ -21,7 +20,6 @@ import {
   Sparkles,
   Star,
   Truck,
-  Warehouse,
   X,
   Zap,
 } from "lucide-react"
@@ -30,6 +28,7 @@ import { cn } from "@/lib/utils"
 import {
   AMENITY_FILTERS,
   REGIONS,
+  REGION_VIEWPORTS,
   SPACE_CATEGORIES,
   STORAGE_SPACES,
   calculateDailyRateForSqFt,
@@ -53,6 +52,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { SpaceEstimatorSheet } from "@/components/renter/space-estimator-modal"
+import { CoordMap } from "@/components/renter/coord-map"
 
 export function ExploreSpaces() {
   const searchParams = useSearchParams()
@@ -91,6 +91,21 @@ export function ExploreSpaces() {
   const [estimatorOpen, setEstimatorOpen] =
     React.useState<boolean>(initialEstimatorOpen)
 
+  // Map camera state driven by region selection or active listing selection
+  const initialViewport =
+    REGION_VIEWPORTS[selectedRegion] || REGION_VIEWPORTS["All Locations"]
+  const [mapCenter, setMapCenter] = React.useState<{
+    lat: number
+    lng: number
+    zoom: number
+  }>(initialViewport)
+
+  const handleRegionChange = (region: string) => {
+    setSelectedRegion(region)
+    const vp = REGION_VIEWPORTS[region] || REGION_VIEWPORTS["All Locations"]
+    setMapCenter(vp)
+  }
+
   const toggleAmenity = (amenity: string) => {
     setSelectedAmenities((prev) =>
       prev.includes(amenity)
@@ -116,6 +131,7 @@ export function ExploreSpaces() {
     setInstantBookOnly(false)
     setSelectedAmenities([])
     setSortBy("recommended")
+    setMapCenter(REGION_VIEWPORTS["All Locations"])
   }
 
   const filteredSpaces = React.useMemo(() => {
@@ -184,6 +200,38 @@ export function ExploreSpaces() {
     filteredSpaces[0] ||
     STORAGE_SPACES[0]
 
+  const selectAndFocusSpace = (space: StorageSpace) => {
+    setActiveSpaceId(space.id)
+    setMapCenter((prev) => ({
+      lat: space.mapCoords.lat,
+      lng: space.mapCoords.lng,
+      zoom: Math.max(prev.zoom, 13),
+    }))
+  }
+
+  const mapMarkers = React.useMemo(
+    () =>
+      filteredSpaces.map((space) => {
+        const displayPrice =
+          requiredSqFt > 0
+            ? calculateDailyRateForSqFt(
+                space,
+                Math.max(space.minSqFt, requiredSqFt)
+              )
+            : space.pricePerDay
+        return {
+          id: space.id,
+          lat: space.mapCoords.lat,
+          lng: space.mapCoords.lng,
+          priceLabel: `RM ${displayPrice}/d`,
+          title: space.title,
+          subtitle: space.location,
+          image: space.images[0],
+        }
+      }),
+    [filteredSpaces, requiredSqFt]
+  )
+
   const activeFilterCount =
     (selectedRegion !== "All Locations" ? 1 : 0) +
     (selectedCategory !== "all" ? 1 : 0) +
@@ -222,7 +270,7 @@ export function ExploreSpaces() {
               </div>
 
               {/* Region Select */}
-              <Select value={selectedRegion} onValueChange={setSelectedRegion}>
+              <Select value={selectedRegion} onValueChange={handleRegionChange}>
                 <SelectTrigger
                   size="sm"
                   className="h-9 rounded-full border-zinc-200/90 bg-white px-3.5 text-xs font-semibold shadow-2xs dark:border-zinc-800 dark:bg-zinc-900"
@@ -544,8 +592,8 @@ export function ExploreSpaces() {
                     {filteredSpaces.length === 1 ? "hub" : "hubs"} available
                   </h1>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                    Pay-per-day rates in MYR • Zero lease lock-in • Up to RM
-                    50,000 inventory protection
+                    Pay-per-day rates in MYR • Zero lease lock-in • Click any
+                    card to locate on map
                   </p>
                 </div>
 
@@ -610,10 +658,9 @@ export function ExploreSpaces() {
                     return (
                       <div
                         key={space.id}
-                        onMouseEnter={() => setActiveSpaceId(space.id)}
-                        onClick={() => setActiveSpaceId(space.id)}
+                        onClick={() => selectAndFocusSpace(space)}
                         className={cn(
-                          "group relative flex flex-col justify-between overflow-hidden rounded-3xl border bg-white p-3 transition-all duration-200 dark:bg-zinc-900",
+                          "group relative flex cursor-pointer flex-col justify-between overflow-hidden rounded-3xl border bg-white p-3 transition-all duration-200 dark:bg-zinc-900",
                           isSelected
                             ? "border-primary ring-primary/30 shadow-[0_14px_40px_rgba(132,204,22,0.12)] ring-2"
                             : "border-zinc-200/80 shadow-2xs hover:border-zinc-300 hover:shadow-md dark:border-zinc-800"
@@ -689,9 +736,16 @@ export function ExploreSpaces() {
                               </span>
                             </div>
 
-                            <p className="mt-0.5 flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400">
-                              <MapPin className="size-3.5 shrink-0 text-lime-600 dark:text-lime-400" />
-                              <span className="truncate">{space.location}</span>
+                            <p className="mt-0.5 flex items-center justify-between gap-1 text-xs text-zinc-500 dark:text-zinc-400">
+                              <span className="inline-flex items-center gap-1 truncate">
+                                <MapPin className="size-3.5 shrink-0 text-lime-600 dark:text-lime-400" />
+                                <span className="truncate">
+                                  {space.location}
+                                </span>
+                              </span>
+                              <span className="font-mono text-[10px] text-zinc-400">
+                                {space.mapCoords.latLabel}
+                              </span>
                             </p>
 
                             {/* Key Specs Row */}
@@ -763,7 +817,7 @@ export function ExploreSpaces() {
             </div>
           )}
 
-          {/* Right / Sticky Interactive Map Column */}
+          {/* Right / Sticky Coordinate-Accurate Map Column */}
           {viewMode !== "grid" && (
             <div
               className={cn(
@@ -773,126 +827,105 @@ export function ExploreSpaces() {
               )}
             >
               <div className="sticky top-42 h-[580px] w-full overflow-hidden rounded-3xl border border-zinc-200/80 bg-zinc-100 shadow-sm lg:h-[calc(100vh-12rem)] dark:border-zinc-800 dark:bg-zinc-900">
-                {/* OpenStreetMap Base Layer */}
-                <iframe
-                  title="Packrat Malaysia Storage Hub Map"
-                  src="https://www.openstreetmap.org/export/embed.html?bbox=100.25%2C5.30%2C100.46%2C5.46&layer=mapnik"
-                  className="pointer-events-none absolute inset-0 size-full border-0 opacity-80 grayscale contrast-95 filter dark:invert dark:hue-rotate-180 dark:opacity-45"
-                  loading="lazy"
-                />
-
-                {/* Top Map Overlay Header */}
-                <div className="absolute inset-x-3 top-3 z-20 flex items-center justify-between gap-2">
-                  <div className="inline-flex items-center gap-2 rounded-full border border-zinc-200/80 bg-white/95 px-3 py-1.5 text-xs font-semibold text-zinc-900 shadow-sm backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-900/95 dark:text-white">
-                    <span className="bg-primary size-2 rounded-full" />
-                    <span>
-                      {selectedRegion === "All Locations"
-                        ? "Penang & Malaysia Hubs"
-                        : selectedRegion}
-                    </span>
+                <CoordMap
+                  centerLat={mapCenter.lat}
+                  centerLng={mapCenter.lng}
+                  zoom={mapCenter.zoom}
+                  markers={mapMarkers}
+                  activeMarkerId={activeSpace?.id}
+                  onSelectMarker={(id) => {
+                    const found = STORAGE_SPACES.find((s) => s.id === id)
+                    if (found) selectAndFocusSpace(found)
+                  }}
+                >
+                  {/* Top Map Corridor Switcher Overlay */}
+                  <div
+                    data-map-interactive="true"
+                    className="absolute inset-x-3 top-3 z-30 flex flex-wrap items-center justify-between gap-2"
+                  >
+                    <div className="flex flex-wrap items-center gap-1 rounded-full border border-zinc-200/80 bg-white/95 p-1 shadow-sm backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-900/95">
+                      {[
+                        {
+                          label: "Penang",
+                          vp: { lat: 5.388, lng: 100.355, zoom: 12 },
+                        },
+                        {
+                          label: "KL & PJ",
+                          vp: { lat: 3.1129, lng: 101.6398, zoom: 13 },
+                        },
+                        {
+                          label: "Shah Alam",
+                          vp: { lat: 3.0548, lng: 101.5492, zoom: 13 },
+                        },
+                        {
+                          label: "Johor Bahru",
+                          vp: { lat: 1.5521, lng: 103.7815, zoom: 13 },
+                        },
+                      ].map((corridor) => (
+                        <button
+                          key={corridor.label}
+                          type="button"
+                          onClick={() => setMapCenter(corridor.vp)}
+                          className="rounded-full px-2.5 py-1 text-[11px] font-semibold text-zinc-700 transition-colors hover:bg-lime-500/20 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white"
+                        >
+                          {corridor.label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
 
-                  <span className="rounded-full bg-zinc-950/80 px-2.5 py-1 text-[10px] font-medium text-white backdrop-blur-xs">
-                    Click a pin to preview
-                  </span>
-                </div>
-
-                {/* Interactive Price Pins on Map */}
-                {filteredSpaces.map((space) => {
-                  const isSelected = activeSpace.id === space.id
-                  const displayPrice =
-                    requiredSqFt > 0
-                      ? calculateDailyRateForSqFt(
-                          space,
-                          Math.max(space.minSqFt, requiredSqFt)
-                        )
-                      : space.pricePerDay
-
-                  return (
-                    <button
-                      key={space.id}
-                      type="button"
-                      onClick={() => setActiveSpaceId(space.id)}
-                      style={{
-                        top: space.mapCoords.top,
-                        left: space.mapCoords.left,
-                      }}
-                      className={cn(
-                        "group absolute z-20 -translate-x-1/2 -translate-y-1/2 transition-all duration-200",
-                        isSelected ? "z-30 scale-110" : "hover:scale-105"
-                      )}
+                  {/* Bottom Active Hub Floating Preview Card */}
+                  {activeSpace && (
+                    <div
+                      data-map-interactive="true"
+                      className="absolute inset-x-3 bottom-8 z-30"
                     >
-                      <div
-                        className={cn(
-                          "flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-bold shadow-md transition-colors",
-                          isSelected
-                            ? "border-zinc-950 bg-primary text-primary-foreground ring-4 ring-lime-400/40"
-                            : "border-zinc-200 bg-white text-zinc-950 hover:bg-zinc-950 hover:text-white dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
-                        )}
-                      >
-                        <Warehouse className="size-3" />
-                        <span>RM {displayPrice}/d</span>
-                      </div>
-                      <span
-                        className={cn(
-                          "mx-auto block size-2 -translate-y-1 rotate-45",
-                          isSelected
-                            ? "bg-primary"
-                            : "bg-white dark:bg-zinc-900"
-                        )}
-                      />
-                    </button>
-                  )
-                })}
-
-                {/* Bottom Active Hub Floating Preview Card */}
-                {activeSpace && (
-                  <div className="absolute inset-x-3 bottom-3 z-30">
-                    <div className="flex flex-col gap-3 rounded-3xl border border-zinc-200/90 bg-white/95 p-3.5 shadow-[0_20px_50px_rgba(0,0,0,0.18)] backdrop-blur-md sm:flex-row sm:items-center dark:border-zinc-800 dark:bg-zinc-900/95">
-                      <img
-                        src={activeSpace.images[0]}
-                        alt={activeSpace.title}
-                        className="h-24 w-full shrink-0 rounded-2xl object-cover sm:w-28"
-                      />
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1.5">
-                          <Badge className="bg-primary text-primary-foreground rounded-full border-0 px-2 py-0 text-[10px] font-bold">
-                            {activeSpace.categoryLabel}
-                          </Badge>
-                          <span className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400">
-                            {activeSpace.mapCoords.lat},{" "}
-                            {activeSpace.mapCoords.lng}
-                          </span>
-                        </div>
-                        <h3 className="mt-1 truncate text-sm font-bold text-zinc-950 dark:text-white">
-                          {activeSpace.title}
-                        </h3>
-                        <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
-                          {activeSpace.address}
-                        </p>
-                        <div className="mt-2 flex items-center justify-between">
-                          <div className="flex items-baseline gap-1">
-                            <span className="text-sm font-bold text-zinc-950 dark:text-white">
-                              RM {activeSpace.pricePerDay} / day
-                            </span>
-                            <span className="text-[11px] font-medium text-lime-700 dark:text-lime-400">
-                              • {activeSpace.availableSqFt} sq.ft open
+                      <div className="flex flex-col gap-3 rounded-3xl border border-zinc-200/90 bg-white/95 p-3.5 shadow-[0_20px_50px_rgba(0,0,0,0.18)] backdrop-blur-md sm:flex-row sm:items-center dark:border-zinc-800 dark:bg-zinc-900/95">
+                        <img
+                          src={activeSpace.images[0]}
+                          alt={activeSpace.title}
+                          className="h-24 w-full shrink-0 rounded-2xl object-cover sm:w-28"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1.5">
+                            <Badge className="bg-primary text-primary-foreground rounded-full border-0 px-2 py-0 text-[10px] font-bold">
+                              {activeSpace.categoryLabel}
+                            </Badge>
+                            <span className="font-mono text-[10px] font-semibold text-zinc-500 dark:text-zinc-400">
+                              {activeSpace.mapCoords.latLabel},{" "}
+                              {activeSpace.mapCoords.lngLabel}
                             </span>
                           </div>
-                          <Button
-                            size="sm"
-                            asChild
-                            className="h-7 rounded-full px-3 text-[11px] font-semibold"
-                          >
-                            <Link href={`/spaces/${activeSpace.id}`}>
-                              Inspect Hub
-                            </Link>
-                          </Button>
+                          <h3 className="mt-1 truncate text-sm font-bold text-zinc-950 dark:text-white">
+                            {activeSpace.title}
+                          </h3>
+                          <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
+                            {activeSpace.address}
+                          </p>
+                          <div className="mt-2 flex items-center justify-between">
+                            <div className="flex items-baseline gap-1">
+                              <span className="text-sm font-bold text-zinc-950 dark:text-white">
+                                RM {activeSpace.pricePerDay} / day
+                              </span>
+                              <span className="text-[11px] font-medium text-lime-700 dark:text-lime-400">
+                                • {activeSpace.availableSqFt} sq.ft open
+                              </span>
+                            </div>
+                            <Button
+                              size="sm"
+                              asChild
+                              className="h-7 rounded-full px-3 text-[11px] font-semibold"
+                            >
+                              <Link href={`/spaces/${activeSpace.id}`}>
+                                Inspect Hub
+                              </Link>
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </CoordMap>
               </div>
             </div>
           )}

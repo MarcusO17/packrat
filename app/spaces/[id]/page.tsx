@@ -16,6 +16,7 @@ export async function generateMetadata({
 }: {
   params: Promise<{ id: string }>
 }): Promise<Metadata> {
+  "use cache"
   const { id } = await params
   const space = getSpaceById(id)
   if (!space) {
@@ -27,7 +28,7 @@ export async function generateMetadata({
   }
 }
 
-export default async function SpaceDetailPage({
+async function SpaceDetailLoader({
   params,
 }: {
   params: Promise<{ id: string }>
@@ -39,6 +40,14 @@ export default async function SpaceDetailPage({
     notFound()
   }
 
+  return <SpaceDetail space={space} />
+}
+
+export default function SpaceDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
   return (
     <React.Suspense
       fallback={
@@ -47,8 +56,7 @@ export default async function SpaceDetailPage({
         </div>
       }
     >
-      <SpaceDetail space={space} />
+      <SpaceDetailLoader params={params} />
     </React.Suspense>
   )
 }
-

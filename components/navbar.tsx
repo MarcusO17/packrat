@@ -25,8 +25,75 @@ const navLinks = [
   { title: "My Bookings", href: "/dashboard" },
 ]
 
-export function Navbar() {
+function DesktopNavLinks() {
   const pathname = usePathname()
+
+  return (
+    <nav className="hidden h-full items-center gap-8 md:flex">
+      {navLinks.map((link) => {
+        const baseHref = link.href.split("?")[0]
+        const isActive =
+          link.href === "/"
+            ? pathname === "/"
+            : link.href.includes("estimator")
+              ? false
+              : pathname.startsWith(baseHref)
+        return (
+          <Link
+            key={link.title}
+            href={link.href}
+            className={cn(
+              "relative flex h-full items-center text-sm font-medium transition-colors",
+              isActive
+                ? "text-zinc-950 dark:text-white"
+                : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+            )}
+          >
+            {link.title}
+            {isActive && (
+              <span className="bg-primary absolute inset-x-0 bottom-0 h-0.5 rounded-full" />
+            )}
+          </Link>
+        )
+      })}
+    </nav>
+  )
+}
+
+function MobileNavLinks({ onSelect }: { onSelect: () => void }) {
+  const pathname = usePathname()
+
+  return (
+    <>
+      {navLinks.map((link) => {
+        const baseHref = link.href.split("?")[0]
+        const isActive =
+          link.href === "/"
+            ? pathname === "/"
+            : link.href.includes("estimator")
+              ? false
+              : pathname.startsWith(baseHref)
+        return (
+          <Link
+            key={link.title}
+            href={link.href}
+            onClick={onSelect}
+            className={cn(
+              "rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+              isActive
+                ? "bg-primary/15 text-zinc-950 font-semibold dark:text-lime-400"
+                : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
+            )}
+          >
+            {link.title}
+          </Link>
+        )
+      })}
+    </>
+  )
+}
+
+export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false)
 
   return (
@@ -48,35 +115,24 @@ export function Navbar() {
           <span className="text-lg font-bold tracking-tight">Packrat</span>
         </Link>
 
-        {/* Center: Navigation Links */}
-        <nav className="hidden h-full items-center gap-8 md:flex">
-          {navLinks.map((link) => {
-            const baseHref = link.href.split("?")[0]
-            const isActive =
-              link.href === "/"
-                ? pathname === "/"
-                : link.href.includes("estimator")
-                  ? false
-                  : pathname.startsWith(baseHref)
-            return (
-              <Link
-                key={link.title}
-                href={link.href}
-                className={cn(
-                  "relative flex h-full items-center text-sm font-medium transition-colors",
-                  isActive
-                    ? "text-zinc-950 dark:text-white"
-                    : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
-                )}
-              >
-                {link.title}
-                {isActive && (
-                  <span className="bg-primary absolute inset-x-0 bottom-0 h-0.5 rounded-full" />
-                )}
-              </Link>
-            )
-          })}
-        </nav>
+        {/* Center: Navigation Links wrapped in Suspense for Cache Components */}
+        <React.Suspense
+          fallback={
+            <nav className="hidden h-full items-center gap-8 md:flex">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.title}
+                  href={link.href}
+                  className="relative flex h-full items-center text-sm font-medium text-zinc-500 transition-colors"
+                >
+                  {link.title}
+                </Link>
+              ))}
+            </nav>
+          }
+        >
+          <DesktopNavLinks />
+        </React.Suspense>
 
         {/* Right: Theme Toggle, Renter Actions & Mobile Trigger */}
         <div className="flex items-center gap-2.5">
@@ -131,30 +187,9 @@ export function Navbar() {
                 </SheetTitle>
               </SheetHeader>
               <nav className="mt-6 flex flex-col gap-1 px-2">
-                {navLinks.map((link) => {
-                  const baseHref = link.href.split("?")[0]
-                  const isActive =
-                    link.href === "/"
-                      ? pathname === "/"
-                      : link.href.includes("estimator")
-                        ? false
-                        : pathname.startsWith(baseHref)
-                  return (
-                    <Link
-                      key={link.title}
-                      href={link.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={cn(
-                        "rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                        isActive
-                          ? "bg-primary/15 text-zinc-950 font-semibold dark:text-lime-400"
-                          : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
-                      )}
-                    >
-                      {link.title}
-                    </Link>
-                  )
-                })}
+                <React.Suspense fallback={null}>
+                  <MobileNavLinks onSelect={() => setMobileMenuOpen(false)} />
+                </React.Suspense>
                 <div className="mt-4 flex flex-col gap-2 pt-2">
                   <Button
                     variant="outline"

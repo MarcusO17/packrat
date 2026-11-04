@@ -43,6 +43,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { SpaceEstimatorContent } from "@/components/renter/space-estimator-modal"
+import { CoordMap } from "@/components/renter/coord-map"
 
 const DURATION_PRESETS = [
   { days: 7, label: "7 Days", discount: 0 },
@@ -239,6 +240,9 @@ export function SpaceDetail({ space }: { space: StorageSpace }) {
                   <MapPin className="size-4 text-lime-600 dark:text-lime-400" />
                   {space.address}
                 </span>
+                <span className="rounded-full bg-zinc-100 px-2.5 py-0.5 font-mono text-[11px] text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
+                  {space.mapCoords.latLabel}, {space.mapCoords.lngLabel}
+                </span>
               </div>
             </div>
 
@@ -372,6 +376,35 @@ export function SpaceDetail({ space }: { space: StorageSpace }) {
                 <p className="mt-1 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">
                   {space.accessInstructions}
                 </p>
+              </div>
+
+              {/* Exact GPS Coordinate Map Preview */}
+              <div className="pt-2">
+                <div className="mb-2.5 flex items-center justify-between">
+                  <span className="text-xs font-bold text-zinc-900 dark:text-white">
+                    Exact Hub Coordinates & Loading Access
+                  </span>
+                  <span className="font-mono text-[11px] text-lime-700 dark:text-lime-400">
+                    {space.mapCoords.latLabel}, {space.mapCoords.lngLabel}
+                  </span>
+                </div>
+                <div className="h-60 w-full overflow-hidden rounded-3xl border border-zinc-200/80 dark:border-zinc-800">
+                  <CoordMap
+                    centerLat={space.mapCoords.lat}
+                    centerLng={space.mapCoords.lng}
+                    zoom={14}
+                    markers={[
+                      {
+                        id: space.id,
+                        lat: space.mapCoords.lat,
+                        lng: space.mapCoords.lng,
+                        priceLabel: `RM ${space.pricePerDay}/d`,
+                        title: space.title,
+                      },
+                    ]}
+                    activeMarkerId={space.id}
+                  />
+                </div>
               </div>
             </div>
 

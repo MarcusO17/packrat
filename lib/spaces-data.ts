@@ -36,10 +36,10 @@ export interface StorageSpace {
   featured?: boolean
   images: string[]
   mapCoords: {
-    top: string
-    left: string
-    lat: string
-    lng: string
+    lat: number
+    lng: number
+    latLabel: string
+    lngLabel: string
   }
   specs: {
     ceilingHeight: string
@@ -101,6 +101,19 @@ export const REGIONS = [
   "Shah Alam, Selangor",
   "Johor Bahru, Johor",
 ] as const
+
+export const REGION_VIEWPORTS: Record<
+  string,
+  { lat: number; lng: number; zoom: number }
+> = {
+  "All Locations": { lat: 5.388, lng: 100.355, zoom: 12 },
+  "George Town, Penang": { lat: 5.416, lng: 100.325, zoom: 13 },
+  "Bayan Lepas, Penang": { lat: 5.3185, lng: 100.287, zoom: 14 },
+  "Butterworth & Bukit Mertajam": { lat: 5.36, lng: 100.424, zoom: 13 },
+  "Kuala Lumpur & PJ": { lat: 3.1129, lng: 101.6398, zoom: 13 },
+  "Shah Alam, Selangor": { lat: 3.0548, lng: 101.5492, zoom: 13 },
+  "Johor Bahru, Johor": { lat: 1.5521, lng: 103.7815, zoom: 13 },
+}
 
 export const SPACE_CATEGORIES: {
   id: "all" | SpaceCategory
@@ -239,7 +252,8 @@ export const STORAGE_SPACES: StorageSpace[] = [
     categoryLabel: "SME Pallet Bay",
     location: "Bayan Lepas, Penang",
     region: "Bayan Lepas, Penang",
-    address: "Halaman Kampung Jawa, Bayan Lepas Free Industrial Zone, 11900 Penang",
+    address:
+      "Halaman Kampung Jawa, Bayan Lepas Free Industrial Zone, 11900 Penang",
     pricePerDay: 28,
     pricePerSqFtPerDay: 0.08,
     minSqFt: 100,
@@ -261,10 +275,10 @@ export const STORAGE_SPACES: StorageSpace[] = [
       "https://images.unsplash.com/photo-1580674285054-bed31e145f59?auto=format&fit=crop&w=900&q=80",
     ],
     mapCoords: {
-      top: "64%",
-      left: "34%",
-      lat: "5.3248° N",
-      lng: "100.2894° E",
+      lat: 5.3185,
+      lng: 100.287,
+      latLabel: "5.3185° N",
+      lngLabel: "100.2870° E",
     },
     specs: {
       ceilingHeight: "7.5m Clear Height",
@@ -339,7 +353,8 @@ export const STORAGE_SPACES: StorageSpace[] = [
   {
     id: "george-town-shoplot-hub",
     title: "George Town Heritage Shoplot Micro-Hub",
-    subtitle: "Ground-floor commercial backroom off Beach Street with wide back-lane loading",
+    subtitle:
+      "Ground-floor commercial backroom off Beach Street with wide back-lane loading",
     category: "shoplot",
     categoryLabel: "Shoplot Micro-Hub",
     location: "George Town, Penang",
@@ -366,10 +381,10 @@ export const STORAGE_SPACES: StorageSpace[] = [
       "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=900&q=80",
     ],
     mapCoords: {
-      top: "28%",
-      left: "39%",
-      lat: "5.4141° N",
-      lng: "100.3402° E",
+      lat: 5.4145,
+      lng: 100.3385,
+      latLabel: "5.4145° N",
+      lngLabel: "100.3385° E",
     },
     specs: {
       ceilingHeight: "4.2m High Ceiling",
@@ -428,14 +443,93 @@ export const STORAGE_SPACES: StorageSpace[] = [
     ],
   },
   {
+    id: "jelutong-sme-hub",
+    title: "Jelutong Expressway Commercial Shoplot Hub",
+    subtitle:
+      "Central island ground-floor fulfillment backroom 2 mins from Tun Dr Lim Chong Eu Highway",
+    category: "shoplot",
+    categoryLabel: "Shoplot Micro-Hub",
+    location: "Jelutong, Penang",
+    region: "George Town, Penang",
+    address: "Jalan Jelutong, 11600 Jelutong, Penang",
+    pricePerDay: 20,
+    pricePerSqFtPerDay: 0.08,
+    minSqFt: 80,
+    maxSqFt: 550,
+    availableSqFt: 400,
+    totalSqFt: 650,
+    defaultSqFt: 250,
+    palletCapacity: 10,
+    rating: 4.93,
+    reviewCount: 47,
+    instantBook: true,
+    verified: true,
+    zeroLockIn: true,
+    images: [
+      "https://images.unsplash.com/photo-1565891741441-64926e441838?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=900&q=80",
+    ],
+    mapCoords: {
+      lat: 5.3895,
+      lng: 100.3145,
+      latLabel: "5.3895° N",
+      lngLabel: "100.3145° E",
+    },
+    specs: {
+      ceilingHeight: "4.0m Commercial",
+      floorLevel: "Ground Floor Roller Shutter",
+      loadingAccess: "Direct Roadside Loading Bay",
+      accessHours: "24/7 Smart PIN",
+      climateControl: "Dehumidified + Ventilated",
+      security: "24/7 CCTV + Smart Alarm",
+    },
+    amenities: [
+      "24/7 Smart Access",
+      "Loading Bay",
+      "Ground Floor",
+      "Pallet Jack On-Site",
+      "Lalamove Friendly",
+      "24/7 CCTV",
+      "Rack Shelving Included",
+    ],
+    idealFor: [
+      "Shopee & Lazada Parcel Staging",
+      "Central Island Distribution",
+      "Retail Promotion Stock",
+    ],
+    compatibleVehicles: [
+      "Motorcycle Courier",
+      "4x4 Pickup",
+      "1.7m / 2.4m Van",
+      "1-Ton Lorry",
+    ],
+    host: {
+      name: "Island Grid Spaces",
+      role: "Verified Commercial Host",
+      avatar:
+        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
+      responseTime: "< 10 mins",
+      joinedYear: "2024",
+      verifiedHost: true,
+      completedBookings: 142,
+    },
+    description:
+      "Strategically positioned midway between George Town and Penang Bridge along the Jelutong corridor. Features wide roller-shutter access, complimentary hand pallet jack, and pre-installed heavy-duty racking.",
+    accessInstructions:
+      "Unlock the front roller shutter keypad using your 6-digit Packrat PIN.",
+    reviews: [],
+  },
+  {
     id: "butterworth-pallet-unit",
     title: "Butterworth Deep-Water Hub Pallet Bay",
-    subtitle: "High-clearance mainland warehouse next to North-South Expressway & Penang Sentral",
+    subtitle:
+      "High-clearance mainland warehouse next to North-South Expressway & Perai Industrial Estate",
     category: "warehouse",
     categoryLabel: "SME Pallet Bay",
     location: "Butterworth, Penang",
     region: "Butterworth & Bukit Mertajam",
-    address: "Jalan Baru, Perai Industrial Estate, 13600 Butterworth, Penang",
+    address: "Jalan Perusahaan, Perai Industrial Estate, 13600 Butterworth, Penang",
     pricePerDay: 18,
     pricePerSqFtPerDay: 0.06,
     minSqFt: 150,
@@ -455,10 +549,10 @@ export const STORAGE_SPACES: StorageSpace[] = [
       "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=900&q=80",
     ],
     mapCoords: {
-      top: "38%",
-      left: "76%",
-      lat: "5.3867° N",
-      lng: "100.3915° E",
+      lat: 5.368,
+      lng: 100.402,
+      latLabel: "5.3680° N",
+      lngLabel: "100.4020° E",
     },
     specs: {
       ceilingHeight: "9.0m Industrial Clear",
@@ -519,7 +613,8 @@ export const STORAGE_SPACES: StorageSpace[] = [
   {
     id: "tanjung-tokong-spare-room",
     title: "Tanjung Tokong Ground-Level Spare Room",
-    subtitle: "Clean, air-conditioned private room for personal boxes, luggage & home furniture",
+    subtitle:
+      "Clean, air-conditioned private room for personal boxes, luggage & home furniture",
     category: "residential",
     categoryLabel: "Verified Spare Room",
     location: "Tanjung Tokong, Penang",
@@ -543,10 +638,10 @@ export const STORAGE_SPACES: StorageSpace[] = [
       "https://images.unsplash.com/photo-1590247813693-5541d1c609fd?auto=format&fit=crop&w=900&q=80",
     ],
     mapCoords: {
-      top: "18%",
-      left: "26%",
-      lat: "5.4586° N",
-      lng: "100.3085° E",
+      lat: 5.4535,
+      lng: 100.3065,
+      latLabel: "5.4535° N",
+      lngLabel: "100.3065° E",
     },
     specs: {
       ceilingHeight: "3.0m Residential",
@@ -604,9 +699,84 @@ export const STORAGE_SPACES: StorageSpace[] = [
     ],
   },
   {
+    id: "bukit-mertajam-locker",
+    title: "Bukit Mertajam Ground-Floor Smart Locker & Box Unit",
+    subtitle: "Secure self-access box & small-business storage near Icon City BM",
+    category: "residential",
+    categoryLabel: "Smart Box Unit",
+    location: "Bukit Mertajam, Penang",
+    region: "Butterworth & Bukit Mertajam",
+    address: "Jalan Song Ban Kheng, 14000 Bukit Mertajam, Penang",
+    pricePerDay: 14,
+    pricePerSqFtPerDay: 0.1,
+    minSqFt: 40,
+    maxSqFt: 250,
+    availableSqFt: 200,
+    totalSqFt: 300,
+    defaultSqFt: 120,
+    rating: 4.87,
+    reviewCount: 29,
+    instantBook: true,
+    verified: true,
+    zeroLockIn: true,
+    images: [
+      "https://images.unsplash.com/photo-1590247813693-5541d1c609fd?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=900&q=80",
+    ],
+    mapCoords: {
+      lat: 5.3522,
+      lng: 100.4468,
+      latLabel: "5.3522° N",
+      lngLabel: "100.4468° E",
+    },
+    specs: {
+      ceilingHeight: "3.4m Clear",
+      floorLevel: "Ground Floor",
+      loadingAccess: "Front Curbside Loading",
+      accessHours: "24/7 Smart PIN",
+      climateControl: "Ventilated + Dry",
+      security: "24/7 CCTV + Alarm",
+    },
+    amenities: [
+      "24/7 Smart Access",
+      "Ground Floor",
+      "Lalamove Friendly",
+      "24/7 CCTV",
+      "Rack Shelving Included",
+    ],
+    idealFor: [
+      "Online Seller Cartons",
+      "Seasonal Festive Decor",
+      "Business Accounting Archives",
+      "Home Moving Overflow",
+    ],
+    compatibleVehicles: [
+      "Sedan / SUV",
+      "Motorcycle Courier",
+      "4x4 Pickup",
+      "1.7m Lalamove Van",
+    ],
+    host: {
+      name: "BM Storage Box Co.",
+      role: "Verified Space Host",
+      avatar:
+        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80",
+      responseTime: "< 15 mins",
+      joinedYear: "2024",
+      verifiedHost: true,
+      completedBookings: 94,
+    },
+    description:
+      "Accessible 24/7 ground-floor storage bays in central Bukit Mertajam. Equipped with 4-tier heavy-duty racking and hand trolleys for effortless box stacking.",
+    accessInstructions:
+      "Park directly in the yellow Packrat bay in front of unit #18. Enter your 6-digit PIN at the main glass door.",
+    reviews: [],
+  },
+  {
     id: "kl-pj-commercial-bay",
     title: "PJ Section 13 E-Commerce Micro-Fulfillment Hub",
-    subtitle: "Central Klang Valley shoplot-warehouse hybrid with packing station & Lalamove bay",
+    subtitle:
+      "Central Klang Valley shoplot-warehouse hybrid with packing station & Lalamove bay",
     category: "shoplot",
     categoryLabel: "Shoplot Micro-Hub",
     location: "Petaling Jaya, Selangor",
@@ -632,10 +802,10 @@ export const STORAGE_SPACES: StorageSpace[] = [
       "https://images.unsplash.com/photo-1596422846543-75c6fc197f07?auto=format&fit=crop&w=900&q=80",
     ],
     mapCoords: {
-      top: "52%",
-      left: "52%",
-      lat: "3.1129° N",
-      lng: "101.6398° E",
+      lat: 3.1129,
+      lng: 101.6398,
+      latLabel: "3.1129° N",
+      lngLabel: "101.6398° E",
     },
     specs: {
       ceilingHeight: "5.0m Commercial",
@@ -696,83 +866,10 @@ export const STORAGE_SPACES: StorageSpace[] = [
     ],
   },
   {
-    id: "bukit-mertajam-locker",
-    title: "Bukit Mertajam Ground-Floor Smart Locker & Box Unit",
-    subtitle: "Secure self-access box & small-business storage near Icon City BM",
-    category: "residential",
-    categoryLabel: "Smart Box Unit",
-    location: "Bukit Mertajam, Penang",
-    region: "Butterworth & Bukit Mertajam",
-    address: "Jalan Song Ban Kheng, 14000 Bukit Mertajam, Penang",
-    pricePerDay: 14,
-    pricePerSqFtPerDay: 0.1,
-    minSqFt: 40,
-    maxSqFt: 250,
-    availableSqFt: 200,
-    totalSqFt: 300,
-    defaultSqFt: 120,
-    rating: 4.87,
-    reviewCount: 29,
-    instantBook: true,
-    verified: true,
-    zeroLockIn: true,
-    images: [
-      "https://images.unsplash.com/photo-1590247813693-5541d1c609fd?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=900&q=80",
-    ],
-    mapCoords: {
-      top: "68%",
-      left: "82%",
-      lat: "5.3522° N",
-      lng: "100.4468° E",
-    },
-    specs: {
-      ceilingHeight: "3.4m Clear",
-      floorLevel: "Ground Floor",
-      loadingAccess: "Front Curbside Loading",
-      accessHours: "24/7 Smart PIN",
-      climateControl: "Ventilated + Dry",
-      security: "24/7 CCTV + Alarm",
-    },
-    amenities: [
-      "24/7 Smart Access",
-      "Ground Floor",
-      "Lalamove Friendly",
-      "24/7 CCTV",
-      "Rack Shelving Included",
-    ],
-    idealFor: [
-      "Online Seller Cartons",
-      "Seasonal Festive Decor",
-      "Business Accounting Archives",
-      "Home Moving Overflow",
-    ],
-    compatibleVehicles: [
-      "Sedan / SUV",
-      "Motorcycle Courier",
-      "4x4 Pickup",
-      "1.7m Lalamove Van",
-    ],
-    host: {
-      name: "BM Storage Box Co.",
-      role: "Verified Space Host",
-      avatar:
-        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80",
-      responseTime: "< 15 mins",
-      joinedYear: "2024",
-      verifiedHost: true,
-      completedBookings: 94,
-    },
-    description:
-      "Accessible 24/7 ground-floor storage bays in central Bukit Mertajam. Equipped with 4-tier heavy-duty racking and hand trolleys for effortless box stacking.",
-    accessInstructions:
-      "Park directly in the yellow Packrat bay in front of unit #18. Enter your 6-digit PIN at the main glass door.",
-    reviews: [],
-  },
-  {
     id: "shah-alam-fulfillment-bay",
     title: "Shah Alam Hicom Grade-A Pallet & Racking Bay",
-    subtitle: "High-volume pallet storage with dock levelers & optional pick-and-pack staging",
+    subtitle:
+      "High-volume pallet storage with dock levelers & optional pick-and-pack staging",
     category: "warehouse",
     categoryLabel: "SME Pallet Bay",
     location: "Shah Alam, Selangor",
@@ -796,10 +893,10 @@ export const STORAGE_SPACES: StorageSpace[] = [
       "https://images.unsplash.com/photo-1580674285054-bed31e145f59?auto=format&fit=crop&w=900&q=80",
     ],
     mapCoords: {
-      top: "44%",
-      left: "62%",
-      lat: "3.0548° N",
-      lng: "101.5492° E",
+      lat: 3.0548,
+      lng: 101.5492,
+      latLabel: "3.0548° N",
+      lngLabel: "101.5492° E",
     },
     specs: {
       ceilingHeight: "10.5m Super High",
@@ -849,12 +946,14 @@ export const STORAGE_SPACES: StorageSpace[] = [
   {
     id: "jb-cross-border-hub",
     title: "Johor Bahru Tebrau Cross-Border Logistics Bay",
-    subtitle: "Strategic Southern hub 12 mins from CIQ Woodland Causeway for MY-SG stock",
+    subtitle:
+      "Strategic Southern hub 12 mins from CIQ Woodland Causeway for MY-SG stock",
     category: "shoplot",
     categoryLabel: "Shoplot Micro-Hub",
     location: "Johor Bahru, Johor",
     region: "Johor Bahru, Johor",
-    address: "Jalan Austin Perdana, Taman Mount Austin, 81100 Johor Bahru, Johor",
+    address:
+      "Jalan Austin Perdana, Taman Mount Austin, 81100 Johor Bahru, Johor",
     pricePerDay: 24,
     pricePerSqFtPerDay: 0.08,
     minSqFt: 100,
@@ -873,10 +972,10 @@ export const STORAGE_SPACES: StorageSpace[] = [
       "https://images.unsplash.com/photo-1565891741441-64926e441838?auto=format&fit=crop&w=900&q=80",
     ],
     mapCoords: {
-      top: "74%",
-      left: "56%",
-      lat: "1.5521° N",
-      lng: "103.7815° E",
+      lat: 1.5521,
+      lng: 103.7815,
+      latLabel: "1.5521° N",
+      lngLabel: "103.7815° E",
     },
     specs: {
       ceilingHeight: "4.8m High Ceiling",
@@ -931,7 +1030,8 @@ export const INITIAL_RENTER_BOOKINGS: RenterBooking[] = [
     spaceTitle: "Climate-Controlled SME Warehouse Bay",
     spaceCategory: "SME Pallet Bay",
     location: "Bayan Lepas, Penang",
-    address: "Halaman Kampung Jawa, Bayan Lepas Free Industrial Zone, 11900 Penang",
+    address:
+      "Halaman Kampung Jawa, Bayan Lepas Free Industrial Zone, 11900 Penang",
     image:
       "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80",
     startDate: "2026-10-28",
@@ -1048,4 +1148,3 @@ export function calculateDailyRateForSqFt(
 export function getSpaceById(id: string): StorageSpace | undefined {
   return STORAGE_SPACES.find((s) => s.id === id)
 }
-
