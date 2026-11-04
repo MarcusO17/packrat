@@ -223,8 +223,8 @@ export function SpaceEstimatorContent({
       )}
 
       {/* Recommended Output Summary Card */}
-      <div className="rounded-3xl border border-zinc-200/90 bg-zinc-950 p-5 text-white shadow-lg dark:border-zinc-800 dark:bg-zinc-900">
-        <div className="flex items-center justify-between">
+      <div className="rounded-3xl border border-zinc-200/90 bg-zinc-950 p-4 text-white shadow-lg sm:p-5 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold tracking-wider text-lime-400 uppercase">
             <Sparkles className="size-3.5" />
             Recommended Footprint
@@ -234,23 +234,23 @@ export function SpaceEstimatorContent({
           </span>
         </div>
 
-        <div className="mt-3 flex items-baseline justify-between border-b border-white/10 pb-4">
+        <div className="mt-3 flex flex-wrap items-baseline justify-between gap-3 border-b border-white/10 pb-4">
           <div>
             <div className="flex items-baseline gap-2">
-              <span className="font-mono text-3xl font-bold tracking-tight text-white">
+              <span className="font-mono text-2xl font-bold tracking-tight text-white sm:text-3xl">
                 {calculatedSqFt}
               </span>
               <span className="text-sm font-medium text-zinc-400">sq.ft</span>
             </div>
             <p className="mt-1 flex items-center gap-1.5 text-xs text-zinc-300">
-              <Warehouse className="size-3.5 text-lime-400" />
+              <Warehouse className="size-3.5 shrink-0 text-lime-400" />
               <span>Best match: {suggestedCategoryLabel}</span>
             </p>
           </div>
 
-          <div className="text-right">
+          <div className="text-left sm:text-right">
             <span className="text-[11px] text-zinc-400">Est. Daily Rate</span>
-            <p className="text-lg font-bold text-lime-400">
+            <p className="text-base font-bold text-lime-400 sm:text-lg">
               ~RM {estDailyCost} / day
             </p>
             <span className="text-[10px] text-zinc-400">0 Lock-in Lease</span>

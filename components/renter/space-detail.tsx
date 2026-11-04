@@ -104,19 +104,20 @@ export function SpaceDetail({ space }: { space: StorageSpace }) {
   )
 
   return (
-    <div className="bg-background flex-1 pb-20">
+    <div className="bg-background flex-1 pb-28 lg:pb-20">
       {/* Top Breadcrumb & Actions Bar */}
       <div className="border-b border-zinc-200/80 bg-white/60 backdrop-blur-xs dark:border-zinc-800 dark:bg-zinc-900/50">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3.5 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-3 sm:px-6 sm:py-3.5 lg:px-8">
+          <div className="flex min-w-0 items-center gap-1.5 text-xs text-zinc-500 sm:gap-2 dark:text-zinc-400">
             <Link
               href="/explore"
-              className="inline-flex items-center gap-1.5 font-semibold text-zinc-800 transition-colors hover:text-lime-700 dark:text-zinc-200 dark:hover:text-lime-400"
+              className="inline-flex shrink-0 items-center gap-1.5 font-semibold text-zinc-800 transition-colors hover:text-lime-700 dark:text-zinc-200 dark:hover:text-lime-400"
             >
               <ArrowLeft className="size-3.5" />
-              <span>Explore Spaces</span>
+              <span>Explore</span>
+              <span className="hidden sm:inline">Spaces</span>
             </Link>
-            <ChevronRight className="size-3.5 opacity-50" />
+            <ChevronRight className="size-3.5 shrink-0 opacity-50" />
             <Link
               href={`/explore?location=${encodeURIComponent(space.region)}`}
               className="hidden hover:underline sm:inline"
@@ -124,12 +125,12 @@ export function SpaceDetail({ space }: { space: StorageSpace }) {
               {space.region}
             </Link>
             <ChevronRight className="hidden size-3.5 opacity-50 sm:inline" />
-            <span className="max-w-[200px] truncate text-zinc-900 font-medium sm:max-w-xs dark:text-white">
+            <span className="truncate font-medium text-zinc-900 sm:max-w-xs dark:text-white">
               {space.title}
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             <Button
               variant="outline"
               size="sm"
@@ -137,16 +138,18 @@ export function SpaceDetail({ space }: { space: StorageSpace }) {
                 setCopied(true)
                 setTimeout(() => setCopied(false), 2000)
               }}
-              className="h-8 rounded-full px-3 text-xs"
+              className="h-8 rounded-full px-2.5 text-xs sm:px-3"
             >
               <Share2 className="size-3.5" />
-              <span>{copied ? "Link Copied" : "Share"}</span>
+              <span className="hidden sm:inline">
+                {copied ? "Link Copied" : "Share"}
+              </span>
             </Button>
             <Button
               variant="outline"
               size="sm"
               onClick={() => setSaved((s) => !s)}
-              className="h-8 rounded-full px-3 text-xs"
+              className="h-8 rounded-full px-2.5 text-xs sm:px-3"
             >
               <Heart
                 className={cn(
@@ -154,17 +157,19 @@ export function SpaceDetail({ space }: { space: StorageSpace }) {
                   saved && "fill-rose-500 text-rose-500"
                 )}
               />
-              <span>{saved ? "Saved" : "Save"}</span>
+              <span className="hidden sm:inline">
+                {saved ? "Saved" : "Save"}
+              </span>
             </Button>
           </div>
         </div>
       </div>
 
-      <div className="mx-auto max-w-6xl px-4 pt-6 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-6xl px-4 pt-4 sm:px-6 sm:pt-6 lg:px-8">
         {/* Bento Image Gallery */}
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-12">
+        <div className="grid grid-cols-1 gap-2.5 sm:gap-3 md:grid-cols-12">
           {/* Primary Active Photo */}
-          <div className="relative h-72 overflow-hidden rounded-3xl bg-zinc-100 sm:h-96 md:col-span-8 dark:bg-zinc-900">
+          <div className="relative h-60 overflow-hidden rounded-3xl bg-zinc-100 sm:h-96 md:col-span-8 dark:bg-zinc-900">
             <img
               src={space.images[activeImageIdx] || space.images[0]}
               alt={space.title}
@@ -315,8 +320,8 @@ export function SpaceDetail({ space }: { space: StorageSpace }) {
             </div>
 
             {/* Interactive Inline Space Estimator Callout */}
-            <div className="rounded-3xl border border-lime-500/35 bg-lime-50/40 p-5 dark:border-lime-500/25 dark:bg-lime-950/15">
-              <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="rounded-3xl border border-lime-500/35 bg-lime-50/40 p-4 sm:p-5 dark:border-lime-500/25 dark:bg-lime-950/15">
+              <div className="flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">
                 <div className="flex items-center gap-3">
                   <div className="bg-primary text-primary-foreground flex size-10 shrink-0 items-center justify-center rounded-2xl shadow-xs">
                     <Box className="size-5" />
@@ -336,7 +341,7 @@ export function SpaceDetail({ space }: { space: StorageSpace }) {
                   variant={showEstimator ? "secondary" : "default"}
                   size="sm"
                   onClick={() => setShowEstimator((prev) => !prev)}
-                  className="rounded-full px-4 text-xs font-semibold"
+                  className="w-full rounded-full px-4 text-xs font-semibold sm:w-auto"
                 >
                   {showEstimator ? "Hide Estimator" : "Open Space Estimator"}
                 </Button>
@@ -546,8 +551,8 @@ export function SpaceDetail({ space }: { space: StorageSpace }) {
           </div>
 
           {/* Right Column: Sticky Interactive Daily Rate & Space Calculator */}
-          <div className="lg:col-span-5">
-            <div className="sticky top-24 rounded-3xl border border-zinc-200/90 bg-white p-6 shadow-[0_20px_60px_rgba(0,0,0,0.08)] dark:border-zinc-800 dark:bg-zinc-900">
+          <div id="booking-calculator" className="scroll-mt-20 lg:col-span-5">
+            <div className="sticky top-24 rounded-3xl border border-zinc-200/90 bg-white p-5 shadow-[0_20px_60px_rgba(0,0,0,0.08)] sm:p-6 dark:border-zinc-800 dark:bg-zinc-900">
               {/* Top Price Banner */}
               <div className="flex items-baseline justify-between border-b border-zinc-100 pb-4 dark:border-zinc-800">
                 <div>
@@ -841,6 +846,44 @@ export function SpaceDetail({ space }: { space: StorageSpace }) {
               </Link>
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* Sticky Mobile Bottom Booking Bar */}
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-zinc-200/90 bg-white/95 px-4 py-3 shadow-[0_-10px_30px_rgba(0,0,0,0.08)] backdrop-blur-md lg:hidden dark:border-zinc-800 dark:bg-zinc-900/95">
+        <div className="mx-auto flex max-w-lg items-center justify-between gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              document
+                .getElementById("booking-calculator")
+                ?.scrollIntoView({ behavior: "smooth", block: "start" })
+            }}
+            className="min-w-0 text-left"
+          >
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-base font-bold text-zinc-950 dark:text-white">
+                RM {dailyRate}
+              </span>
+              <span className="text-xs text-zinc-500">/ day</span>
+              <span className="rounded-full bg-lime-500/15 px-2 py-0.5 text-[10px] font-bold text-lime-800 dark:text-lime-300">
+                0 Lock-in
+              </span>
+            </div>
+            <p className="truncate text-[11px] text-zinc-500 underline decoration-dotted underline-offset-2 dark:text-zinc-400">
+              {allocatedSqFt} sq.ft • {durationDays}d (RM{" "}
+              {totalMYR.toLocaleString()}) · Edit
+            </p>
+          </button>
+
+          <Button
+            type="button"
+            onClick={handleProceedToCheckout}
+            className="h-10 shrink-0 gap-1.5 rounded-full px-5 text-xs font-bold shadow-xs"
+          >
+            <span>Book Space</span>
+            <ChevronRight className="size-3.5" />
+          </Button>
         </div>
       </div>
     </div>

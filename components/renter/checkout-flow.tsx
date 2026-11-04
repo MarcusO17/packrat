@@ -241,10 +241,10 @@ export function CheckoutFlow() {
             </div>
 
             {/* Digital Smart Access Pass Card */}
-            <div className="mt-8 rounded-3xl border border-zinc-800 bg-zinc-950 p-6 text-white shadow-lg">
+            <div className="mt-6 rounded-3xl border border-zinc-800 bg-zinc-950 p-4 text-white shadow-lg sm:mt-8 sm:p-6">
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-4">
                 <div className="flex items-center gap-2">
-                  <span className="bg-primary text-primary-foreground flex size-7 items-center justify-center rounded-lg">
+                  <span className="bg-primary text-primary-foreground flex size-7 shrink-0 items-center justify-center rounded-lg">
                     <KeyRound className="size-4" />
                   </span>
                   <div>
@@ -262,7 +262,7 @@ export function CheckoutFlow() {
                 </span>
               </div>
 
-              <div className="mt-5 grid grid-cols-1 gap-6 sm:grid-cols-12 sm:items-center">
+              <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-12 sm:items-center sm:gap-6">
                 {/* Simulated QR Code Block */}
                 <div className="flex flex-col items-center justify-center rounded-2xl bg-white p-4 text-zinc-950 sm:col-span-4">
                   <QrCode className="size-24 stroke-[1.5]" />
@@ -273,12 +273,12 @@ export function CheckoutFlow() {
 
                 {/* Access Details & Gate PIN */}
                 <div className="space-y-3 sm:col-span-8">
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
                     <div className="rounded-2xl bg-white/5 p-3">
                       <span className="text-[10px] tracking-wider text-zinc-400 uppercase">
-                        Smart Gate / Keypad PIN
+                        Smart Gate PIN
                       </span>
-                      <p className="mt-1 font-mono text-2xl font-bold tracking-wider text-lime-400">
+                      <p className="mt-1 font-mono text-xl font-bold tracking-wider text-lime-400 sm:text-2xl">
                         {confirmedBooking.accessPin}
                       </p>
                     </div>
@@ -286,7 +286,7 @@ export function CheckoutFlow() {
                       <span className="text-[10px] tracking-wider text-zinc-400 uppercase">
                         Allocated Space
                       </span>
-                      <p className="mt-1 font-mono text-2xl font-bold text-white">
+                      <p className="mt-1 font-mono text-xl font-bold text-white sm:text-2xl">
                         {confirmedBooking.sqFtBooked}{" "}
                         <span className="text-xs font-normal text-zinc-400">
                           sq.ft
@@ -295,15 +295,15 @@ export function CheckoutFlow() {
                     </div>
                   </div>
 
-                  <div className="rounded-2xl bg-white/5 p-3 text-xs">
-                    <div className="flex items-center justify-between text-zinc-300">
-                      <span>Move-In Window:</span>
+                  <div className="space-y-2 rounded-2xl bg-white/5 p-3 text-xs">
+                    <div className="flex flex-col justify-between gap-0.5 text-zinc-300 sm:flex-row sm:items-center">
+                      <span className="text-zinc-400">Move-In Window:</span>
                       <span className="font-semibold text-white">
                         {confirmedBooking.startDate} ({arrivalSlot})
                       </span>
                     </div>
-                    <div className="mt-1.5 flex items-center justify-between text-zinc-300">
-                      <span>Logistics Method:</span>
+                    <div className="flex flex-col justify-between gap-0.5 text-zinc-300 sm:flex-row sm:items-center">
+                      <span className="text-zinc-400">Logistics Method:</span>
                       <span className="font-semibold text-lime-400">
                         {confirmedBooking.moveInMethod === "lalamove"
                           ? `Lalamove ${confirmedBooking.lalamoveVehicle}`
@@ -342,14 +342,14 @@ export function CheckoutFlow() {
   }
 
   return (
-    <div className="bg-background flex-1 pb-20">
+    <div className="bg-background flex-1 pb-28 lg:pb-20">
       {/* Top Progress Header */}
       <div className="border-b border-zinc-200/80 bg-white/80 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-900/70">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3.5 sm:gap-4 sm:px-6 sm:py-4 lg:px-8">
           <div className="flex items-center gap-3">
             <Link
               href={`/spaces/${space.id}?sqft=${sqFt}`}
-              className="flex size-8 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200"
+              className="flex size-8 shrink-0 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200"
               aria-label="Back to space details"
             >
               <ArrowLeft className="size-4" />
@@ -365,17 +365,17 @@ export function CheckoutFlow() {
             </div>
           </div>
 
-          {/* Step Pills */}
-          <div className="hidden items-center gap-2 text-xs font-semibold md:flex">
-            <span className="bg-primary text-primary-foreground rounded-full px-3 py-1">
+          {/* Step Pills (Scrollable on Mobile, Inline on Desktop) */}
+          <div className="flex w-full items-center gap-1.5 overflow-x-auto pb-0.5 text-[11px] font-semibold [-ms-overflow-style:none] [scrollbar-width:none] md:w-auto md:gap-2 md:pb-0 md:text-xs [&::-webkit-scrollbar]:hidden">
+            <span className="bg-primary text-primary-foreground shrink-0 rounded-full px-2.5 py-1 md:px-3">
               1. Inventory
             </span>
-            <ChevronRight className="size-3.5 text-zinc-400" />
-            <span className="bg-primary text-primary-foreground rounded-full px-3 py-1">
+            <ChevronRight className="size-3.5 shrink-0 text-zinc-400" />
+            <span className="bg-primary text-primary-foreground shrink-0 rounded-full px-2.5 py-1 md:px-3">
               2. Move-In Logistics
             </span>
-            <ChevronRight className="size-3.5 text-zinc-400" />
-            <span className="bg-primary text-primary-foreground rounded-full px-3 py-1">
+            <ChevronRight className="size-3.5 shrink-0 text-zinc-400" />
+            <span className="bg-primary text-primary-foreground shrink-0 rounded-full px-2.5 py-1 md:px-3">
               3. Payment (MYR)
             </span>
           </div>
@@ -384,15 +384,15 @@ export function CheckoutFlow() {
 
       <form
         onSubmit={handleConfirmBooking}
-        className="mx-auto mt-8 max-w-6xl px-4 sm:px-6 lg:px-8"
+        className="mx-auto mt-6 max-w-6xl px-4 sm:mt-8 sm:px-6 lg:px-8"
       >
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+        <div className="grid grid-cols-1 gap-6 sm:gap-8 lg:grid-cols-12">
           {/* Left Column: 3-Step Checkout Sections */}
-          <div className="flex flex-col gap-6 lg:col-span-7">
+          <div className="flex flex-col gap-5 sm:gap-6 lg:col-span-7">
             {/* Section 1: Renter & Inventory Details */}
-            <div className="rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-2xs dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="rounded-3xl border border-zinc-200/80 bg-white p-4 shadow-2xs sm:p-6 dark:border-zinc-800 dark:bg-zinc-900">
               <div className="flex items-center gap-2.5">
-                <span className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-full text-xs font-bold">
+                <span className="bg-primary text-primary-foreground flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold">
                   1
                 </span>
                 <h2 className="text-base font-bold text-zinc-950 dark:text-white">
@@ -501,10 +501,10 @@ export function CheckoutFlow() {
             </div>
 
             {/* Section 2: Move-In & Last-Mile Logistics (Self Drop-Off vs Lalamove) */}
-            <div className="rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-2xs dark:border-zinc-800 dark:bg-zinc-900">
-              <div className="flex items-center justify-between">
+            <div className="rounded-3xl border border-zinc-200/80 bg-white p-4 shadow-2xs sm:p-6 dark:border-zinc-800 dark:bg-zinc-900">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2.5">
-                  <span className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-full text-xs font-bold">
+                  <span className="bg-primary text-primary-foreground flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold">
                     2
                   </span>
                   <h2 className="text-base font-bold text-zinc-950 dark:text-white">
@@ -649,9 +649,9 @@ export function CheckoutFlow() {
             </div>
 
             {/* Section 3: Malaysian Payment Method (FPX / DuitNow QR / Card) */}
-            <div className="rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-2xs dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="rounded-3xl border border-zinc-200/80 bg-white p-4 shadow-2xs sm:p-6 dark:border-zinc-800 dark:bg-zinc-900">
               <div className="flex items-center gap-2.5">
-                <span className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-full text-xs font-bold">
+                <span className="bg-primary text-primary-foreground flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold">
                   3
                 </span>
                 <h2 className="text-base font-bold text-zinc-950 dark:text-white">
@@ -709,12 +709,12 @@ export function CheckoutFlow() {
               </div>
 
               {/* Payment Method Tabs */}
-              <div className="mt-5 grid grid-cols-3 gap-2 rounded-2xl bg-zinc-100 p-1 dark:bg-zinc-950">
+              <div className="mt-5 grid grid-cols-3 gap-1.5 rounded-2xl bg-zinc-100 p-1 sm:gap-2 dark:bg-zinc-950">
                 <button
                   type="button"
                   onClick={() => setPaymentMethod("fpx")}
                   className={cn(
-                    "flex items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-semibold transition-all",
+                    "flex flex-col items-center justify-center gap-1 rounded-xl px-1.5 py-2 text-[11px] font-semibold transition-all sm:flex-row sm:gap-1.5 sm:py-2.5 sm:text-xs",
                     paymentMethod === "fpx"
                       ? "bg-white text-zinc-950 shadow-2xs dark:bg-zinc-800 dark:text-white"
                       : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400"
@@ -728,7 +728,7 @@ export function CheckoutFlow() {
                   type="button"
                   onClick={() => setPaymentMethod("duitnow")}
                   className={cn(
-                    "flex items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-semibold transition-all",
+                    "flex flex-col items-center justify-center gap-1 rounded-xl px-1.5 py-2 text-[11px] font-semibold transition-all sm:flex-row sm:gap-1.5 sm:py-2.5 sm:text-xs",
                     paymentMethod === "duitnow"
                       ? "bg-white text-zinc-950 shadow-2xs dark:bg-zinc-800 dark:text-white"
                       : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400"
@@ -742,7 +742,7 @@ export function CheckoutFlow() {
                   type="button"
                   onClick={() => setPaymentMethod("card")}
                   className={cn(
-                    "flex items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-semibold transition-all",
+                    "flex flex-col items-center justify-center gap-1 rounded-xl px-1.5 py-2 text-[11px] font-semibold transition-all sm:flex-row sm:gap-1.5 sm:py-2.5 sm:text-xs",
                     paymentMethod === "card"
                       ? "bg-white text-zinc-950 shadow-2xs dark:bg-zinc-800 dark:text-white"
                       : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400"
@@ -1007,6 +1007,36 @@ export function CheckoutFlow() {
                 </span>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Sticky Mobile Bottom Checkout Bar */}
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-zinc-200/90 bg-white/95 px-4 py-3 shadow-[0_-10px_30px_rgba(0,0,0,0.08)] backdrop-blur-md lg:hidden dark:border-zinc-800 dark:bg-zinc-900/95">
+          <div className="mx-auto flex max-w-lg items-center justify-between gap-3">
+            <div className="min-w-0">
+              <div className="flex items-baseline gap-1.5">
+                <span className="font-mono text-base font-bold text-zinc-950 dark:text-white">
+                  RM {dueToday.toLocaleString()}
+                </span>
+                <span className="text-[11px] text-zinc-500">due today</span>
+              </div>
+              <p className="truncate text-[11px] text-zinc-500 dark:text-zinc-400">
+                {sqFt} sq.ft • {durationDays}d •{" "}
+                {paymentMethod === "fpx"
+                  ? "FPX"
+                  : paymentMethod === "duitnow"
+                    ? "DuitNow"
+                    : "Card"}
+              </p>
+            </div>
+
+            <Button
+              type="submit"
+              className="h-10 shrink-0 gap-1.5 rounded-full px-5 text-xs font-bold shadow-xs"
+            >
+              <Lock className="size-3.5" />
+              <span>Confirm & Pay</span>
+            </Button>
           </div>
         </div>
       </form>

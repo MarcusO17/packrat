@@ -90,6 +90,10 @@ export function ExploreSpaces() {
   )
   const [estimatorOpen, setEstimatorOpen] =
     React.useState<boolean>(initialEstimatorOpen)
+  const [inViewSpaceIds, setInViewSpaceIds] = React.useState<
+    Record<string, boolean>
+  >({})
+  const spaceCardRefs = React.useRef<Record<string, HTMLDivElement | null>>({})
 
   // Map camera state driven by region selection or active listing selection
   const initialViewport =
@@ -200,6 +204,45 @@ export function ExploreSpaces() {
     filteredSpaces[0] ||
     STORAGE_SPACES[0]
 
+  React.useEffect(() => {
+    const mql = window.matchMedia("(max-width: 767px)")
+    let observer: IntersectionObserver | null = null
+
+    const setup = () => {
+      observer?.disconnect()
+      if (!mql.matches) {
+        setInViewSpaceIds({})
+        return
+      }
+
+      observer = new IntersectionObserver(
+        (entries) => {
+          setInViewSpaceIds((prev) => {
+            const next = { ...prev }
+            entries.forEach((entry) => {
+              const id = entry.target.getAttribute("data-space-card-id")
+              if (id) next[id] = entry.isIntersecting
+            })
+            return next
+          })
+        },
+        { threshold: 0.55, rootMargin: "-12% 0px -15% 0px" }
+      )
+
+      Object.values(spaceCardRefs.current).forEach((el) => {
+        if (el) observer?.observe(el)
+      })
+    }
+
+    setup()
+    mql.addEventListener("change", setup)
+
+    return () => {
+      mql.removeEventListener("change", setup)
+      observer?.disconnect()
+    }
+  }, [filteredSpaces, viewMode])
+
   const selectAndFocusSpace = (space: StorageSpace) => {
     setActiveSpaceId(space.id)
     setMapCenter((prev) => ({
@@ -241,15 +284,15 @@ export function ExploreSpaces() {
     selectedAmenities.length
 
   return (
-    <div className="bg-background flex flex-1 flex-col">
+    <div className="bg-background relative flex flex-1 flex-col pb-16 lg:pb-0">
       {/* Top Sticky Filter & Search Control Bar */}
-      <div className="bg-background/95 sticky top-18 z-30 border-b border-zinc-200/80 backdrop-blur-md dark:border-zinc-800">
-        <div className="mx-auto max-w-7xl px-4 py-3.5 sm:px-6 lg:px-8">
+      <div className="bg-background/95 sticky top-16 z-30 border-b border-zinc-200/80 backdrop-blur-md sm:top-18 dark:border-zinc-800">
+        <div className="mx-auto max-w-7xl px-4 py-2.5 sm:px-6 sm:py-3.5 lg:px-8">
           {/* Primary Row: Search Input, Region, Space Estimator Trigger & View Toggle */}
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            {/* Search & Region Group */}
-            <div className="flex flex-1 flex-wrap items-center gap-2.5">
-              <div className="relative min-w-[220px] flex-1 sm:max-w-xs">
+          <div className="flex flex-col gap-2.5 lg:flex-row lg:items-center lg:justify-between lg:gap-3">
+            {/* Search Input + Mobile View Mode Switcher Row */}
+            <div className="flex items-center gap-2 lg:contents">
+              <div className="relative min-w-0 flex-1 lg:max-w-xs">
                 <Search className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-zinc-400" />
                 <Input
                   value={searchQuery}
@@ -269,11 +312,60 @@ export function ExploreSpaces() {
                 )}
               </div>
 
+              {/* Mobile View Mode Pill Switcher (shown inline with search on < lg) */}
+              <div className="inline-flex shrink-0 items-center rounded-full border border-zinc-200/80 bg-zinc-100/80 p-0.5 lg:hidden dark:border-zinc-800 dark:bg-zinc-900">
+                <button
+                  type="button"
+                  onClick={() => setViewMode("split")}
+                  className={cn(
+                    "inline-flex items-center gap-1 rounded-full px-2.5 py-1.5 text-xs font-semibold transition-all",
+                    viewMode === "split"
+                      ? "bg-white text-zinc-950 shadow-2xs dark:bg-zinc-800 dark:text-white"
+                      : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400"
+                  )}
+                  title="Split View"
+                >
+                  <Columns2 className="size-3.5" />
+                  <span className="hidden sm:inline">Split</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode("grid")}
+                  className={cn(
+                    "inline-flex items-center gap-1 rounded-full px-2.5 py-1.5 text-xs font-semibold transition-all",
+                    viewMode === "grid"
+                      ? "bg-white text-zinc-950 shadow-2xs dark:bg-zinc-800 dark:text-white"
+                      : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400"
+                  )}
+                  title="List / Grid View"
+                >
+                  <LayoutGrid className="size-3.5" />
+                  <span className="hidden sm:inline">Grid</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode("map")}
+                  className={cn(
+                    "inline-flex items-center gap-1 rounded-full px-2.5 py-1.5 text-xs font-semibold transition-all",
+                    viewMode === "map"
+                      ? "bg-white text-zinc-950 shadow-2xs dark:bg-zinc-800 dark:text-white"
+                      : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400"
+                  )}
+                  title="Full Map View"
+                >
+                  <MapIcon className="size-3.5" />
+                  <span className="hidden sm:inline">Map</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Horizontally Scrollable Filter Pills Row on Mobile, Flex-Wrap on Desktop */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] lg:flex-1 lg:flex-wrap lg:overflow-visible lg:pb-0 [&::-webkit-scrollbar]:hidden">
               {/* Region Select */}
               <Select value={selectedRegion} onValueChange={handleRegionChange}>
                 <SelectTrigger
                   size="sm"
-                  className="h-9 rounded-full border-zinc-200/90 bg-white px-3.5 text-xs font-semibold shadow-2xs dark:border-zinc-800 dark:bg-zinc-900"
+                  className="h-8.5 shrink-0 rounded-full border-zinc-200/90 bg-white px-3 text-xs font-semibold shadow-2xs sm:h-9 sm:px-3.5 dark:border-zinc-800 dark:bg-zinc-900"
                 >
                   <MapPin className="size-3.5 text-lime-600 dark:text-lime-400" />
                   <SelectValue placeholder="Location" />
@@ -297,7 +389,7 @@ export function ExploreSpaces() {
                   <button
                     type="button"
                     className={cn(
-                      "inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-xs font-semibold transition-colors",
+                      "inline-flex h-8.5 shrink-0 items-center gap-1.5 rounded-full border px-3 text-xs font-semibold whitespace-nowrap transition-colors sm:h-9 sm:px-3.5",
                       requiredSqFt > 0
                         ? "border-lime-500/50 bg-lime-50/80 text-lime-900 dark:border-lime-500/40 dark:bg-lime-950/30 dark:text-lime-300"
                         : "border-zinc-200/90 bg-white text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200"
@@ -313,7 +405,7 @@ export function ExploreSpaces() {
                 </PopoverTrigger>
                 <PopoverContent
                   align="start"
-                  className="w-72 rounded-3xl border-zinc-200/80 p-4 shadow-xl dark:border-zinc-800"
+                  className="w-[calc(100vw-2rem)] max-w-72 rounded-3xl border-zinc-200/80 p-4 shadow-xl dark:border-zinc-800"
                 >
                   <div className="flex flex-col gap-3.5">
                     <div className="flex items-center justify-between">
@@ -349,7 +441,7 @@ export function ExploreSpaces() {
                   <button
                     type="button"
                     className={cn(
-                      "inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-xs font-semibold transition-colors",
+                      "inline-flex h-8.5 shrink-0 items-center gap-1.5 rounded-full border px-3 text-xs font-semibold whitespace-nowrap transition-colors sm:h-9 sm:px-3.5",
                       maxDailyBudget < 80
                         ? "border-lime-500/50 bg-lime-50/80 text-lime-900 dark:border-lime-500/40 dark:bg-lime-950/30 dark:text-lime-300"
                         : "border-zinc-200/90 bg-white text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200"
@@ -365,7 +457,7 @@ export function ExploreSpaces() {
                 </PopoverTrigger>
                 <PopoverContent
                   align="start"
-                  className="w-72 rounded-3xl border-zinc-200/80 p-4 shadow-xl dark:border-zinc-800"
+                  className="w-[calc(100vw-2rem)] max-w-72 rounded-3xl border-zinc-200/80 p-4 shadow-xl dark:border-zinc-800"
                 >
                   <div className="flex flex-col gap-3.5">
                     <div className="flex items-center justify-between">
@@ -393,20 +485,22 @@ export function ExploreSpaces() {
               </Popover>
 
               {/* Box & Pallet Space Estimator Sheet Trigger */}
-              <SpaceEstimatorSheet
-                open={estimatorOpen}
-                onOpenChange={setEstimatorOpen}
-                onApply={(sqFt, suggestedCat) => {
-                  setRequiredSqFt(sqFt)
-                  if (suggestedCat && suggestedCat !== "all") {
-                    setSelectedCategory(suggestedCat)
-                  }
-                }}
-              />
+              <div className="shrink-0">
+                <SpaceEstimatorSheet
+                  open={estimatorOpen}
+                  onOpenChange={setEstimatorOpen}
+                  onApply={(sqFt, suggestedCat) => {
+                    setRequiredSqFt(sqFt)
+                    if (suggestedCat && suggestedCat !== "all") {
+                      setSelectedCategory(suggestedCat)
+                    }
+                  }}
+                />
+              </div>
             </div>
 
-            {/* Right Controls: Sort + View Mode Switcher */}
-            <div className="flex items-center gap-2">
+            {/* Right Controls (Desktop): Sort + View Mode Switcher */}
+            <div className="hidden items-center gap-2 lg:flex">
               <Select
                 value={sortBy}
                 onValueChange={(val) =>
@@ -421,7 +515,7 @@ export function ExploreSpaces() {
               >
                 <SelectTrigger
                   size="sm"
-                  className="hidden h-9 rounded-full border-zinc-200/90 bg-white px-3 text-xs font-medium lg:flex dark:border-zinc-800 dark:bg-zinc-900"
+                  className="h-9 rounded-full border-zinc-200/90 bg-white px-3 text-xs font-medium dark:border-zinc-800 dark:bg-zinc-900"
                 >
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
@@ -455,7 +549,7 @@ export function ExploreSpaces() {
                   title="Split View (Listings + Map)"
                 >
                   <Columns2 className="size-3.5" />
-                  <span className="hidden sm:inline">Split</span>
+                  <span>Split</span>
                 </button>
                 <button
                   type="button"
@@ -469,7 +563,7 @@ export function ExploreSpaces() {
                   title="Grid View"
                 >
                   <LayoutGrid className="size-3.5" />
-                  <span className="hidden sm:inline">Grid</span>
+                  <span>Grid</span>
                 </button>
                 <button
                   type="button"
@@ -483,14 +577,14 @@ export function ExploreSpaces() {
                   title="Full Map View"
                 >
                   <MapIcon className="size-3.5" />
-                  <span className="hidden sm:inline">Map</span>
+                  <span>Map</span>
                 </button>
               </div>
             </div>
           </div>
 
           {/* Secondary Row: Category Tabs + Amenity Filter Pills */}
-          <div className="mt-3 flex items-center justify-between gap-3 overflow-x-auto pb-1 no-scrollbar">
+          <div className="mt-2.5 flex items-center justify-between gap-2.5 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] sm:mt-3 sm:gap-3 [&::-webkit-scrollbar]:hidden">
             {/* Category Switcher */}
             <div className="flex shrink-0 items-center gap-1.5">
               {SPACE_CATEGORIES.map((cat) => {
@@ -646,6 +740,7 @@ export function ExploreSpaces() {
                   {filteredSpaces.map((space) => {
                     const isSelected = activeSpace.id === space.id
                     const isSaved = savedIds.includes(space.id)
+                    const isInView = Boolean(inViewSpaceIds[space.id])
                     const targetSqFt =
                       requiredSqFt > 0
                         ? Math.max(space.minSqFt, requiredSqFt)
@@ -658,12 +753,18 @@ export function ExploreSpaces() {
                     return (
                       <div
                         key={space.id}
+                        data-space-card-id={space.id}
+                        ref={(el) => {
+                          spaceCardRefs.current[space.id] = el
+                        }}
                         onClick={() => selectAndFocusSpace(space)}
                         className={cn(
-                          "group relative flex cursor-pointer flex-col justify-between overflow-hidden rounded-3xl border bg-white p-3 transition-all duration-200 dark:bg-zinc-900",
+                          "group relative flex cursor-pointer flex-col justify-between overflow-hidden rounded-3xl border bg-white p-3 transition-all duration-300 dark:bg-zinc-900",
                           isSelected
                             ? "border-primary ring-primary/30 shadow-[0_14px_40px_rgba(132,204,22,0.12)] ring-2"
-                            : "border-zinc-200/80 shadow-2xs hover:border-zinc-300 hover:shadow-md dark:border-zinc-800"
+                            : isInView
+                              ? "-translate-y-0.5 border-zinc-300 shadow-md dark:border-zinc-700"
+                              : "border-zinc-200/80 shadow-2xs hover:border-zinc-300 hover:shadow-md dark:border-zinc-800"
                         )}
                       >
                         <div>
@@ -672,7 +773,10 @@ export function ExploreSpaces() {
                             <img
                               src={space.images[0]}
                               alt={space.title}
-                              className="size-full object-cover transition-transform duration-300 group-hover:scale-105"
+                              className={cn(
+                                "size-full object-cover transition-transform duration-500 group-hover:scale-105",
+                                isInView && "scale-105"
+                              )}
                             />
 
                             {/* Top Left Category Pill */}
@@ -823,10 +927,10 @@ export function ExploreSpaces() {
               className={cn(
                 viewMode === "split"
                   ? "lg:col-span-5"
-                  : "h-[680px] w-full"
+                  : "h-[calc(100dvh-13rem)] min-h-[480px] w-full sm:h-[680px]"
               )}
             >
-              <div className="sticky top-42 h-[580px] w-full overflow-hidden rounded-3xl border border-zinc-200/80 bg-zinc-100 shadow-sm lg:h-[calc(100vh-12rem)] dark:border-zinc-800 dark:bg-zinc-900">
+              <div className="sticky top-42 h-[480px] w-full overflow-hidden rounded-3xl border border-zinc-200/80 bg-zinc-100 shadow-sm sm:h-[580px] lg:h-[calc(100vh-12rem)] dark:border-zinc-800 dark:bg-zinc-900">
                 <CoordMap
                   centerLat={mapCenter.lat}
                   centerLng={mapCenter.lng}
@@ -841,9 +945,9 @@ export function ExploreSpaces() {
                   {/* Top Map Corridor Switcher Overlay */}
                   <div
                     data-map-interactive="true"
-                    className="absolute inset-x-3 top-3 z-30 flex flex-wrap items-center justify-between gap-2"
+                    className="absolute inset-x-2.5 top-2.5 z-30 flex items-center justify-between gap-2 sm:inset-x-3 sm:top-3"
                   >
-                    <div className="flex flex-wrap items-center gap-1 rounded-full border border-zinc-200/80 bg-white/95 p-1 shadow-sm backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-900/95">
+                    <div className="flex max-w-full items-center gap-1 overflow-x-auto rounded-full border border-zinc-200/80 bg-white/95 p-1 shadow-sm backdrop-blur-md [-ms-overflow-style:none] [scrollbar-width:none] dark:border-zinc-800 dark:bg-zinc-900/95 [&::-webkit-scrollbar]:hidden">
                       {[
                         {
                           label: "Penang",
@@ -866,7 +970,7 @@ export function ExploreSpaces() {
                           key={corridor.label}
                           type="button"
                           onClick={() => setMapCenter(corridor.vp)}
-                          className="rounded-full px-2.5 py-1 text-[11px] font-semibold text-zinc-700 transition-colors hover:bg-lime-500/20 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white"
+                          className="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold whitespace-nowrap text-zinc-700 transition-colors hover:bg-lime-500/20 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white"
                         >
                           {corridor.label}
                         </button>
@@ -878,36 +982,36 @@ export function ExploreSpaces() {
                   {activeSpace && (
                     <div
                       data-map-interactive="true"
-                      className="absolute inset-x-3 bottom-8 z-30"
+                      className="absolute inset-x-2.5 bottom-7 z-30 sm:inset-x-3 sm:bottom-8"
                     >
-                      <div className="flex flex-col gap-3 rounded-3xl border border-zinc-200/90 bg-white/95 p-3.5 shadow-[0_20px_50px_rgba(0,0,0,0.18)] backdrop-blur-md sm:flex-row sm:items-center dark:border-zinc-800 dark:bg-zinc-900/95">
+                      <div className="flex items-center gap-3 rounded-3xl border border-zinc-200/90 bg-white/95 p-2.5 shadow-[0_20px_50px_rgba(0,0,0,0.18)] backdrop-blur-md sm:p-3.5 dark:border-zinc-800 dark:bg-zinc-900/95">
                         <img
                           src={activeSpace.images[0]}
                           alt={activeSpace.title}
-                          className="h-24 w-full shrink-0 rounded-2xl object-cover sm:w-28"
+                          className="size-18 shrink-0 rounded-2xl object-cover sm:h-24 sm:w-28"
                         />
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5">
                             <Badge className="bg-primary text-primary-foreground rounded-full border-0 px-2 py-0 text-[10px] font-bold">
                               {activeSpace.categoryLabel}
                             </Badge>
-                            <span className="font-mono text-[10px] font-semibold text-zinc-500 dark:text-zinc-400">
+                            <span className="hidden font-mono text-[10px] font-semibold text-zinc-500 sm:inline dark:text-zinc-400">
                               {activeSpace.mapCoords.latLabel},{" "}
                               {activeSpace.mapCoords.lngLabel}
                             </span>
                           </div>
-                          <h3 className="mt-1 truncate text-sm font-bold text-zinc-950 dark:text-white">
+                          <h3 className="mt-1 truncate text-xs font-bold text-zinc-950 sm:text-sm dark:text-white">
                             {activeSpace.title}
                           </h3>
-                          <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
+                          <p className="truncate text-[11px] text-zinc-500 sm:text-xs dark:text-zinc-400">
                             {activeSpace.address}
                           </p>
-                          <div className="mt-2 flex items-center justify-between">
+                          <div className="mt-1.5 flex items-center justify-between gap-2 sm:mt-2">
                             <div className="flex items-baseline gap-1">
-                              <span className="text-sm font-bold text-zinc-950 dark:text-white">
-                                RM {activeSpace.pricePerDay} / day
+                              <span className="text-xs font-bold text-zinc-950 sm:text-sm dark:text-white">
+                                RM {activeSpace.pricePerDay}/d
                               </span>
-                              <span className="text-[11px] font-medium text-lime-700 dark:text-lime-400">
+                              <span className="hidden text-[11px] font-medium text-lime-700 sm:inline dark:text-lime-400">
                                 • {activeSpace.availableSqFt} sq.ft open
                               </span>
                             </div>
@@ -930,6 +1034,29 @@ export function ExploreSpaces() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Floating Mobile Map / List Quick Toggle Pill */}
+      <div className="fixed bottom-5 left-1/2 z-40 -translate-x-1/2 lg:hidden">
+        <button
+          type="button"
+          onClick={() =>
+            setViewMode((prev) => (prev === "map" ? "split" : "map"))
+          }
+          className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-zinc-950 px-5 py-2.5 text-xs font-bold text-white shadow-[0_12px_32px_rgba(0,0,0,0.3)] transition-transform active:scale-95 dark:border-zinc-700 dark:bg-white dark:text-zinc-950"
+        >
+          {viewMode === "map" ? (
+            <>
+              <LayoutGrid className="size-3.5 text-lime-400 dark:text-lime-600" />
+              <span>Show List ({filteredSpaces.length})</span>
+            </>
+          ) : (
+            <>
+              <MapIcon className="size-3.5 text-lime-400 dark:text-lime-600" />
+              <span>Full Map ({filteredSpaces.length})</span>
+            </>
+          )}
+        </button>
       </div>
     </div>
   )

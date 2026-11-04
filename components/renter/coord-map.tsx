@@ -200,7 +200,7 @@ export function CoordMap({
       onPointerUp={handlePointerUp}
       className={cn(
         "relative size-full overflow-hidden bg-zinc-200 select-none dark:bg-zinc-900",
-        interactive && "cursor-grab active:cursor-grabbing",
+        interactive && "touch-none cursor-grab active:cursor-grabbing",
         className
       )}
     >
@@ -363,9 +363,12 @@ export function CoordMap({
         target="_blank"
         rel="noopener noreferrer"
         data-map-interactive="true"
-        className="absolute right-3 bottom-2 z-20 rounded bg-white/80 px-2 py-0.5 text-[10px] text-zinc-500 backdrop-blur-xs hover:text-zinc-800 dark:bg-zinc-900/80 dark:text-zinc-400"
+        className="absolute right-2.5 bottom-2 z-20 rounded bg-white/80 px-2 py-0.5 text-[9px] text-zinc-500 backdrop-blur-xs hover:text-zinc-800 sm:right-3 sm:text-[10px] dark:bg-zinc-900/80 dark:text-zinc-400"
       >
-        © OpenStreetMap • {view.lat.toFixed(4)}°N, {view.lng.toFixed(4)}°E
+        © OpenStreetMap{" "}
+        <span className="hidden sm:inline">
+          • {view.lat.toFixed(4)}°N, {view.lng.toFixed(4)}°E
+        </span>
       </a>
 
       {children}
