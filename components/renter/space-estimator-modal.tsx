@@ -278,7 +278,8 @@ interface SpaceEstimatorSheetProps {
   open?: boolean
   onOpenChange?: (open: boolean) => void
   onApply: (sqFt: number, suggestedCategory?: "all" | SpaceCategory) => void
-  trigger?: React.ReactNode
+  /** Custom trigger. Pass `null` to render no trigger (fully controlled). */
+  trigger?: React.ReactNode | null
 }
 
 export function SpaceEstimatorSheet({
@@ -298,7 +299,7 @@ export function SpaceEstimatorSheet({
 
   return (
     <Sheet open={isOpen} onOpenChange={handleOpenChange}>
-      {trigger ? (
+      {trigger === null ? null : trigger ? (
         <SheetTrigger asChild>{trigger}</SheetTrigger>
       ) : (
         <SheetTrigger asChild>

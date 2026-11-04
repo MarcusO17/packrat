@@ -4,113 +4,98 @@ import * as React from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import {
-  Check,
   ChevronRight,
   Filter,
   Heart,
   MapPin,
   Maximize2,
   RotateCcw,
-  Search,
   ShieldCheck,
-  SlidersHorizontal,
-  Sparkles,
   Star,
   Truck,
   X,
-  Zap,
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import {
-  AMENITY_FILTERS,
   REGIONS,
   REGION_VIEWPORTS,
-  SPACE_CATEGORIES,
   STORAGE_SPACES,
-  calculateDailyRateForSqFt,
   type SpaceCategory,
   type StorageSpace,
 } from "@/lib/spaces-data"
+import {
+  CATEGORY_NOUNS,
+  DEFAULT_FILTERS,
+  NO_BUDGET_LIMIT,
+  SORT_OPTIONS,
+  describeResults,
+  filterSpaces,
+  isDefaultFilters,
+  priceForSize,
+  shortRegion,
+  type SearchFilters,
+} from "@/lib/search-filters"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Slider } from "@/components/ui/slider"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { SpaceEstimatorSheet } from "@/components/renter/space-estimator-modal"
 import { CoordMap } from "@/components/renter/coord-map"
+import { FiltersSheet, SmartSearch } from "@/components/renter/smart-search"
 
 export function ExploreSpaces() {
   const searchParams = useSearchParams()
 
-  const initialRegion = searchParams.get("location") || "All Locations"
-  const initialCategory =
-    (searchParams.get("category") as "all" | SpaceCategory) || "all"
-  const initialSqFt = Number(searchParams.get("sqft")) || 0
-  const initialEstimatorOpen = searchParams.get("estimator") === "open"
+  const [filters, setFilters] = React.useState<SearchFilters>(() => {
+    const location = searchParams.get("location") || ""
+    return {
+      ...DEFAULT_FILTERS,
+      region: REGIONS.includes(location as (typeof REGIONS)[number])
+        ? location
+        : DEFAULT_FILTERS.region,
+      category:
+        (searchParams.get("category") as "all" | SpaceCategory) || "all",
+      sqft: Number(searchParams.get("sqft")) || 0,
+    }
+  })
+  const requiredSqFt = filters.sqft
 
-  const [searchQuery, setSearchQuery] = React.useState("")
-  const [selectedRegion, setSelectedRegion] = React.useState<string>(
-    REGIONS.includes(initialRegion as (typeof REGIONS)[number])
-      ? initialRegion
-      : "All Locations"
-  )
-  const [selectedCategory, setSelectedCategory] = React.useState<
-    "all" | SpaceCategory
-  >(initialCategory)
-  const [requiredSqFt, setRequiredSqFt] = React.useState<number>(initialSqFt)
-  const [maxDailyBudget, setMaxDailyBudget] = React.useState<number>(80)
-  const [instantBookOnly, setInstantBookOnly] = React.useState<boolean>(false)
-  const [selectedAmenities, setSelectedAmenities] = React.useState<string[]>([])
-  const [sortBy, setSortBy] = React.useState<
-    "recommended" | "price-asc" | "sqft-desc" | "rating"
-  >("recommended")
   const [savedIds, setSavedIds] = React.useState<string[]>([
     "bayan-lepas-ftz-sme-bay",
   ])
   const [activeSpaceId, setActiveSpaceId] = React.useState<string>(
     STORAGE_SPACES[0].id
   )
-  const [estimatorOpen, setEstimatorOpen] =
-    React.useState<boolean>(initialEstimatorOpen)
+  const [estimatorOpen, setEstimatorOpen] = React.useState<boolean>(
+    searchParams.get("estimator") === "open"
+  )
   const [inViewSpaceIds, setInViewSpaceIds] = React.useState<
     Record<string, boolean>
   >({})
   const spaceCardRefs = React.useRef<Record<string, HTMLDivElement | null>>({})
 
   // Map camera state driven by region selection or active listing selection
-  const initialViewport =
-    REGION_VIEWPORTS[selectedRegion] || REGION_VIEWPORTS["All Locations"]
   const [mapCenter, setMapCenter] = React.useState<{
     lat: number
     lng: number
     zoom: number
-  }>(initialViewport)
+  }>(
+    () =>
+      REGION_VIEWPORTS[filters.region] || REGION_VIEWPORTS["All Locations"]
+  )
 
-  const handleRegionChange = (region: string) => {
-    setSelectedRegion(region)
-    const vp = REGION_VIEWPORTS[region] || REGION_VIEWPORTS["All Locations"]
-    setMapCenter(vp)
+  const replaceFilters = (next: SearchFilters) => {
+    if (next.region !== filters.region) {
+      setMapCenter(
+        REGION_VIEWPORTS[next.region] || REGION_VIEWPORTS["All Locations"]
+      )
+    }
+    setFilters(next)
   }
 
-  const toggleAmenity = (amenity: string) => {
-    setSelectedAmenities((prev) =>
-      prev.includes(amenity)
-        ? prev.filter((a) => a !== amenity)
-        : [...prev, amenity]
-    )
-  }
+  const updateFilters = (patch: Partial<SearchFilters>) =>
+    replaceFilters({ ...filters, ...patch })
+
+  const resetFilters = () => replaceFilters(DEFAULT_FILTERS)
 
   const toggleSaved = (id: string, e: React.MouseEvent) => {
     e.preventDefault()
@@ -120,78 +105,7 @@ export function ExploreSpaces() {
     )
   }
 
-  const resetFilters = () => {
-    setSearchQuery("")
-    setSelectedRegion("All Locations")
-    setSelectedCategory("all")
-    setRequiredSqFt(0)
-    setMaxDailyBudget(80)
-    setInstantBookOnly(false)
-    setSelectedAmenities([])
-    setSortBy("recommended")
-    setMapCenter(REGION_VIEWPORTS["All Locations"])
-  }
-
-  const filteredSpaces = React.useMemo(() => {
-    return STORAGE_SPACES.filter((space) => {
-      if (
-        selectedRegion !== "All Locations" &&
-        space.region !== selectedRegion
-      ) {
-        return false
-      }
-      if (selectedCategory !== "all" && space.category !== selectedCategory) {
-        return false
-      }
-      if (requiredSqFt > 0 && space.availableSqFt < requiredSqFt) {
-        return false
-      }
-      const effectiveDailyPrice =
-        requiredSqFt > 0
-          ? calculateDailyRateForSqFt(
-              space,
-              Math.max(space.minSqFt, requiredSqFt)
-            )
-          : space.pricePerDay
-      if (effectiveDailyPrice > maxDailyBudget) {
-        return false
-      }
-      if (instantBookOnly && !space.instantBook) {
-        return false
-      }
-      if (selectedAmenities.length > 0) {
-        const hasAll = selectedAmenities.every((am) =>
-          space.amenities.includes(am)
-        )
-        if (!hasAll) return false
-      }
-      if (searchQuery.trim().length > 0) {
-        const q = searchQuery.toLowerCase()
-        const matchTitle = space.title.toLowerCase().includes(q)
-        const matchLoc = space.location.toLowerCase().includes(q)
-        const matchSub = space.subtitle.toLowerCase().includes(q)
-        const matchIdeal = space.idealFor.some((tag) =>
-          tag.toLowerCase().includes(q)
-        )
-        if (!matchTitle && !matchLoc && !matchSub && !matchIdeal) return false
-      }
-      return true
-    }).sort((a, b) => {
-      if (sortBy === "price-asc") return a.pricePerDay - b.pricePerDay
-      if (sortBy === "sqft-desc") return b.availableSqFt - a.availableSqFt
-      if (sortBy === "rating") return b.rating - a.rating
-      return (b.featured ? 1 : 0) - (a.featured ? 1 : 0)
-    })
-  }, [
-    selectedRegion,
-    selectedCategory,
-    requiredSqFt,
-    maxDailyBudget,
-    instantBookOnly,
-    selectedAmenities,
-    searchQuery,
-    sortBy,
-  ])
+  const filteredSpaces = React.useMemo(() => filterSpaces(filters), [filters])
 
   const activeSpace: StorageSpace =
     filteredSpaces.find((s) => s.id === activeSpaceId) ||
@@ -248,318 +162,97 @@ export function ExploreSpaces() {
 
   const mapMarkers = React.useMemo(
     () =>
-      filteredSpaces.map((space) => {
-        const displayPrice =
-          requiredSqFt > 0
-            ? calculateDailyRateForSqFt(
-                space,
-                Math.max(space.minSqFt, requiredSqFt)
-              )
-            : space.pricePerDay
-        return {
-          id: space.id,
-          lat: space.mapCoords.lat,
-          lng: space.mapCoords.lng,
-          priceLabel: `RM ${displayPrice}/d`,
-          title: space.title,
-          subtitle: space.location,
-          image: space.images[0],
-        }
-      }),
+      filteredSpaces.map((space) => ({
+        id: space.id,
+        lat: space.mapCoords.lat,
+        lng: space.mapCoords.lng,
+        priceLabel: `RM ${priceForSize(space, requiredSqFt)}/d`,
+        title: space.title,
+        subtitle: space.location,
+        image: space.images[0],
+      })),
     [filteredSpaces, requiredSqFt]
   )
 
-  const activeFilterCount =
-    (selectedRegion !== "All Locations" ? 1 : 0) +
-    (selectedCategory !== "all" ? 1 : 0) +
-    (requiredSqFt > 0 ? 1 : 0) +
-    (maxDailyBudget < 80 ? 1 : 0) +
-    (instantBookOnly ? 1 : 0) +
-    selectedAmenities.length
+  // Removable chips that explain exactly what is being shown
+  const activeChips: { key: string; label: string; clear: () => void }[] = [
+    filters.query && {
+      key: "query",
+      label: `“${filters.query}”`,
+      clear: () => updateFilters({ query: "" }),
+    },
+    filters.region !== "All Locations" && {
+      key: "region",
+      label: shortRegion(filters.region),
+      clear: () => updateFilters({ region: "All Locations" }),
+    },
+    filters.category !== "all" && {
+      key: "category",
+      label: CATEGORY_NOUNS[filters.category].many.replace(/^./, (c) =>
+        c.toUpperCase()
+      ),
+      clear: () => updateFilters({ category: "all" }),
+    },
+    filters.sqft > 0 && {
+      key: "sqft",
+      label: `Fits ${filters.sqft} sq.ft`,
+      clear: () => updateFilters({ sqft: 0 }),
+    },
+    filters.maxBudget < NO_BUDGET_LIMIT && {
+      key: "budget",
+      label: `≤ RM ${filters.maxBudget}/day`,
+      clear: () => updateFilters({ maxBudget: NO_BUDGET_LIMIT }),
+    },
+    filters.instantBook && {
+      key: "instant",
+      label: "Instant book",
+      clear: () => updateFilters({ instantBook: false }),
+    },
+    ...filters.amenities.map((amenity) => ({
+      key: `amenity-${amenity}`,
+      label: amenity,
+      clear: () =>
+        updateFilters({
+          amenities: filters.amenities.filter((a) => a !== amenity),
+        }),
+    })),
+    filters.sortBy !== "recommended" && {
+      key: "sort",
+      label: SORT_OPTIONS.find((o) => o.id === filters.sortBy)?.label ?? "",
+      clear: () => updateFilters({ sortBy: "recommended" }),
+    },
+  ].filter(Boolean) as { key: string; label: string; clear: () => void }[]
 
   return (
     <div className="bg-background relative flex flex-1 flex-col pb-16 lg:pb-0">
-      {/* Top Sticky Filter & Search Control Bar */}
-      <div className="bg-background/95 sticky top-16 z-30 border-b border-zinc-200/80 backdrop-blur-md sm:top-18 dark:border-zinc-800">
-        <div className="mx-auto max-w-7xl px-4 py-2.5 sm:px-6 sm:py-3.5 lg:px-8">
-          {/* Primary Row: Search Input, Region, Space Estimator Trigger & View Toggle */}
-          <div className="flex flex-col gap-2.5 lg:flex-row lg:items-center lg:justify-between lg:gap-3">
-            {/* Search Input + Mobile View Mode Switcher Row */}
-            <div className="flex items-center gap-2 lg:contents">
-              <div className="relative min-w-0 flex-1 lg:max-w-xs">
-                <Search className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-zinc-400" />
-                <Input
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search Penang, PJ, pallet bay, shoplot..."
-                  className="h-9 rounded-full border-zinc-200/90 bg-white pr-8 pl-9 text-xs shadow-2xs dark:border-zinc-800 dark:bg-zinc-900"
-                />
-                {searchQuery && (
-                  <button
-                    type="button"
-                    onClick={() => setSearchQuery("")}
-                    className="absolute top-1/2 right-2.5 -translate-y-1/2 text-zinc-400 hover:text-zinc-700"
-                    aria-label="Clear search"
-                  >
-                    <X className="size-3.5" />
-                  </button>
-                )}
-              </div>
-
-            </div>
-
-            {/* Horizontally Scrollable Filter Pills Row on Mobile, Flex-Wrap on Desktop */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] lg:flex-1 lg:flex-wrap lg:overflow-visible lg:pb-0 [&::-webkit-scrollbar]:hidden">
-              {/* Region Select */}
-              <Select value={selectedRegion} onValueChange={handleRegionChange}>
-                <SelectTrigger
-                  size="sm"
-                  className="h-8.5 shrink-0 rounded-full border-zinc-200/90 bg-white px-3 text-xs font-semibold shadow-2xs sm:h-9 sm:px-3.5 dark:border-zinc-800 dark:bg-zinc-900"
-                >
-                  <MapPin className="size-3.5 text-lime-600 dark:text-lime-400" />
-                  <SelectValue placeholder="Location" />
-                </SelectTrigger>
-                <SelectContent className="rounded-2xl">
-                  {REGIONS.map((region) => (
-                    <SelectItem
-                      key={region}
-                      value={region}
-                      className="text-xs font-medium"
-                    >
-                      {region}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              {/* Sq.Ft Filter Popover */}
-              <Popover>
-                <PopoverTrigger asChild>
-                  <button
-                    type="button"
-                    className={cn(
-                      "inline-flex h-8.5 shrink-0 items-center gap-1.5 rounded-full border px-3 text-xs font-semibold whitespace-nowrap transition-colors sm:h-9 sm:px-3.5",
-                      requiredSqFt > 0
-                        ? "border-lime-500/50 bg-lime-50/80 text-lime-900 dark:border-lime-500/40 dark:bg-lime-950/30 dark:text-lime-300"
-                        : "border-zinc-200/90 bg-white text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200"
-                    )}
-                  >
-                    <Maximize2 className="size-3.5 text-lime-600 dark:text-lime-400" />
-                    <span>
-                      {requiredSqFt > 0
-                        ? `Min ${requiredSqFt} sq.ft`
-                        : "Space Size (sq.ft)"}
-                    </span>
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent
-                  align="start"
-                  className="w-[calc(100vw-2rem)] max-w-72 rounded-3xl border-zinc-200/80 p-4 shadow-xl dark:border-zinc-800"
-                >
-                  <div className="flex flex-col gap-3.5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-zinc-900 dark:text-white">
-                        Minimum Space Needed
-                      </span>
-                      <span className="font-mono text-xs font-bold text-lime-700 dark:text-lime-400">
-                        {requiredSqFt === 0
-                          ? "Any size"
-                          : `${requiredSqFt} sq.ft`}
-                      </span>
-                    </div>
-                    <Slider
-                      value={[requiredSqFt]}
-                      min={0}
-                      max={1500}
-                      step={50}
-                      onValueChange={(val) => setRequiredSqFt(val[0] ?? 0)}
-                    />
-                    <div className="flex justify-between text-[10px] text-zinc-400">
-                      <span>Any</span>
-                      <span>300 sq.ft</span>
-                      <span>800 sq.ft</span>
-                      <span>1,500+ sq.ft</span>
-                    </div>
-                  </div>
-                </PopoverContent>
-              </Popover>
-
-              {/* Daily Rate Filter Popover */}
-              <Popover>
-                <PopoverTrigger asChild>
-                  <button
-                    type="button"
-                    className={cn(
-                      "inline-flex h-8.5 shrink-0 items-center gap-1.5 rounded-full border px-3 text-xs font-semibold whitespace-nowrap transition-colors sm:h-9 sm:px-3.5",
-                      maxDailyBudget < 80
-                        ? "border-lime-500/50 bg-lime-50/80 text-lime-900 dark:border-lime-500/40 dark:bg-lime-950/30 dark:text-lime-300"
-                        : "border-zinc-200/90 bg-white text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200"
-                    )}
-                  >
-                    <SlidersHorizontal className="size-3.5 text-lime-600 dark:text-lime-400" />
-                    <span>
-                      {maxDailyBudget < 80
-                        ? `Up to RM ${maxDailyBudget}/day`
-                        : "Daily Budget"}
-                    </span>
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent
-                  align="start"
-                  className="w-[calc(100vw-2rem)] max-w-72 rounded-3xl border-zinc-200/80 p-4 shadow-xl dark:border-zinc-800"
-                >
-                  <div className="flex flex-col gap-3.5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-zinc-900 dark:text-white">
-                        Max Daily Rate
-                      </span>
-                      <span className="font-mono text-xs font-bold text-lime-700 dark:text-lime-400">
-                        RM {maxDailyBudget} / day
-                      </span>
-                    </div>
-                    <Slider
-                      value={[maxDailyBudget]}
-                      min={12}
-                      max={80}
-                      step={2}
-                      onValueChange={(val) => setMaxDailyBudget(val[0] ?? 80)}
-                    />
-                    <div className="flex justify-between text-[10px] text-zinc-400">
-                      <span>RM 12/day</span>
-                      <span>RM 40/day</span>
-                      <span>RM 80+/day</span>
-                    </div>
-                  </div>
-                </PopoverContent>
-              </Popover>
-
-              {/* Box & Pallet Space Estimator Sheet Trigger */}
-              <div className="shrink-0">
-                <SpaceEstimatorSheet
-                  open={estimatorOpen}
-                  onOpenChange={setEstimatorOpen}
-                  onApply={(sqFt, suggestedCat) => {
-                    setRequiredSqFt(sqFt)
-                    if (suggestedCat && suggestedCat !== "all") {
-                      setSelectedCategory(suggestedCat)
-                    }
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Right Controls (Desktop): Sort + View Mode Switcher */}
-            <div className="hidden items-center gap-2 lg:flex">
-              <Select
-                value={sortBy}
-                onValueChange={(val) =>
-                  setSortBy(
-                    val as
-                      | "recommended"
-                      | "price-asc"
-                      | "sqft-desc"
-                      | "rating"
-                  )
-                }
-              >
-                <SelectTrigger
-                  size="sm"
-                  className="h-9 rounded-full border-zinc-200/90 bg-white px-3 text-xs font-medium dark:border-zinc-800 dark:bg-zinc-900"
-                >
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent className="rounded-2xl">
-                  <SelectItem value="recommended" className="text-xs">
-                    Sort: Recommended
-                  </SelectItem>
-                  <SelectItem value="price-asc" className="text-xs">
-                    Daily Rate: Low to High
-                  </SelectItem>
-                  <SelectItem value="sqft-desc" className="text-xs">
-                    Available Sq.Ft: High to Low
-                  </SelectItem>
-                  <SelectItem value="rating" className="text-xs">
-                    Highest Rated Hubs
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Secondary Row: Category Tabs + Amenity Filter Pills */}
-          <div className="mt-2.5 flex items-center justify-between gap-2.5 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] sm:mt-3 sm:gap-3 [&::-webkit-scrollbar]:hidden">
-            {/* Category Switcher */}
-            <div className="flex shrink-0 items-center gap-1.5">
-              {SPACE_CATEGORIES.map((cat) => {
-                const isActive = selectedCategory === cat.id
-                return (
-                  <button
-                    key={cat.id}
-                    type="button"
-                    onClick={() => setSelectedCategory(cat.id)}
-                    className={cn(
-                      "rounded-full px-3.5 py-1.5 text-xs font-semibold whitespace-nowrap transition-all",
-                      isActive
-                        ? "bg-primary text-primary-foreground shadow-2xs"
-                        : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200/70 hover:text-zinc-950 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
-                    )}
-                  >
-                    {cat.shortLabel}
-                  </button>
-                )
-              })}
-            </div>
-
-            <div className="h-4 w-px shrink-0 bg-zinc-200 dark:bg-zinc-800" />
-
-            {/* Instant Book + Amenity Quick Pills */}
-            <div className="flex flex-1 items-center gap-1.5">
-              <button
-                type="button"
-                onClick={() => setInstantBookOnly((prev) => !prev)}
-                className={cn(
-                  "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-medium whitespace-nowrap transition-colors",
-                  instantBookOnly
-                    ? "border-lime-600 bg-lime-500/15 text-lime-800 dark:border-lime-400 dark:text-lime-300"
-                    : "border-zinc-200/80 bg-white text-zinc-600 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400"
-                )}
-              >
-                <Zap className="size-3 text-lime-600 dark:text-lime-400" />
-                <span>Instant Book</span>
-              </button>
-
-              {AMENITY_FILTERS.slice(0, 5).map((amenity) => {
-                const isSelected = selectedAmenities.includes(amenity)
-                return (
-                  <button
-                    key={amenity}
-                    type="button"
-                    onClick={() => toggleAmenity(amenity)}
-                    className={cn(
-                      "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-medium whitespace-nowrap transition-colors",
-                      isSelected
-                        ? "border-lime-600 bg-lime-500/15 text-lime-800 dark:border-lime-400 dark:text-lime-300"
-                        : "border-zinc-200/80 bg-white text-zinc-600 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400"
-                    )}
-                  >
-                    {isSelected && <Check className="size-3" />}
-                    <span>{amenity}</span>
-                  </button>
-                )
-              })}
-
-              {activeFilterCount > 0 && (
-                <button
-                  type="button"
-                  onClick={resetFilters}
-                  className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold whitespace-nowrap text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
-                >
-                  <RotateCcw className="size-3" />
-                  <span>Reset ({activeFilterCount})</span>
-                </button>
-              )}
-            </div>
-          </div>
+      {/* Top Sticky Smart Search Bar */}
+      <div className="bg-background/90 sticky top-16 z-30 border-b border-zinc-200/70 backdrop-blur-md sm:top-18 dark:border-zinc-800">
+        <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3.5 sm:px-6">
+          <SmartSearch
+            filters={filters}
+            onChange={updateFilters}
+            onReplace={replaceFilters}
+            resultCount={filteredSpaces.length}
+            onOpenEstimator={() => setEstimatorOpen(true)}
+          />
+          <FiltersSheet
+            filters={filters}
+            onChange={updateFilters}
+            resultCount={filteredSpaces.length}
+          />
+          <SpaceEstimatorSheet
+            open={estimatorOpen}
+            onOpenChange={setEstimatorOpen}
+            trigger={null}
+            onApply={(sqft, suggestedCat) =>
+              updateFilters({
+                sqft,
+                ...(suggestedCat && suggestedCat !== "all"
+                  ? { category: suggestedCat }
+                  : {}),
+              })
+            }
+          />
         </div>
       </div>
 
@@ -568,31 +261,48 @@ export function ExploreSpaces() {
         <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-12">
           {/* Left / Main Listings Column */}
             <div className="flex flex-col gap-5 lg:col-span-7">
-              {/* Results Count & Active Estimator Banner */}
-              <div className="flex flex-wrap items-center justify-between gap-2">
+              {/* Results summary */}
+              <div className="flex flex-col gap-2.5">
                 <div>
                   <h1 className="text-lg font-bold tracking-tight text-zinc-950 dark:text-white">
-                    {filteredSpaces.length} verified storage{" "}
-                    {filteredSpaces.length === 1 ? "hub" : "hubs"} available
+                    {describeResults(filters, filteredSpaces.length)}
                   </h1>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                    Pay-per-day rates in MYR • Zero lease lock-in • Click any
-                    card to locate on map
+                    {requiredSqFt > 0
+                      ? `Daily rates shown for ${requiredSqFt} sq.ft`
+                      : "Pay-per-day rates in MYR"}{" "}
+                    • No lease lock-in
                   </p>
                 </div>
 
-                {requiredSqFt > 0 && (
-                  <div className="inline-flex items-center gap-2 rounded-full border border-lime-500/40 bg-lime-50/70 px-3 py-1 text-xs font-semibold text-lime-900 dark:border-lime-500/30 dark:bg-lime-950/30 dark:text-lime-300">
-                    <Sparkles className="size-3.5 text-lime-600 dark:text-lime-400" />
-                    <span>Showing rates for {requiredSqFt} sq.ft</span>
-                    <button
-                      type="button"
-                      onClick={() => setRequiredSqFt(0)}
-                      className="ml-1 rounded-full p-0.5 hover:bg-lime-200/60 dark:hover:bg-lime-900"
-                      aria-label="Clear sq.ft filter"
-                    >
-                      <X className="size-3" />
-                    </button>
+                {activeChips.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {activeChips.map((chip) => (
+                      <span
+                        key={chip.key}
+                        className="inline-flex items-center gap-1 rounded-full bg-zinc-100 py-1 pr-1 pl-2.5 text-[11px] font-medium text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300"
+                      >
+                        {chip.label}
+                        <button
+                          type="button"
+                          onClick={chip.clear}
+                          className="rounded-full p-0.5 text-zinc-400 hover:bg-zinc-200 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-white"
+                          aria-label={`Remove ${chip.label}`}
+                        >
+                          <X className="size-3" />
+                        </button>
+                      </span>
+                    ))}
+                    {!isDefaultFilters(filters) && (
+                      <button
+                        type="button"
+                        onClick={resetFilters}
+                        className="inline-flex items-center gap-1 px-1.5 text-[11px] font-semibold text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+                      >
+                        <RotateCcw className="size-3" />
+                        Clear all
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
@@ -604,17 +314,16 @@ export function ExploreSpaces() {
                     <Filter className="size-6" />
                   </div>
                   <h2 className="mt-4 text-base font-bold text-zinc-950 dark:text-white">
-                    No storage hubs match those exact filters
+                    Nothing matches that yet
                   </h2>
                   <p className="mt-1 max-w-sm text-xs text-zinc-500 dark:text-zinc-400">
-                    Try adjusting your square footage requirement, daily budget,
-                    or switching to &ldquo;All Locations&rdquo;.
+                    Try removing a filter above, or describe what you need differently.
                   </p>
                   <Button
                     onClick={resetFilters}
                     className="mt-5 rounded-full px-5 text-xs font-semibold"
                   >
-                    Reset All Filters
+                    Start over
                   </Button>
                 </div>
               ) : (
@@ -632,10 +341,7 @@ export function ExploreSpaces() {
                       requiredSqFt > 0
                         ? Math.max(space.minSqFt, requiredSqFt)
                         : space.defaultSqFt
-                    const displayDailyPrice =
-                      requiredSqFt > 0
-                        ? calculateDailyRateForSqFt(space, targetSqFt)
-                        : space.pricePerDay
+                    const displayDailyPrice = priceForSize(space, requiredSqFt)
 
                     return (
                       <div
