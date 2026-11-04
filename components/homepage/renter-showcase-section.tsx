@@ -5,25 +5,13 @@ import Link from "next/link"
 import {
   ArrowRight,
   Check,
-  ChevronRight,
-  MapPin,
-  Maximize2,
   QrCode,
-  ShieldCheck,
   Sparkles,
-  Star,
   Truck,
-  Zap,
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import {
-  SPACE_CATEGORIES,
-  STORAGE_SPACES,
-  type SpaceCategory,
-} from "@/lib/spaces-data"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { type SpaceCategory } from "@/lib/spaces-data"
 
 const universalStorageRows = [
   ["Luggage", "Moving Boxes", "Furniture", "Baby Gear"],
@@ -31,18 +19,116 @@ const universalStorageRows = [
   ["Retail Stock", "Packaging", "Archives", "Equipment"],
 ]
 
-export function RenterShowcaseSection() {
-  const [selectedCategory, setSelectedCategory] = React.useState<
-    "all" | SpaceCategory
-  >("all")
+interface RenterPersonaCard {
+  id: string
+  pillLabel: string
+  cardTitle: string
+  fitHint: string
+  category: SpaceCategory
+  href: string
+  image: string
+}
 
-  const displayedSpaces = React.useMemo(() => {
-    const filtered =
-      selectedCategory === "all"
-        ? STORAGE_SPACES
-        : STORAGE_SPACES.filter((s) => s.category === selectedCategory)
-    return filtered.slice(0, 6)
-  }, [selectedCategory])
+const RENTER_PERSONAS: RenterPersonaCard[] = [
+  {
+    id: "tiktok-shopee",
+    pillLabel: "TikTok & Shopee sellers",
+    cardTitle: "TikTok Shop &\nShopee sellers",
+    fitHint: "50–350 sq.ft • Fast-pick racks",
+    category: "shoplot",
+    href: "/explore?category=shoplot",
+    image:
+      "https://images.unsplash.com/photo-1556740738-b6a63e27c4df?auto=format&fit=crop&w=700&q=80",
+  },
+  {
+    id: "growing-smes",
+    pillLabel: "Growing SMEs",
+    cardTitle: "Growing SMEs\n& distributors",
+    fitHint: "200–1,500 sq.ft • Pallet bays",
+    category: "warehouse",
+    href: "/explore?category=warehouse",
+    image:
+      "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=700&q=80",
+  },
+  {
+    id: "home-movers",
+    pillLabel: "Home movers & renovators",
+    cardTitle: "Home movers &\nrenovators",
+    fitHint: "50–150 sq.ft • Ground-floor rooms",
+    category: "residential",
+    href: "/explore?category=residential",
+    image:
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=700&q=80",
+  },
+  {
+    id: "popup-brands",
+    pillLabel: "Pop-up & bazaar brands",
+    cardTitle: "Pop-up &\nbazaar brands",
+    fitHint: "40–200 sq.ft • Booth & event gear",
+    category: "shoplot",
+    href: "/explore?category=shoplot",
+    image:
+      "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=700&q=80",
+  },
+  {
+    id: "cafes-fnb",
+    pillLabel: "Cafes & F&B outlets",
+    cardTitle: "Cafes &\nF&B outlets",
+    fitHint: "60–250 sq.ft • Dry cup & packaging",
+    category: "shoplot",
+    href: "/explore?category=shoplot",
+    image:
+      "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=700&q=80",
+  },
+  {
+    id: "students",
+    pillLabel: "University students",
+    cardTitle: "Students on\nsemester break",
+    fitHint: "25–60 sq.ft • Luggage & boxes",
+    category: "residential",
+    href: "/explore?category=residential",
+    image:
+      "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=700&q=80",
+  },
+  {
+    id: "creators-studios",
+    pillLabel: "Creators & live studios",
+    cardTitle: "Creators &\nlive studios",
+    fitHint: "50–200 sq.ft • Samples & lighting",
+    category: "shoplot",
+    href: "/explore?category=shoplot",
+    image:
+      "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=700&q=80",
+  },
+  {
+    id: "campaign-overflow",
+    pillLabel: "11.11 & Raya overflow",
+    cardTitle: "11.11 & Raya\ncampaigns",
+    fitHint: "300–2,500 sq.ft • Zero lock-in",
+    category: "warehouse",
+    href: "/explore?category=warehouse",
+    image:
+      "https://images.unsplash.com/photo-1580674285054-bed31e145f59?auto=format&fit=crop&w=700&q=80",
+  },
+]
+
+export function RenterShowcaseSection() {
+  const [activeOptionId, setActiveOptionId] = React.useState<string | null>(
+    null
+  )
+  const cardRefs = React.useRef<Record<string, HTMLAnchorElement | null>>({})
+
+  const handleSelectOption = (optionId: string) => {
+    setActiveOptionId((prev) => (prev === optionId ? null : optionId))
+    const cardEl = cardRefs.current[optionId]
+    if (cardEl) {
+      cardEl.scrollIntoView({
+        behavior: "smooth",
+        inline: "center",
+        block: "nearest",
+      })
+    }
+  }
 
   return (
     <section
@@ -51,7 +137,7 @@ export function RenterShowcaseSection() {
     >
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Part 1: "The way storage should've been done in the first place" 3-Card Bento */}
-        <div className="mb-24">
+        <div>
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="mt-3 text-4xl leading-[1.08] font-semibold tracking-tight text-zinc-950 sm:text-5xl md:text-[54px] dark:text-white">
               The way storage{" "}
@@ -127,7 +213,7 @@ export function RenterShowcaseSection() {
                 </h3>
                 <p className="mt-1.5 text-sm leading-snug text-lime-100/90">
                   Whether you&apos;re between apartments, renovating your home,
-                  or staging campaign stock—only pay for the exact days you
+                  or staging campaign stock, only pay for the exact days you
                   need.
                 </p>
               </div>
@@ -279,142 +365,239 @@ export function RenterShowcaseSection() {
                 </h3>
                 <p className="mt-1.5 text-sm leading-snug text-orange-50/90">
                   We turn idle neighborhood rooms and shoplots into verified
-                  local hubs—drop off 24/7 or book a pickup in one tap.
+                  local hubs, drop off 24/7 or book a pickup in one tap.
                 </p>
               </div>
             </Link>
           </div>
         </div>
 
-        {/* Part 2: Featured Verified Storage Hubs Grid */}
-        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-          <div>
-            <span className="block text-xs font-semibold tracking-wide text-lime-700 dark:text-lime-400">
-              • Verified Micro-Hubs
-            </span>
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-zinc-950 sm:text-4xl dark:text-white">
-              Explore instant-book spaces near you
-            </h2>
-          </div>
+        {/* Middle Section: Trust & Brand Social Proof Wall (in between Part 1 & Part 2) */}
+        <div className="mx-auto my-20 flex max-w-4xl flex-col items-center border-y border-zinc-200/80 py-16 text-center sm:my-24 sm:py-20 dark:border-zinc-800">
+          <h2 className="max-w-3xl text-2xl leading-[1.3] font-light tracking-tight text-zinc-950 sm:text-4xl dark:text-white">
+            <strong className="font-bold">1,200+</strong> space hosts and{" "}
+            <strong className="font-bold">20,000+</strong> renters &amp; SMEs
+            <br className="hidden sm:inline" /> unlock flexible daily storage
+            with Packrat
+          </h2>
 
-          {/* Category Filter Pills */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            {SPACE_CATEGORIES.map((cat) => (
-              <button
-                key={cat.id}
-                type="button"
-                onClick={() => setSelectedCategory(cat.id)}
-                className={cn(
-                  "rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all",
-                  selectedCategory === cat.id
-                    ? "bg-primary text-primary-foreground shadow-2xs"
-                    : "border border-zinc-200/80 bg-white text-zinc-600 hover:bg-zinc-100 dark:border-white/10 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:border-white/20"
-                )}
+          {/* Row 1: 5 Monochrome Malaysian SME & Homegrown Brand Logos */}
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-x-10 gap-y-6 text-zinc-900 sm:mt-12 sm:gap-x-14 dark:text-zinc-200">
+            {/* Shopee */}
+            <div className="flex items-center gap-1.5 opacity-85 transition-opacity hover:opacity-100">
+              <svg
+                className="size-6"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
               >
-                {cat.shortLabel}
-              </button>
-            ))}
+                <path d="M5 7h14l-1.2 13a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8L5 7Z" />
+                <path d="M9 7V5a3 3 0 0 1 6 0v2" />
+                <path
+                  d="M14.2 11.2c-.4-.5-1.1-.8-2-.8-1.2 0-2 .6-2 1.4 0 .9.9 1.2 2.1 1.5 1.3.3 2.1.7 2.1 1.7 0 1-.9 1.6-2.3 1.6-1 0-1.9-.4-2.3-1"
+                  strokeLinecap="round"
+                />
+              </svg>
+              <span className="text-lg font-bold tracking-tight">Shopee</span>
+            </div>
+
+            {/* Lalamove */}
+            <div className="flex items-center gap-2 opacity-85 transition-opacity hover:opacity-100">
+              <svg className="size-6" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M4 5.5 15.5 11 21 7.5l-4.5 6.8L20 19l-7.5-3.2L6 19.5l3.2-6.2L4 5.5Z" />
+              </svg>
+              <span className="text-base font-black tracking-[0.12em] uppercase">
+                LALAMOVE
+              </span>
+            </div>
+
+            {/* EasyParcel (Penang-founded SME Logistics) */}
+            <div className="flex items-center gap-2 opacity-85 transition-opacity hover:opacity-100">
+              <svg
+                className="size-5.5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+                <path d="m3.3 7 8.7 5 8.7-5M12 22V12" />
+              </svg>
+              <span className="text-lg font-bold tracking-tight">
+                Easy<span className="font-normal">Parcel</span>
+              </span>
+            </div>
+
+            {/* MONTiGO */}
+            <div className="flex items-center gap-1.5 opacity-85 transition-opacity hover:opacity-100">
+              <svg
+                className="size-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+              >
+                <path d="M8 3h8l1 4H7l1-4Z" />
+                <path d="M7 7h10l-1.2 13a2 2 0 0 1-2 1.8h-3.6a2 2 0 0 1-2-1.8L7 7Z" />
+              </svg>
+              <span className="text-base font-extrabold tracking-[0.16em] uppercase">
+                MONTiGO
+              </span>
+            </div>
+
+            {/* Christy Ng */}
+            <div className="flex items-center gap-2 opacity-85 transition-opacity hover:opacity-100">
+              <span className="font-[family-name:var(--font-editorial)] text-2xl tracking-wider uppercase">
+                Christy Ng
+              </span>
+            </div>
           </div>
-        </div>
 
-        {/* Spaces Grid */}
-        <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {displayedSpaces.map((space) => (
-            <div
-              key={space.id}
-              className="group flex flex-col justify-between rounded-3xl border border-zinc-200/80 bg-white p-3.5 shadow-2xs transition-all hover:border-zinc-300 hover:shadow-md dark:border-white/10 dark:bg-zinc-900/70 dark:hover:border-white/20"
-            >
-              <div>
-                <Link
-                  href={`/spaces/${space.id}`}
-                  className="relative block h-48 w-full overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-800"
-                >
-                  <img
-                    src={space.images[0]}
-                    alt={space.title}
-                    className="size-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                  <span className="absolute top-2.5 left-2.5 rounded-full bg-zinc-950/75 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur-xs">
-                    {space.categoryLabel}
-                  </span>
-                  {space.instantBook && (
-                    <Badge className="bg-primary text-primary-foreground absolute top-2.5 right-2.5 rounded-full border-0 px-2.5 py-0.5 text-[10px] font-bold">
-                      <Zap className="size-3" />
-                      Instant Book
-                    </Badge>
-                  )}
-                </Link>
-
-                <div className="mt-3.5 px-1">
-                  <div className="flex items-start justify-between gap-2">
-                    <Link
-                      href={`/spaces/${space.id}`}
-                      className="line-clamp-1 text-sm font-bold text-zinc-950 hover:underline dark:text-white"
-                    >
-                      {space.title}
-                    </Link>
-                    <span className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-zinc-800 dark:text-zinc-200">
-                      <Star className="size-3.5 fill-amber-400 text-amber-400" />
-                      {space.rating}
-                    </span>
-                  </div>
-
-                  <p className="mt-1 flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400">
-                    <MapPin className="size-3.5 text-lime-600 dark:text-lime-400" />
-                    <span>{space.location}</span>
-                  </p>
-
-                  <div className="mt-3 flex items-center gap-3 border-y border-zinc-100 py-2.5 text-[11px] text-zinc-500 dark:border-white/10 dark:text-zinc-400">
-                    <span className="inline-flex items-center gap-1">
-                      <Maximize2 className="size-3 text-zinc-400" />
-                      {space.minSqFt}–{space.availableSqFt} sq.ft
-                    </span>
-                    <span className="inline-flex items-center gap-1">
-                      <Truck className="size-3 text-zinc-400" />
-                      {space.specs.loadingAccess.split(" ")[0]}
-                    </span>
-                    <span className="inline-flex items-center gap-1">
-                      <ShieldCheck className="size-3 text-zinc-400" />
-                      24/7 Access
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-3.5 flex items-center justify-between px-1">
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-base font-bold text-zinc-950 dark:text-white">
-                    RM {space.pricePerDay} / day
-                  </span>
-                  <span className="text-[11px] font-semibold text-lime-700 dark:text-lime-400">
-                    (0 Lock-in)
-                  </span>
-                </div>
-
-                <Button
-                  size="sm"
-                  asChild
-                  className="h-8 rounded-full px-4 text-xs font-semibold"
-                >
-                  <Link href={`/spaces/${space.id}`}>Book Space</Link>
-                </Button>
+          {/* Row 2: 4 Monochrome Malaysian SME & Heritage Brand Logos */}
+          <div className="mt-7 flex flex-wrap items-center justify-center gap-x-10 gap-y-6 text-zinc-900 sm:gap-x-14 dark:text-zinc-200">
+            {/* ZUS Coffee */}
+            <div className="flex items-center gap-2 opacity-85 transition-opacity hover:opacity-100">
+              <svg className="size-5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" />
+              </svg>
+              <div className="flex items-baseline gap-1">
+                <span className="text-lg font-black tracking-wider uppercase">
+                  ZUS
+                </span>
+                <span className="text-xs font-semibold tracking-widest uppercase opacity-75">
+                  COFFEE
+                </span>
               </div>
             </div>
-          ))}
+
+            {/* dUCk */}
+            <div className="flex items-center opacity-85 transition-opacity hover:opacity-100">
+              <span className="text-xl font-extrabold tracking-tight">
+                dUCk
+              </span>
+            </div>
+
+            {/* Ghee Hiang (Penang Heritage Brand) */}
+            <div className="flex items-center gap-2 opacity-85 transition-opacity hover:opacity-100">
+              <svg
+                className="size-5.5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.75"
+              >
+                <polygon points="12 2 19 5 22 12 19 19 12 22 5 19 2 12 5 5 12 2" />
+                <circle cx="12" cy="12" r="4.5" />
+              </svg>
+              <div className="flex flex-col items-start leading-none">
+                <span className="text-sm font-bold tracking-wider uppercase">
+                  Ghee Hiang
+                </span>
+                <span className="text-[8px] font-semibold tracking-widest uppercase opacity-70">
+                  PENANG • EST. 1856
+                </span>
+              </div>
+            </div>
+
+            {/* Exabytes (Penang-founded Enterprise/SME) */}
+            <div className="flex items-center gap-1.5 opacity-85 transition-opacity hover:opacity-100">
+              <svg className="size-5" viewBox="0 0 24 24" fill="currentColor">
+                <circle cx="12" cy="16" r="2.5" />
+                <path d="M5.5 12.5a9.2 9.2 0 0 1 13 0l-1.9 1.9a6.5 6.5 0 0 0-9.2 0l-1.9-1.9z" />
+              </svg>
+              <span className="text-base font-bold tracking-tight lowercase">
+                exabytes
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Part 2: Renter Personas Portrait Strip */}
+      <div>
+        <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
+          <h2 className="text-3xl leading-[1.12] font-semibold tracking-tight text-zinc-950 sm:text-5xl dark:text-white">
+            Built for every stage of{" "}
+            <span className="font-[family-name:var(--font-editorial)] text-[1.08em] font-normal italic text-lime-600 dark:text-primary">
+              growth
+            </span>{" "}
+            &amp; life
+          </h2>
+          <p className="mt-3 text-base text-zinc-600 sm:text-lg dark:text-zinc-400">
+            Whether you&apos;re dispatching daily TikTok Shop orders, scaling
+            11.11 pallets, or renovating your home, book only the space and days
+            you need.
+          </p>
         </div>
 
-        {/* Bottom CTA to Full Explore Map & Grid */}
-        <div className="mt-10 flex justify-center">
-          <Button
-            size="lg"
-            asChild
-            className="h-11 gap-2 rounded-full px-8 text-xs font-bold"
-          >
-            <Link href="/explore">
-              <span>Explore All Verified Hubs on Split Map</span>
-              <ChevronRight className="size-4" />
-            </Link>
-          </Button>
+        {/* Horizontal Renter Persona Cards Strip */}
+        <div className="mt-10 w-full overflow-x-auto py-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="mx-auto flex w-max items-center gap-4 px-4 sm:gap-5 sm:px-8">
+            {RENTER_PERSONAS.map((persona) => {
+              const isSelected = activeOptionId === persona.id
+              return (
+                <Link
+                  key={persona.id}
+                  href={persona.href}
+                  ref={(el) => {
+                    cardRefs.current[persona.id] = el
+                  }}
+                  className={cn(
+                    "group relative h-[300px] w-[195px] shrink-0 overflow-hidden rounded-[22px] bg-zinc-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl sm:h-[330px] sm:w-[215px] dark:bg-zinc-800",
+                    isSelected
+                      ? "ring-primary ring-offset-background -translate-y-1 shadow-xl ring-2 ring-offset-2"
+                      : "shadow-xs ring-1 ring-inset ring-black/6 dark:ring-white/10"
+                  )}
+                >
+                  <img
+                    src={persona.image}
+                    alt={persona.pillLabel}
+                    className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+
+                  {/* Top & Bottom Readability Scrims */}
+                  <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/60 via-black/20 to-transparent" />
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/65 via-black/25 to-transparent" />
+
+                  {/* Top-Left Persona Title */}
+                  <div className="absolute top-5 right-4 left-5">
+                    <h3 className="text-lg leading-[1.15] font-bold tracking-tight whitespace-pre-line text-white drop-shadow-xs sm:text-[19px]">
+                      {persona.cardTitle}
+                    </h3>
+                  </div>
+
+                  {/* Bottom-Left Fit Hint */}
+                  <div className="absolute right-4 bottom-4 left-5 flex items-center justify-between text-[11px] font-medium text-white/90">
+                    <span className="truncate">{persona.fitHint}</span>
+                    <ArrowRight className="size-3.5 shrink-0 opacity-75 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:opacity-100" />
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Bottom Centered Renter Persona Pills */}
+        <div className="mx-auto mt-9 flex max-w-5xl flex-wrap items-center justify-center gap-2.5 px-4 sm:px-6">
+          {RENTER_PERSONAS.map((persona) => {
+            const isSelected = activeOptionId === persona.id
+            return (
+              <button
+                key={persona.id}
+                type="button"
+                onClick={() => handleSelectOption(persona.id)}
+                className={cn(
+                  "rounded-full border px-4 py-1.5 text-xs font-medium transition-all",
+                  isSelected
+                    ? "border-zinc-900 bg-zinc-900 text-white shadow-2xs dark:border-white dark:bg-white dark:text-zinc-950"
+                    : "border-zinc-200/80 bg-zinc-50/70 text-zinc-600 hover:border-zinc-300 hover:bg-zinc-100 hover:text-zinc-950 dark:border-white/10 dark:bg-zinc-900/60 dark:text-zinc-400 dark:hover:border-white/20 dark:hover:text-white"
+                )}
+              >
+                {persona.pillLabel}
+              </button>
+            )
+          })}
         </div>
       </div>
     </section>
