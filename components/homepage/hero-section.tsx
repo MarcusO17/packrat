@@ -404,26 +404,26 @@ export function HeroSection() {
           {/* Center Featured Storage Hub Card Overlay */}
           <div
             data-map-interactive="true"
-            className="absolute top-1/2 left-1/2 z-30 w-[calc(100%-2rem)] max-w-[300px] -translate-x-1/2 -translate-y-[44%] sm:w-[320px] sm:max-w-none"
+            className="absolute top-1/2 left-1/2 z-30 w-[236px] -translate-x-1/2 -translate-y-[44%] sm:w-[320px]"
           >
-            <div className="rounded-3xl border border-zinc-200/80 bg-white p-3 shadow-[0_20px_50px_rgba(0,0,0,0.12)] dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="rounded-2xl border border-zinc-200/80 bg-white p-2 shadow-[0_20px_50px_rgba(0,0,0,0.12)] sm:rounded-3xl sm:p-3 dark:border-zinc-800 dark:bg-zinc-900">
               {/* Storage Hub Image */}
               <Link
                 href="/spaces/bayan-lepas-ftz-sme-bay"
-                className="relative block h-40 w-full overflow-hidden rounded-2xl bg-zinc-100"
+                className="relative block h-28 w-full overflow-hidden rounded-xl bg-zinc-100 sm:h-40 sm:rounded-2xl"
               >
                 <img
                   src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=700&q=80"
                   alt="Climate-Controlled SME Warehouse Bay"
                   className="size-full object-cover transition-transform duration-300 hover:scale-105"
                 />
-                <Badge className="bg-primary text-primary-foreground hover:bg-primary/90 absolute top-2.5 right-2.5 rounded-full border-0 px-2.5 py-0.5 text-[11px] font-semibold shadow-xs">
+                <Badge className="bg-primary text-primary-foreground hover:bg-primary/90 absolute top-2 right-2 rounded-full border-0 px-2 py-0 text-[10px] font-semibold shadow-xs sm:top-2.5 sm:right-2.5 sm:px-2.5 sm:py-0.5 sm:text-[11px]">
                   Instant Book
                 </Badge>
 
                 {/* Carousel Dots */}
-                <div className="absolute bottom-2.5 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full bg-black/35 px-2 py-1 backdrop-blur-xs">
-                  <span className="bg-primary h-1 w-3 rounded-full" />
+                <div className="absolute bottom-2 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full bg-black/35 px-1.5 py-0.5 backdrop-blur-xs sm:bottom-2.5 sm:px-2 sm:py-1">
+                  <span className="bg-primary h-1 w-2.5 rounded-full sm:w-3" />
                   <span className="size-1 rounded-full bg-white/60" />
                   <span className="size-1 rounded-full bg-white/60" />
                   <span className="size-1 rounded-full bg-white/60" />
@@ -431,53 +431,54 @@ export function HeroSection() {
               </Link>
 
               {/* Card Details */}
-              <div className="mt-3 px-1">
+              <div className="mt-2 px-0.5 sm:mt-3 sm:px-1">
                 <Link
                   href="/spaces/bayan-lepas-ftz-sme-bay"
-                  className="text-sm font-bold text-zinc-950 hover:underline dark:text-white"
+                  className="block truncate text-xs font-bold text-zinc-950 hover:underline sm:text-sm dark:text-white"
                 >
                   Climate-Controlled SME Bay
                 </Link>
-                <p className="mt-1 flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
-                  <span className="inline-flex items-center gap-1">
-                    <MapPin className="size-3.5 text-lime-600 dark:text-lime-400" />
-                    <span>Bayan Lepas, Penang</span>
+                <p className="mt-0.5 flex items-center justify-between text-[11px] text-zinc-500 sm:mt-1 sm:text-xs dark:text-zinc-400">
+                  <span className="inline-flex items-center gap-1 truncate">
+                    <MapPin className="size-3 shrink-0 text-lime-600 sm:size-3.5 dark:text-lime-400" />
+                    <span className="truncate">Bayan Lepas, Penang</span>
                   </span>
-                  <span className="font-mono text-[10px] text-zinc-400">
+                  <span className="hidden font-mono text-[10px] text-zinc-400 sm:inline">
                     5.3185°N, 100.2870°E
                   </span>
                 </p>
 
                 {/* Storage Specs Row */}
-                <div className="mt-2.5 flex items-center gap-3 border-b border-zinc-100 pb-3 text-[11px] text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
+                <div className="mt-2 flex items-center justify-between border-b border-zinc-100 pb-2 text-[10px] text-zinc-500 sm:mt-2.5 sm:justify-start sm:gap-3 sm:pb-3 sm:text-[11px] dark:border-zinc-800 dark:text-zinc-400">
                   <span className="inline-flex items-center gap-1">
-                    <Maximize2 className="size-3 text-zinc-400" />
+                    <Maximize2 className="size-2.5 text-zinc-400 sm:size-3" />
                     350 sq.ft
                   </span>
                   <span className="inline-flex items-center gap-1">
-                    <Truck className="size-3 text-zinc-400" />
+                    <Truck className="size-2.5 text-zinc-400 sm:size-3" />
                     Loading Bay
                   </span>
                   <span className="inline-flex items-center gap-1">
-                    <ShieldCheck className="size-3 text-zinc-400" />
-                    24/7 Access
+                    <ShieldCheck className="size-2.5 text-zinc-400 sm:size-3" />
+                    24/7
+                    <span className="hidden sm:inline">Access</span>
                   </span>
                 </div>
 
                 {/* Price & CTA Row */}
-                <div className="mt-3 flex items-center justify-between">
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-sm font-bold text-zinc-950 dark:text-white">
+                <div className="mt-2 flex items-center justify-between sm:mt-3">
+                  <div className="flex items-baseline gap-1 sm:gap-1.5">
+                    <span className="text-xs font-bold text-zinc-950 sm:text-sm dark:text-white">
                       RM 28 / day
                     </span>
-                    <span className="text-[11px] font-semibold text-lime-700 dark:text-lime-400">
+                    <span className="text-[10px] font-semibold text-lime-700 sm:text-[11px] dark:text-lime-400">
                       (0 Lock-in)
                     </span>
                   </div>
                   <Button
                     size="sm"
                     asChild
-                    className="h-7 rounded-full px-3 text-[11px] font-semibold"
+                    className="h-6 rounded-full px-2.5 text-[10px] font-semibold sm:h-7 sm:px-3 sm:text-[11px]"
                   >
                     <Link href="/spaces/bayan-lepas-ftz-sme-bay">
                       Book Space
@@ -490,12 +491,12 @@ export function HeroSection() {
             {/* Map Cluster Pin Indicator ("20") below card */}
             <Link
               href="/explore"
-              className="mt-3 flex flex-col items-center transition-transform hover:scale-105"
+              className="mt-2 flex flex-col items-center transition-transform hover:scale-105 sm:mt-3"
             >
-              <div className="bg-primary text-primary-foreground flex size-10 items-center justify-center rounded-full border-2 border-white text-xs font-bold shadow-lg dark:border-zinc-800">
+              <div className="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-full border-2 border-white text-[11px] font-bold shadow-lg sm:size-10 sm:text-xs dark:border-zinc-800">
                 20
               </div>
-              <div className="bg-primary/60 h-2 w-0.5" />
+              <div className="bg-primary/60 h-1.5 w-0.5 sm:h-2" />
             </Link>
           </div>
         </CoordMap>
