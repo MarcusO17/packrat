@@ -38,7 +38,7 @@ export interface CalendarProps {
 }
 
 export function Calendar({ selected, onSelect, className }: CalendarProps) {
-  const today = React.useMemo(() => new Date(), [])
+  const today = React.useMemo(() => new Date(2026, 10, 4), [])
   const [viewDate, setViewDate] = React.useState<Date>(
     selected ?? new Date(today.getFullYear(), today.getMonth(), 1)
   )
@@ -160,4 +160,3 @@ export function Calendar({ selected, onSelect, className }: CalendarProps) {
     </div>
   )
 }
-

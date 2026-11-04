@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
 import {
   ChevronRight,
   MapPin,
@@ -77,13 +78,18 @@ export function FeaturesSection() {
 
               {/* Dual CTA Buttons */}
               <div className="mt-6 flex flex-wrap items-center gap-3">
-                <Button className="h-10 gap-1.5 rounded-full px-6 text-xs font-semibold">
-                  <span>
-                    {audience === "renters"
-                      ? "Find Storage Near You"
-                      : "Start Hosting Space"}
-                  </span>
-                  <ChevronRight className="size-3.5" />
+                <Button
+                  asChild
+                  className="h-10 gap-1.5 rounded-full px-6 text-xs font-semibold"
+                >
+                  <Link href={audience === "renters" ? "/explore" : "/explore"}>
+                    <span>
+                      {audience === "renters"
+                        ? "Find Storage Near You"
+                        : "Start Hosting Space"}
+                    </span>
+                    <ChevronRight className="size-3.5" />
+                  </Link>
                 </Button>
                 <Button
                   variant="outline"
@@ -210,7 +216,10 @@ export function FeaturesSection() {
                 </div>
 
                 {/* Right Stacked Hub Preview Card */}
-                <div className="relative self-center sm:self-end">
+                <Link
+                  href="/spaces/george-town-shoplot-hub"
+                  className="relative self-center transition-transform hover:scale-[1.02] sm:self-end"
+                >
                   {/* Back Tilted Card */}
                   <div className="absolute -top-2 -left-4 h-36 w-44 -rotate-6 rounded-2xl border border-zinc-200/70 bg-zinc-50/90 p-1.5 shadow-sm dark:border-zinc-700 dark:bg-zinc-800/80">
                     <div className="bg-primary/20 size-full rounded-xl" />
@@ -240,7 +249,7 @@ export function FeaturesSection() {
                       </p>
                     </div>
                   </div>
-                </div>
+                </Link>
               </div>
             </div>
           </div>
