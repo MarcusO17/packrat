@@ -1,10 +1,12 @@
 "use client"
 
 import * as React from "react"
+import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Building2, ChevronRight, Menu } from "lucide-react"
+import { ChevronRight, Menu } from "lucide-react"
 
+import logoPackrat from "@/app/assets/logo-packrat.png"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -28,16 +30,21 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false)
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-zinc-200/70 bg-white/95 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/90">
+    <header className="bg-background/95 sticky top-0 z-50 w-full border-b border-zinc-200/70 backdrop-blur-md dark:border-zinc-800">
       <div className="mx-auto flex h-18 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Left: Brand Logo */}
         <Link
           href="/"
-          className="flex items-center gap-2.5 text-zinc-950 transition-opacity hover:opacity-90 dark:text-white"
+          className="flex items-center gap-2 text-zinc-950 transition-opacity hover:opacity-90 dark:text-white"
         >
-          <div className="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-lg shadow-xs">
-            <Building2 className="size-4.5" />
-          </div>
+          <Image
+            src={logoPackrat}
+            alt="Packrat logo"
+            width={34}
+            height={34}
+            priority
+            className="size-8.5 object-contain"
+          />
           <span className="text-lg font-bold tracking-tight">Packrat</span>
         </Link>
 
@@ -105,9 +112,13 @@ export function Navbar() {
             <SheetContent side="right" className="w-72">
               <SheetHeader className="text-left">
                 <SheetTitle className="flex items-center gap-2">
-                  <div className="bg-primary text-primary-foreground flex size-7 items-center justify-center rounded-md">
-                    <Building2 className="size-4" />
-                  </div>
+                  <Image
+                    src={logoPackrat}
+                    alt="Packrat logo"
+                    width={28}
+                    height={28}
+                    className="size-7 object-contain"
+                  />
                   <span className="font-bold tracking-tight">Packrat</span>
                 </SheetTitle>
               </SheetHeader>
@@ -125,7 +136,7 @@ export function Navbar() {
                       className={cn(
                         "rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                         isActive
-                          ? "bg-primary/10 text-primary"
+                          ? "bg-primary/15 text-zinc-950 font-semibold dark:text-lime-400"
                           : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
                       )}
                     >

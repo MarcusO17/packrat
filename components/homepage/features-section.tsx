@@ -20,24 +20,24 @@ export function FeaturesSection() {
   return (
     <section
       id="about"
-      className="bg-white py-16 sm:py-24 dark:bg-zinc-950"
+      className="bg-background py-16 sm:py-24"
     >
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:items-stretch">
           {/* Left Column: Two-Sided Market Editorial & Switcher */}
           <div className="flex flex-col justify-between lg:col-span-5">
-            <div>
-              <span className="text-primary text-xs font-semibold tracking-wide">
+            <div className="flex flex-col items-start">
+              <span className="block text-xs font-semibold tracking-wide text-lime-700 dark:text-lime-400">
                 • Why Packrat
               </span>
 
               {/* Renter / Host Interactive Pill Switcher */}
-              <div className="mt-4 inline-flex items-center rounded-full border border-zinc-200/80 bg-zinc-100/80 p-1 dark:border-zinc-800 dark:bg-zinc-900">
+              <div className="mt-4 inline-flex items-center gap-1 rounded-full border border-zinc-200/80 bg-zinc-100/80 p-1 dark:border-zinc-800 dark:bg-zinc-900">
                 <button
                   type="button"
                   onClick={() => setAudience("renters")}
                   className={cn(
-                    "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1 text-xs font-semibold transition-all",
+                    "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all",
                     audience === "renters"
                       ? "bg-primary text-primary-foreground shadow-2xs"
                       : "text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white"
@@ -50,7 +50,7 @@ export function FeaturesSection() {
                   type="button"
                   onClick={() => setAudience("hosts")}
                   className={cn(
-                    "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1 text-xs font-semibold transition-all",
+                    "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all",
                     audience === "hosts"
                       ? "bg-primary text-primary-foreground shadow-2xs"
                       : "text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white"
@@ -90,7 +90,7 @@ export function FeaturesSection() {
                   onClick={() =>
                     setAudience(audience === "renters" ? "hosts" : "renters")
                   }
-                  className="h-10 gap-1.5 rounded-full border-zinc-200 px-5 text-xs font-semibold text-zinc-800 hover:bg-zinc-100 dark:border-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-900"
+                  className="h-10 gap-1.5 rounded-full border-zinc-200 bg-white px-5 text-xs font-semibold text-zinc-800 hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
                 >
                   <span>
                     {audience === "renters"
@@ -106,16 +106,16 @@ export function FeaturesSection() {
           {/* Right Column: Bento Feature Cards */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:col-span-7">
             {/* Top-Left Card: Pay-Per-Day / Zero Lease Lock-In */}
-            <div className="flex flex-col justify-between rounded-3xl border border-zinc-100 bg-zinc-50/80 p-6 dark:border-zinc-800/80 dark:bg-zinc-900/60">
+            <div className="flex flex-col justify-between rounded-3xl border border-zinc-200/70 bg-white p-6 shadow-2xs dark:border-zinc-800/80 dark:bg-zinc-900/60">
               {/* Interactive-style Day / Sq.ft Pill Preview */}
-              <div className="mb-8 flex items-center justify-between rounded-full border border-zinc-200/80 bg-white px-4 py-2.5 shadow-2xs dark:border-zinc-800 dark:bg-zinc-950">
+              <div className="mb-8 flex items-center justify-between rounded-full border border-zinc-200/80 bg-zinc-50 px-4 py-2.5 shadow-2xs dark:border-zinc-800 dark:bg-zinc-950">
                 <div className="flex items-center gap-2">
-                  <CalendarClock className="text-primary size-4" />
+                  <CalendarClock className="size-4 text-lime-600 dark:text-lime-400" />
                   <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
                     150 sq.ft • 14 Days
                   </span>
                 </div>
-                <span className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-[10px] font-bold">
+                <span className="bg-primary text-primary-foreground rounded-full px-2.5 py-0.5 text-[10px] font-bold">
                   0 Lock-in
                 </span>
               </div>
@@ -133,7 +133,7 @@ export function FeaturesSection() {
             </div>
 
             {/* Top-Right Card: Two-Sided Space Marketplace (Spare Rooms to Warehouse Bays) */}
-            <div className="flex flex-col justify-between rounded-3xl border border-zinc-100 bg-zinc-50/80 p-6 dark:border-zinc-800/80 dark:bg-zinc-900/60">
+            <div className="flex flex-col justify-between rounded-3xl border border-zinc-200/70 bg-white p-6 shadow-2xs dark:border-zinc-800/80 dark:bg-zinc-900/60">
               <div className="mb-8 flex items-center justify-between">
                 <div className="bg-primary text-primary-foreground flex size-11 items-center justify-center rounded-2xl shadow-sm">
                   {audience === "renters" ? (
@@ -142,7 +142,7 @@ export function FeaturesSection() {
                     <Coins className="size-5" />
                   )}
                 </div>
-                <span className="rounded-full border border-zinc-200/80 bg-white px-2.5 py-1 text-[10px] font-semibold text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400">
+                <span className="rounded-full border border-zinc-200/80 bg-zinc-50 px-2.5 py-1 text-[10px] font-semibold text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400">
                   50 – 5,000+ sq.ft
                 </span>
               </div>
@@ -162,7 +162,7 @@ export function FeaturesSection() {
             </div>
 
             {/* Bottom Wide Card: Hyper-Local Neighborhood Hubs Across Malaysia */}
-            <div className="relative overflow-hidden rounded-3xl border border-zinc-100 bg-zinc-50/80 p-6 sm:col-span-2 dark:border-zinc-800/80 dark:bg-zinc-900/60">
+            <div className="relative overflow-hidden rounded-3xl border border-zinc-200/70 bg-white p-6 shadow-2xs sm:col-span-2 dark:border-zinc-800/80 dark:bg-zinc-900/60">
               {/* Subtle Dotted Map Pattern Background */}
               <div
                 aria-hidden="true"
@@ -180,11 +180,11 @@ export function FeaturesSection() {
                   {/* Primary Rate Marker & Dashed Trajectory */}
                   <div className="relative flex items-center pt-2 pl-4">
                     <span className="bg-primary text-primary-foreground inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold shadow-sm">
-                      <span className="size-1.5 rounded-full bg-white" />
+                      <span className="size-1.5 rounded-full bg-[#1a2e05]" />
                       RM 18 / day
                     </span>
                     <svg
-                      className="text-primary/60 ml-2 h-8 w-28"
+                      className="ml-2 h-8 w-28 text-lime-600/70 dark:text-lime-400/60"
                       viewBox="0 0 120 32"
                       fill="none"
                     >
@@ -212,8 +212,8 @@ export function FeaturesSection() {
                 {/* Right Stacked Hub Preview Card */}
                 <div className="relative self-center sm:self-end">
                   {/* Back Tilted Card */}
-                  <div className="absolute -top-2 -left-4 h-36 w-44 -rotate-6 rounded-2xl border border-zinc-200/70 bg-white/80 p-1.5 shadow-sm dark:border-zinc-700 dark:bg-zinc-800/80">
-                    <div className="bg-primary/15 size-full rounded-xl" />
+                  <div className="absolute -top-2 -left-4 h-36 w-44 -rotate-6 rounded-2xl border border-zinc-200/70 bg-zinc-50/90 p-1.5 shadow-sm dark:border-zinc-700 dark:bg-zinc-800/80">
+                    <div className="bg-primary/20 size-full rounded-xl" />
                   </div>
 
                   {/* Front Storage Hub Mini Card */}
@@ -224,7 +224,7 @@ export function FeaturesSection() {
                         alt="PJ Section 13 Micro-Hub"
                         className="size-full object-cover"
                       />
-                      <span className="bg-primary text-primary-foreground absolute top-1.5 right-1.5 rounded-full px-2 py-0.5 text-[9px] font-semibold">
+                      <span className="bg-primary text-primary-foreground absolute top-1.5 right-1.5 rounded-full px-2 py-0.5 text-[9px] font-bold">
                         250 sq.ft
                       </span>
                     </div>
@@ -233,7 +233,7 @@ export function FeaturesSection() {
                         PJ Section 13 Micro-Hub
                       </p>
                       <p className="mt-0.5 flex items-center gap-1 text-[10px] text-zinc-400">
-                        <MapPin className="text-primary size-2.5 shrink-0" />
+                        <MapPin className="size-2.5 shrink-0 text-lime-600 dark:text-lime-400" />
                         <span className="truncate">
                           Petaling Jaya, Selangor
                         </span>

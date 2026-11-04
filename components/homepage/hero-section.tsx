@@ -27,22 +27,22 @@ const rotatingPhrases = [
   {
     text: "overflow.",
     className:
-      "font-[family-name:var(--font-mono)] font-bold tracking-tighter text-primary",
+      "font-[family-name:var(--font-mono)] font-bold tracking-tighter text-lime-600 dark:text-primary",
   },
   {
     text: "everyone.",
     className:
-      "font-[family-name:var(--font-editorial)] italic font-normal tracking-normal text-primary text-[1.15em]",
+      "font-[family-name:var(--font-editorial)] italic font-normal tracking-normal text-lime-600 dark:text-primary text-[1.15em]",
   },
   {
     text: "growth.",
     className:
-      "font-[family-name:var(--font-display)] font-bold uppercase tracking-wider text-primary",
+      "font-[family-name:var(--font-display)] font-bold uppercase tracking-wider text-lime-600 dark:text-primary",
   },
   {
     text: "days, not leases.",
     className:
-      "font-[family-name:var(--font-editorial)] italic font-normal text-primary text-[1.1em]",
+      "font-[family-name:var(--font-editorial)] italic font-normal text-lime-600 dark:text-primary text-[1.1em]",
   },
 ]
 
@@ -172,7 +172,7 @@ export function HeroSection() {
   const currentPhrase = rotatingPhrases[wordIndex]
 
   return (
-    <section className="relative overflow-hidden border-b border-zinc-200/80 bg-white dark:border-zinc-800 dark:bg-zinc-950">
+    <section className="bg-background relative overflow-hidden border-b border-zinc-200/80 dark:border-zinc-800">
       {/* Top Heading & Search Bar */}
       <div className="relative z-30 mx-auto flex max-w-5xl flex-col items-center px-4 pt-12 pb-6 text-center sm:px-6 lg:pt-16">
         {/* Top Pill Badge */}
@@ -324,7 +324,7 @@ export function HeroSection() {
                   <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
                     Price Range
                   </span>
-                  <span className="text-primary text-xs font-bold">
+                  <span className="text-xs font-bold text-lime-700 dark:text-lime-400">
                     RM {budgetRange[0].toLocaleString()} – RM{" "}
                     {budgetRange[1].toLocaleString()}
                   </span>
@@ -369,11 +369,11 @@ export function HeroSection() {
           loading="lazy"
         />
 
-        {/* Soft Top & Side Radial/Linear Fade Overlays so map blends higher behind the search bar */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-white via-white/80 to-transparent sm:h-56 dark:from-zinc-950 dark:via-zinc-950/80" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white/90 to-transparent dark:from-zinc-950/90" />
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-white/80 to-transparent dark:from-zinc-950/80" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-white/80 to-transparent dark:from-zinc-950/80" />
+        {/* Soft Top & Side Radial/Linear Fade Overlays matching #f9fafb / #0c0d0e */}
+        <div className="from-background via-background/80 pointer-events-none absolute inset-x-0 top-0 h-48 bg-gradient-to-b to-transparent sm:h-56" />
+        <div className="from-background/90 pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t to-transparent" />
+        <div className="from-background/80 pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r to-transparent" />
+        <div className="from-background/80 pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l to-transparent" />
 
         {/* Subtle Attribution Pill */}
         <a
@@ -435,7 +435,7 @@ export function HeroSection() {
                 Climate-Controlled SME Bay
               </h3>
               <p className="mt-1 flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400">
-                <MapPin className="text-primary size-3.5" />
+                <MapPin className="size-3.5 text-lime-600 dark:text-lime-400" />
                 <span>Glenmarie, Shah Alam</span>
               </p>
 
@@ -461,7 +461,7 @@ export function HeroSection() {
                   <span className="text-sm font-bold text-zinc-950 dark:text-white">
                     RM 28 / day
                   </span>
-                  <span className="text-primary text-[11px] font-semibold">
+                  <span className="text-[11px] font-semibold text-lime-700 dark:text-lime-400">
                     (0 Lock-in)
                   </span>
                 </div>
@@ -480,7 +480,7 @@ export function HeroSection() {
             <div className="bg-primary text-primary-foreground flex size-10 items-center justify-center rounded-full border-2 border-white text-xs font-bold shadow-lg dark:border-zinc-800">
               20
             </div>
-            <div className="bg-primary/50 h-2 w-0.5" />
+            <div className="bg-primary/60 h-2 w-0.5" />
           </div>
         </div>
       </div>

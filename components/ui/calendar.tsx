@@ -147,7 +147,7 @@ export function Calendar({ selected, onSelect, className }: CalendarProps) {
                   "text-zinc-900 hover:bg-zinc-100 dark:text-zinc-100 dark:hover:bg-zinc-800",
                 isToday &&
                   !isSelected &&
-                  "border-primary/40 text-primary border font-semibold",
+                  "border-primary/50 text-lime-700 dark:text-primary border font-semibold",
                 isSelected &&
                   "bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-2xs"
               )}
