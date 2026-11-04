@@ -1,6 +1,8 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 import {
   Play,
   Search,
@@ -48,7 +50,7 @@ const rotatingPhrases = [
 
 const suggestedLocations = [
   {
-    name: "Nearby",
+    name: "All Locations",
     subtitle: "Find available storage around you",
     image:
       "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=120&q=80",
@@ -88,14 +90,16 @@ const suggestedLocations = [
 const floatingMarkers = [
   {
     id: 1,
+    spaceId: "bayan-lepas-ftz-sme-bay",
     top: "38%",
     left: "14%",
     image:
       "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=160&q=80",
-    label: "Bayan Lepas FTZ Bay • RM 25/day",
+    label: "Bayan Lepas FTZ Bay • RM 28/day",
   },
   {
     id: 2,
+    spaceId: "george-town-shoplot-hub",
     top: "32%",
     left: "29%",
     image:
@@ -104,6 +108,7 @@ const floatingMarkers = [
   },
   {
     id: 3,
+    spaceId: "tanjung-tokong-spare-room",
     top: "68%",
     left: "21%",
     image:
@@ -112,14 +117,16 @@ const floatingMarkers = [
   },
   {
     id: 4,
+    spaceId: "kl-pj-commercial-bay",
     top: "58%",
     left: "32%",
     image:
       "https://images.unsplash.com/photo-1565891741441-64926e441838?auto=format&fit=crop&w=160&q=80",
-    label: "Jelutong SME Hub • RM 20/day",
+    label: "PJ Section 13 Hub • RM 32/day",
   },
   {
     id: 5,
+    spaceId: "butterworth-pallet-unit",
     top: "36%",
     left: "82%",
     image:
@@ -128,6 +135,7 @@ const floatingMarkers = [
   },
   {
     id: 6,
+    spaceId: "bukit-mertajam-locker",
     top: "66%",
     left: "81%",
     image:
@@ -146,6 +154,7 @@ function formatShortDate(date?: Date) {
 }
 
 export function HeroSection() {
+  const router = useRouter()
   const [location, setLocation] = React.useState("All Locations")
   const [locationOpen, setLocationOpen] = React.useState(false)
   const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(
@@ -171,20 +180,29 @@ export function HeroSection() {
 
   const currentPhrase = rotatingPhrases[wordIndex]
 
+  const handleSearch = () => {
+    const params = new URLSearchParams()
+    if (location && location !== "All Locations") {
+      params.set("location", location)
+    }
+    const qs = params.toString()
+    router.push(`/explore${qs ? `?${qs}` : ""}`)
+  }
+
   return (
     <section className="bg-background relative overflow-hidden border-b border-zinc-200/80 dark:border-zinc-800">
       {/* Top Heading & Search Bar */}
       <div className="relative z-30 mx-auto flex max-w-5xl flex-col items-center px-4 pt-12 pb-6 text-center sm:px-6 lg:pt-16">
         {/* Top Pill Badge */}
-        <button
-          type="button"
+        <Link
+          href="#properties"
           className="mb-5 inline-flex items-center gap-2 rounded-full border border-zinc-200/80 bg-white px-3.5 py-1.5 text-xs font-medium text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300"
         >
           <span className="bg-primary text-primary-foreground flex size-4 items-center justify-center rounded-full">
             <Play className="size-2 fill-current" />
           </span>
           <span>What is Packrat?</span>
-        </button>
+        </Link>
 
         {/* Main Headline with Dynamic Font-Swapping Word */}
         <h1 className="max-w-4xl text-3xl font-semibold tracking-tight text-zinc-950 sm:text-5xl sm:leading-[1.18] dark:text-white">
@@ -350,6 +368,8 @@ export function HeroSection() {
 
           {/* Search Button */}
           <Button
+            type="button"
+            onClick={handleSearch}
             size="icon"
             aria-label="Search storage spaces"
             className="size-10 shrink-0 self-end rounded-full sm:self-center"
@@ -387,8 +407,9 @@ export function HeroSection() {
 
         {/* Circular Storage Hub Thumbnail Markers on Map */}
         {floatingMarkers.map((marker) => (
-          <div
+          <Link
             key={marker.id}
+            href={`/spaces/${marker.spaceId}`}
             style={{ top: marker.top, left: marker.left }}
             className="group absolute z-20 hidden -translate-x-1/2 -translate-y-1/2 cursor-pointer md:block"
           >
@@ -403,18 +424,21 @@ export function HeroSection() {
             <div className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 rounded-full bg-zinc-900/90 px-2.5 py-0.5 text-[10px] font-medium whitespace-nowrap text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100">
               {marker.label}
             </div>
-          </div>
+          </Link>
         ))}
 
         {/* Center Featured Storage Hub Card Overlay */}
         <div className="absolute top-1/2 left-1/2 z-20 w-[300px] -translate-x-1/2 -translate-y-[54%] sm:w-[320px]">
           <div className="rounded-3xl border border-zinc-200/80 bg-white p-3 shadow-[0_20px_50px_rgba(0,0,0,0.12)] dark:border-zinc-800 dark:bg-zinc-900">
             {/* Storage Hub Image */}
-            <div className="relative h-40 w-full overflow-hidden rounded-2xl bg-zinc-100">
+            <Link
+              href="/spaces/bayan-lepas-ftz-sme-bay"
+              className="relative block h-40 w-full overflow-hidden rounded-2xl bg-zinc-100"
+            >
               <img
                 src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=700&q=80"
                 alt="Climate-Controlled SME Warehouse Bay"
-                className="size-full object-cover"
+                className="size-full object-cover transition-transform duration-300 hover:scale-105"
               />
               <Badge className="bg-primary text-primary-foreground hover:bg-primary/90 absolute top-2.5 right-2.5 rounded-full border-0 px-2.5 py-0.5 text-[11px] font-semibold shadow-xs">
                 Instant Book
@@ -427,13 +451,16 @@ export function HeroSection() {
                 <span className="size-1 rounded-full bg-white/60" />
                 <span className="size-1 rounded-full bg-white/60" />
               </div>
-            </div>
+            </Link>
 
             {/* Card Details */}
             <div className="mt-3 px-1">
-              <h3 className="text-sm font-bold text-zinc-950 dark:text-white">
+              <Link
+                href="/spaces/bayan-lepas-ftz-sme-bay"
+                className="text-sm font-bold text-zinc-950 hover:underline dark:text-white"
+              >
                 Climate-Controlled SME Bay
-              </h3>
+              </Link>
               <p className="mt-1 flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400">
                 <MapPin className="size-3.5 text-lime-600 dark:text-lime-400" />
                 <span>Bayan Lepas, Penang</span>
@@ -467,21 +494,25 @@ export function HeroSection() {
                 </div>
                 <Button
                   size="sm"
+                  asChild
                   className="h-7 rounded-full px-3 text-[11px] font-semibold"
                 >
-                  Book Space
+                  <Link href="/spaces/bayan-lepas-ftz-sme-bay">Book Space</Link>
                 </Button>
               </div>
             </div>
           </div>
 
           {/* Map Cluster Pin Indicator ("20") below card */}
-          <div className="mt-3 flex flex-col items-center">
+          <Link
+            href="/explore"
+            className="mt-3 flex flex-col items-center transition-transform hover:scale-105"
+          >
             <div className="bg-primary text-primary-foreground flex size-10 items-center justify-center rounded-full border-2 border-white text-xs font-bold shadow-lg dark:border-zinc-800">
               20
             </div>
             <div className="bg-primary/60 h-2 w-0.5" />
-          </div>
+          </Link>
         </div>
       </div>
     </section>

@@ -4,7 +4,7 @@ import * as React from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { ChevronRight, Menu } from "lucide-react"
+import { ChevronRight, KeyRound, Menu } from "lucide-react"
 
 import logoPackrat from "@/app/assets/logo-packrat.png"
 import { cn } from "@/lib/utils"
@@ -20,9 +20,9 @@ import { ThemeToggle } from "@/components/theme-toggle"
 
 const navLinks = [
   { title: "Home", href: "/" },
-  { title: "Properties", href: "#properties" },
-  { title: "About", href: "#about" },
-  { title: "Contact", href: "#contact" },
+  { title: "Explore Spaces", href: "/explore" },
+  { title: "Space Estimator", href: "/explore?estimator=open" },
+  { title: "My Bookings", href: "/dashboard" },
 ]
 
 export function Navbar() {
@@ -51,8 +51,13 @@ export function Navbar() {
         {/* Center: Navigation Links */}
         <nav className="hidden h-full items-center gap-8 md:flex">
           {navLinks.map((link) => {
+            const baseHref = link.href.split("?")[0]
             const isActive =
-              link.href === "/" ? pathname === "/" : pathname === link.href
+              link.href === "/"
+                ? pathname === "/"
+                : link.href.includes("estimator")
+                  ? false
+                  : pathname.startsWith(baseHref)
             return (
               <Link
                 key={link.title}
@@ -73,7 +78,7 @@ export function Navbar() {
           })}
         </nav>
 
-        {/* Right: Theme Toggle, Auth Actions & Mobile Trigger */}
+        {/* Right: Theme Toggle, Renter Actions & Mobile Trigger */}
         <div className="flex items-center gap-2.5">
           <ThemeToggle />
 
@@ -81,9 +86,12 @@ export function Navbar() {
             variant="outline"
             size="sm"
             asChild
-            className="hidden h-9 rounded-full border-zinc-200 px-5 text-xs font-semibold text-zinc-800 shadow-none hover:bg-zinc-100 sm:inline-flex dark:border-zinc-800 dark:text-zinc-200"
+            className="hidden h-9 gap-1.5 rounded-full border-zinc-200 px-4 text-xs font-semibold text-zinc-800 shadow-none hover:bg-zinc-100 sm:inline-flex dark:border-zinc-800 dark:text-zinc-200"
           >
-            <Link href="#login">Login</Link>
+            <Link href="/dashboard">
+              <KeyRound className="size-3.5 text-lime-600 dark:text-lime-400" />
+              <span>Renter Portal</span>
+            </Link>
           </Button>
 
           <Button
@@ -91,8 +99,8 @@ export function Navbar() {
             asChild
             className="hidden h-9 gap-1 rounded-full px-5 text-xs font-semibold shadow-none sm:inline-flex"
           >
-            <Link href="#join">
-              <span>Join Now</span>
+            <Link href="/explore">
+              <span>Book Space</span>
               <ChevronRight className="size-3.5" />
             </Link>
           </Button>
@@ -124,10 +132,13 @@ export function Navbar() {
               </SheetHeader>
               <nav className="mt-6 flex flex-col gap-1 px-2">
                 {navLinks.map((link) => {
+                  const baseHref = link.href.split("?")[0]
                   const isActive =
                     link.href === "/"
                       ? pathname === "/"
-                      : pathname === link.href
+                      : link.href.includes("estimator")
+                        ? false
+                        : pathname.startsWith(baseHref)
                   return (
                     <Link
                       key={link.title}
@@ -151,10 +162,10 @@ export function Navbar() {
                     className="h-9 w-full rounded-full"
                   >
                     <Link
-                      href="#login"
+                      href="/dashboard"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Login
+                      Renter Portal
                     </Link>
                   </Button>
                   <Button
@@ -162,10 +173,10 @@ export function Navbar() {
                     className="h-9 w-full gap-1 rounded-full"
                   >
                     <Link
-                      href="#join"
+                      href="/explore"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      <span>Join Now</span>
+                      <span>Book Space</span>
                       <ChevronRight className="size-3.5" />
                     </Link>
                   </Button>

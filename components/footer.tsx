@@ -9,38 +9,38 @@ const footerSections = [
   {
     title: "For Renters & SMEs",
     links: [
-      { label: "Explore Storage", href: "#properties" },
-      { label: "SME Pallet & Fulfillment Bays", href: "#properties" },
-      { label: "Climate-Controlled Units", href: "#properties" },
-      { label: "Personal & Box Storage", href: "#properties" },
-      { label: "Pay-Per-Day Pricing", href: "#about" },
+      { label: "Explore Storage", href: "/explore" },
+      { label: "SME Pallet & Fulfillment Bays", href: "/explore?category=warehouse" },
+      { label: "Shoplot Micro-Hubs", href: "/explore?category=shoplot" },
+      { label: "Personal & Box Storage", href: "/explore?category=residential" },
+      { label: "Box & Pallet Space Estimator", href: "/explore?estimator=open" },
     ],
   },
   {
-    title: "For Space Hosts",
+    title: "Renter Portal",
     links: [
-      { label: "List Your Space", href: "#join" },
-      { label: "Warehouse & Industrial Partners", href: "#join" },
-      { label: "Shoplot & Retail Backrooms", href: "#join" },
-      { label: "Residential Spare Rooms", href: "#join" },
-      { label: "Host Protection & Coverage", href: "#about" },
+      { label: "My Active Bookings", href: "/dashboard" },
+      { label: "24/7 Digital Access Passes", href: "/dashboard" },
+      { label: "Lalamove Pickup Checkout", href: "/checkout" },
+      { label: "Zero Lock-In Guarantee", href: "/#about" },
+      { label: "RM 50k Inventory Shield", href: "/#about" },
     ],
   },
   {
     title: "Top Hubs in Malaysia",
     links: [
-      { label: "George Town, Penang", href: "#properties" },
-      { label: "Bayan Lepas & Seberang Perai", href: "#properties" },
-      { label: "Kuala Lumpur & PJ", href: "#properties" },
-      { label: "Shah Alam, Selangor", href: "#properties" },
-      { label: "Johor Bahru, Johor", href: "#properties" },
+      { label: "George Town, Penang", href: "/explore?location=George+Town%2C+Penang" },
+      { label: "Bayan Lepas & FTZ", href: "/explore?location=Bayan+Lepas%2C+Penang" },
+      { label: "Butterworth & BM", href: "/explore?location=Butterworth+%26+Bukit+Mertajam" },
+      { label: "Kuala Lumpur & PJ", href: "/explore?location=Kuala+Lumpur+%26+PJ" },
+      { label: "Johor Bahru, Johor", href: "/explore?location=Johor+Bahru%2C+Johor" },
     ],
   },
   {
     title: "Company",
     links: [
-      { label: "Why Packrat", href: "#about" },
-      { label: "Trust & 24/7 Security", href: "#about" },
+      { label: "Why Packrat", href: "/#about" },
+      { label: "Trust & 24/7 Security", href: "/#about" },
       { label: "Help Center & FAQs", href: "#contact" },
       { label: "Contact Support", href: "#contact" },
     ],
@@ -264,7 +264,7 @@ export function Footer() {
         {/* Bottom Bar: Copyright, Trust Pill & Locale */}
         <div className="flex flex-col items-center justify-between gap-4 border-t border-zinc-200/80 pt-6 text-xs text-zinc-500 sm:flex-row dark:border-zinc-800 dark:text-zinc-400">
           <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 sm:justify-start">
-            <p>© {new Date().getFullYear()} Packrat. All rights reserved.</p>
+            <p>© 2026 Packrat. All rights reserved.</p>
             <div className="flex items-center gap-4">
               <Link
                 href="#privacy"
