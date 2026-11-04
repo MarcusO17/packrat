@@ -194,11 +194,11 @@ export function HeroSection() {
   return (
     <section className="bg-background relative overflow-hidden border-b border-zinc-200/80 dark:border-zinc-800">
       {/* Top Heading & Search Bar */}
-      <div className="relative z-30 mx-auto flex max-w-5xl flex-col items-center px-4 pt-12 pb-6 text-center sm:px-6 lg:pt-16">
+      <div className="relative z-30 mx-auto flex max-w-5xl flex-col items-center px-4 pt-8 pb-4 text-center sm:px-6 sm:pt-12 sm:pb-6 lg:pt-16">
         {/* Top Pill Badge */}
         <Link
           href="#properties"
-          className="mb-5 inline-flex items-center gap-2 rounded-full border border-zinc-200/80 bg-white px-3.5 py-1.5 text-xs font-medium text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300"
+          className="mb-4 inline-flex items-center gap-2 rounded-full border border-zinc-200/80 bg-white px-3.5 py-1.5 text-xs font-medium text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50 sm:mb-5 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300"
         >
           <span className="bg-primary text-primary-foreground flex size-4 items-center justify-center rounded-full">
             <Play className="size-2 fill-current" />
@@ -207,7 +207,7 @@ export function HeroSection() {
         </Link>
 
         {/* Main Headline with Dynamic Font-Swapping Word */}
-        <h1 className="max-w-4xl text-3xl font-semibold tracking-tight text-zinc-950 sm:text-5xl sm:leading-[1.18] dark:text-white">
+        <h1 className="max-w-4xl text-[28px] leading-[1.15] font-semibold tracking-tight text-zinc-950 sm:text-5xl sm:leading-[1.18] dark:text-white">
           <span>Storage, redefined for </span>
           <span
             className={cn(
@@ -223,13 +223,13 @@ export function HeroSection() {
         </h1>
 
         {/* Search Filter Pill Bar */}
-        <div className="mt-8 flex w-full max-w-2xl flex-col items-stretch gap-2 rounded-3xl border border-zinc-200/90 bg-white p-2 shadow-[0_10px_40px_rgba(0,0,0,0.06)] sm:flex-row sm:items-center sm:rounded-full sm:py-2 sm:pr-2 sm:pl-6 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="mt-6 flex w-full max-w-2xl flex-col items-stretch gap-2.5 rounded-3xl border border-zinc-200/90 bg-white p-3 shadow-[0_10px_40px_rgba(0,0,0,0.06)] sm:mt-8 sm:flex-row sm:items-center sm:gap-2 sm:rounded-full sm:py-2 sm:pr-2 sm:pl-6 dark:border-zinc-800 dark:bg-zinc-900">
           {/* Location Popover with Suggested Destination Banner */}
           <Popover open={locationOpen} onOpenChange={setLocationOpen}>
             <PopoverTrigger asChild>
               <button
                 type="button"
-                className="flex flex-1 flex-col items-start text-left outline-none"
+                className="flex flex-1 flex-col items-start border-b border-zinc-100 pb-2 text-left outline-none sm:border-b-0 sm:pb-0 dark:border-zinc-800"
               >
                 <span className="px-1 text-[11px] font-medium text-zinc-400">
                   Location
@@ -243,7 +243,7 @@ export function HeroSection() {
             <PopoverContent
               align="start"
               sideOffset={14}
-              className="w-80 rounded-3xl border-zinc-200/80 bg-white p-4 shadow-[0_20px_60px_rgba(0,0,0,0.12)] dark:border-zinc-800 dark:bg-zinc-900"
+              className="w-[calc(100vw-2rem)] max-w-80 rounded-3xl border-zinc-200/80 bg-white p-4 shadow-[0_20px_60px_rgba(0,0,0,0.12)] dark:border-zinc-800 dark:bg-zinc-900"
             >
               <p className="mb-3 px-1 text-xs font-medium text-zinc-400">
                 Suggested destination
@@ -280,109 +280,112 @@ export function HeroSection() {
 
           <div className="hidden h-8 w-px bg-zinc-200 sm:block dark:bg-zinc-800" />
 
-          {/* Middle Column: Date with Date Picker Popover */}
-          <Popover open={dateOpen} onOpenChange={setDateOpen}>
-            <PopoverTrigger asChild>
-              <button
-                type="button"
-                className="flex flex-1 flex-col items-start text-left outline-none sm:pl-2"
+          {/* Date & Budget Row (2 columns side-by-side on mobile, inline flex items on desktop) */}
+          <div className="grid grid-cols-2 gap-2 sm:contents">
+            {/* Middle Column: Date with Date Picker Popover */}
+            <Popover open={dateOpen} onOpenChange={setDateOpen}>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  className="flex flex-1 flex-col items-start border-r border-zinc-100 pr-2 text-left outline-none sm:border-r-0 sm:pr-0 sm:pl-2 dark:border-zinc-800"
+                >
+                  <span className="px-1 text-[11px] font-medium text-zinc-400">
+                    Date
+                  </span>
+                  <span className="flex h-7 w-full items-center justify-between px-1 text-xs font-semibold text-zinc-900 dark:text-white">
+                    <span className="truncate">
+                      {formatShortDate(selectedDate)}
+                    </span>
+                    <CalendarIcon className="size-3.5 shrink-0 opacity-50" />
+                  </span>
+                </button>
+              </PopoverTrigger>
+              <PopoverContent
+                align="center"
+                sideOffset={14}
+                className="w-auto rounded-3xl border-zinc-200/80 bg-white p-2 shadow-[0_20px_60px_rgba(0,0,0,0.12)] dark:border-zinc-800 dark:bg-zinc-900"
               >
-                <span className="px-1 text-[11px] font-medium text-zinc-400">
-                  Date
-                </span>
-                <span className="flex h-7 w-full items-center justify-between px-1 text-xs font-semibold text-zinc-900 dark:text-white">
-                  <span className="truncate">
-                    {formatShortDate(selectedDate)}
-                  </span>
-                  <CalendarIcon className="size-3.5 shrink-0 opacity-50" />
-                </span>
-              </button>
-            </PopoverTrigger>
-            <PopoverContent
-              align="center"
-              sideOffset={14}
-              className="w-auto rounded-3xl border-zinc-200/80 bg-white p-2 shadow-[0_20px_60px_rgba(0,0,0,0.12)] dark:border-zinc-800 dark:bg-zinc-900"
-            >
-              <Calendar
-                selected={selectedDate}
-                onSelect={(date) => {
-                  setSelectedDate(date)
-                  setDateOpen(false)
-                }}
-              />
-            </PopoverContent>
-          </Popover>
-
-          <div className="hidden h-8 w-px bg-zinc-200 sm:block dark:bg-zinc-800" />
-
-          {/* Budget Column with Dual-Thumb Range Slider Popover */}
-          <Popover open={budgetOpen} onOpenChange={setBudgetOpen}>
-            <PopoverTrigger asChild>
-              <button
-                type="button"
-                className="flex flex-1 flex-col items-start text-left outline-none sm:pl-2"
-              >
-                <span className="px-1 text-[11px] font-medium text-zinc-400">
-                  Budget
-                </span>
-                <span className="flex h-7 w-full items-center justify-between px-1 text-xs font-semibold text-zinc-900 dark:text-white">
-                  <span className="truncate">
-                    RM {budgetRange[0].toLocaleString()} - RM{" "}
-                    {budgetRange[1].toLocaleString()}
-                  </span>
-                  <ChevronDown className="size-4 shrink-0 opacity-50" />
-                </span>
-              </button>
-            </PopoverTrigger>
-            <PopoverContent
-              align="end"
-              sideOffset={14}
-              className="w-72 rounded-3xl border-zinc-200/80 bg-white p-5 shadow-[0_20px_60px_rgba(0,0,0,0.12)] dark:border-zinc-800 dark:bg-zinc-900"
-            >
-              <div className="flex flex-col gap-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
-                    Price Range
-                  </span>
-                  <span className="text-xs font-bold text-lime-700 dark:text-lime-400">
-                    RM {budgetRange[0].toLocaleString()} – RM{" "}
-                    {budgetRange[1].toLocaleString()}
-                  </span>
-                </div>
-
-                <Slider
-                  value={budgetRange}
-                  min={50}
-                  max={5000}
-                  step={50}
-                  onValueChange={setBudgetRange}
-                  className="py-2"
+                <Calendar
+                  selected={selectedDate}
+                  onSelect={(date) => {
+                    setSelectedDate(date)
+                    setDateOpen(false)
+                  }}
                 />
+              </PopoverContent>
+            </Popover>
 
-                <div className="flex items-center justify-between text-[11px] text-zinc-400">
-                  <span>RM 50</span>
-                  <span>RM 2,500</span>
-                  <span>RM 5,000+</span>
+            <div className="hidden h-8 w-px bg-zinc-200 sm:block dark:bg-zinc-800" />
+
+            {/* Budget Column with Dual-Thumb Range Slider Popover */}
+            <Popover open={budgetOpen} onOpenChange={setBudgetOpen}>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  className="flex flex-1 flex-col items-start pl-1 text-left outline-none sm:pl-2"
+                >
+                  <span className="px-1 text-[11px] font-medium text-zinc-400">
+                    Budget
+                  </span>
+                  <span className="flex h-7 w-full items-center justify-between px-1 text-xs font-semibold text-zinc-900 dark:text-white">
+                    <span className="truncate">
+                      RM {budgetRange[0].toLocaleString()} - RM{" "}
+                      {budgetRange[1].toLocaleString()}
+                    </span>
+                    <ChevronDown className="size-4 shrink-0 opacity-50" />
+                  </span>
+                </button>
+              </PopoverTrigger>
+              <PopoverContent
+                align="end"
+                sideOffset={14}
+                className="w-[calc(100vw-2rem)] max-w-72 rounded-3xl border-zinc-200/80 bg-white p-5 shadow-[0_20px_60px_rgba(0,0,0,0.12)] dark:border-zinc-800 dark:bg-zinc-900"
+              >
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                      Price Range
+                    </span>
+                    <span className="text-xs font-bold text-lime-700 dark:text-lime-400">
+                      RM {budgetRange[0].toLocaleString()} – RM{" "}
+                      {budgetRange[1].toLocaleString()}
+                    </span>
+                  </div>
+
+                  <Slider
+                    value={budgetRange}
+                    min={50}
+                    max={5000}
+                    step={50}
+                    onValueChange={setBudgetRange}
+                    className="py-2"
+                  />
+
+                  <div className="flex items-center justify-between text-[11px] text-zinc-400">
+                    <span>RM 50</span>
+                    <span>RM 2,500</span>
+                    <span>RM 5,000+</span>
+                  </div>
                 </div>
-              </div>
-            </PopoverContent>
-          </Popover>
+              </PopoverContent>
+            </Popover>
+          </div>
 
           {/* Search Button */}
           <Button
             type="button"
             onClick={handleSearch}
-            size="icon"
             aria-label="Search storage spaces"
-            className="size-10 shrink-0 self-end rounded-full sm:self-center"
+            className="h-10 w-full shrink-0 gap-2 rounded-2xl text-xs font-bold sm:size-10 sm:w-10 sm:rounded-full sm:p-0"
           >
             <Search className="size-4" />
+            <span className="sm:hidden">Find Available Spaces</span>
           </Button>
         </div>
       </div>
 
       {/* Coordinate-Projected OpenStreetMap Canvas Area */}
-      <div className="relative -mt-20 h-[550px] w-full pt-16 sm:-mt-24 sm:h-[590px] sm:pt-20">
+      <div className="relative -mt-6 h-[470px] w-full pt-10 sm:-mt-24 sm:h-[590px] sm:pt-20">
         <CoordMap
           centerLat={5.388}
           centerLng={100.36}
@@ -393,34 +396,34 @@ export function HeroSection() {
           className="absolute inset-0 size-full"
         >
           {/* Soft Top & Side Radial/Linear Fade Overlays matching #f9fafb / #0c0d0e */}
-          <div className="from-background via-background/80 pointer-events-none absolute inset-x-0 top-0 z-20 h-48 bg-gradient-to-b to-transparent sm:h-56" />
+          <div className="from-background via-background/70 pointer-events-none absolute inset-x-0 top-0 z-20 h-28 bg-gradient-to-b to-transparent sm:via-background/80 sm:h-56" />
           <div className="from-background/90 pointer-events-none absolute inset-x-0 bottom-0 z-20 h-16 bg-gradient-to-t to-transparent" />
-          <div className="from-background/80 pointer-events-none absolute inset-y-0 left-0 z-20 w-16 bg-gradient-to-r to-transparent" />
-          <div className="from-background/80 pointer-events-none absolute inset-y-0 right-0 z-20 w-16 bg-gradient-to-l to-transparent" />
+          <div className="from-background/80 pointer-events-none absolute inset-y-0 left-0 z-20 w-8 bg-gradient-to-r to-transparent sm:w-16" />
+          <div className="from-background/80 pointer-events-none absolute inset-y-0 right-0 z-20 w-8 bg-gradient-to-l to-transparent sm:w-16" />
 
           {/* Center Featured Storage Hub Card Overlay */}
           <div
             data-map-interactive="true"
-            className="absolute top-1/2 left-1/2 z-30 w-[300px] -translate-x-1/2 -translate-y-[44%] sm:w-[320px]"
+            className="absolute top-1/2 left-1/2 z-30 w-[236px] -translate-x-1/2 -translate-y-[44%] sm:w-[320px]"
           >
-            <div className="rounded-3xl border border-zinc-200/80 bg-white p-3 shadow-[0_20px_50px_rgba(0,0,0,0.12)] dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="rounded-2xl border border-zinc-200/80 bg-white p-2 shadow-[0_20px_50px_rgba(0,0,0,0.12)] sm:rounded-3xl sm:p-3 dark:border-zinc-800 dark:bg-zinc-900">
               {/* Storage Hub Image */}
               <Link
                 href="/spaces/bayan-lepas-ftz-sme-bay"
-                className="relative block h-40 w-full overflow-hidden rounded-2xl bg-zinc-100"
+                className="relative block h-28 w-full overflow-hidden rounded-xl bg-zinc-100 sm:h-40 sm:rounded-2xl"
               >
                 <img
                   src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=700&q=80"
                   alt="Climate-Controlled SME Warehouse Bay"
                   className="size-full object-cover transition-transform duration-300 hover:scale-105"
                 />
-                <Badge className="bg-primary text-primary-foreground hover:bg-primary/90 absolute top-2.5 right-2.5 rounded-full border-0 px-2.5 py-0.5 text-[11px] font-semibold shadow-xs">
+                <Badge className="bg-primary text-primary-foreground hover:bg-primary/90 absolute top-2 right-2 rounded-full border-0 px-2 py-0 text-[10px] font-semibold shadow-xs sm:top-2.5 sm:right-2.5 sm:px-2.5 sm:py-0.5 sm:text-[11px]">
                   Instant Book
                 </Badge>
 
                 {/* Carousel Dots */}
-                <div className="absolute bottom-2.5 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full bg-black/35 px-2 py-1 backdrop-blur-xs">
-                  <span className="bg-primary h-1 w-3 rounded-full" />
+                <div className="absolute bottom-2 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full bg-black/35 px-1.5 py-0.5 backdrop-blur-xs sm:bottom-2.5 sm:px-2 sm:py-1">
+                  <span className="bg-primary h-1 w-2.5 rounded-full sm:w-3" />
                   <span className="size-1 rounded-full bg-white/60" />
                   <span className="size-1 rounded-full bg-white/60" />
                   <span className="size-1 rounded-full bg-white/60" />
@@ -428,53 +431,54 @@ export function HeroSection() {
               </Link>
 
               {/* Card Details */}
-              <div className="mt-3 px-1">
+              <div className="mt-2 px-0.5 sm:mt-3 sm:px-1">
                 <Link
                   href="/spaces/bayan-lepas-ftz-sme-bay"
-                  className="text-sm font-bold text-zinc-950 hover:underline dark:text-white"
+                  className="block truncate text-xs font-bold text-zinc-950 hover:underline sm:text-sm dark:text-white"
                 >
                   Climate-Controlled SME Bay
                 </Link>
-                <p className="mt-1 flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
-                  <span className="inline-flex items-center gap-1">
-                    <MapPin className="size-3.5 text-lime-600 dark:text-lime-400" />
-                    <span>Bayan Lepas, Penang</span>
+                <p className="mt-0.5 flex items-center justify-between text-[11px] text-zinc-500 sm:mt-1 sm:text-xs dark:text-zinc-400">
+                  <span className="inline-flex items-center gap-1 truncate">
+                    <MapPin className="size-3 shrink-0 text-lime-600 sm:size-3.5 dark:text-lime-400" />
+                    <span className="truncate">Bayan Lepas, Penang</span>
                   </span>
-                  <span className="font-mono text-[10px] text-zinc-400">
+                  <span className="hidden font-mono text-[10px] text-zinc-400 sm:inline">
                     5.3185°N, 100.2870°E
                   </span>
                 </p>
 
                 {/* Storage Specs Row */}
-                <div className="mt-2.5 flex items-center gap-3 border-b border-zinc-100 pb-3 text-[11px] text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
+                <div className="mt-2 flex items-center justify-between border-b border-zinc-100 pb-2 text-[10px] text-zinc-500 sm:mt-2.5 sm:justify-start sm:gap-3 sm:pb-3 sm:text-[11px] dark:border-zinc-800 dark:text-zinc-400">
                   <span className="inline-flex items-center gap-1">
-                    <Maximize2 className="size-3 text-zinc-400" />
+                    <Maximize2 className="size-2.5 text-zinc-400 sm:size-3" />
                     350 sq.ft
                   </span>
                   <span className="inline-flex items-center gap-1">
-                    <Truck className="size-3 text-zinc-400" />
+                    <Truck className="size-2.5 text-zinc-400 sm:size-3" />
                     Loading Bay
                   </span>
                   <span className="inline-flex items-center gap-1">
-                    <ShieldCheck className="size-3 text-zinc-400" />
-                    24/7 Access
+                    <ShieldCheck className="size-2.5 text-zinc-400 sm:size-3" />
+                    24/7
+                    <span className="hidden sm:inline">Access</span>
                   </span>
                 </div>
 
                 {/* Price & CTA Row */}
-                <div className="mt-3 flex items-center justify-between">
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-sm font-bold text-zinc-950 dark:text-white">
+                <div className="mt-2 flex items-center justify-between sm:mt-3">
+                  <div className="flex items-baseline gap-1 sm:gap-1.5">
+                    <span className="text-xs font-bold text-zinc-950 sm:text-sm dark:text-white">
                       RM 28 / day
                     </span>
-                    <span className="text-[11px] font-semibold text-lime-700 dark:text-lime-400">
+                    <span className="text-[10px] font-semibold text-lime-700 sm:text-[11px] dark:text-lime-400">
                       (0 Lock-in)
                     </span>
                   </div>
                   <Button
                     size="sm"
                     asChild
-                    className="h-7 rounded-full px-3 text-[11px] font-semibold"
+                    className="h-6 rounded-full px-2.5 text-[10px] font-semibold sm:h-7 sm:px-3 sm:text-[11px]"
                   >
                     <Link href="/spaces/bayan-lepas-ftz-sme-bay">
                       Book Space
@@ -487,12 +491,12 @@ export function HeroSection() {
             {/* Map Cluster Pin Indicator ("20") below card */}
             <Link
               href="/explore"
-              className="mt-3 flex flex-col items-center transition-transform hover:scale-105"
+              className="mt-2 flex flex-col items-center transition-transform hover:scale-105 sm:mt-3"
             >
-              <div className="bg-primary text-primary-foreground flex size-10 items-center justify-center rounded-full border-2 border-white text-xs font-bold shadow-lg dark:border-zinc-800">
+              <div className="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-full border-2 border-white text-[11px] font-bold shadow-lg sm:size-10 sm:text-xs dark:border-zinc-800">
                 20
               </div>
-              <div className="bg-primary/60 h-2 w-0.5" />
+              <div className="bg-primary/60 h-1.5 w-0.5 sm:h-2" />
             </Link>
           </div>
         </CoordMap>

@@ -4,115 +4,98 @@ import * as React from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import {
-  Check,
   ChevronRight,
-  Columns2,
   Filter,
   Heart,
-  LayoutGrid,
-  Map as MapIcon,
   MapPin,
   Maximize2,
   RotateCcw,
-  Search,
   ShieldCheck,
-  SlidersHorizontal,
-  Sparkles,
   Star,
   Truck,
   X,
-  Zap,
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import {
-  AMENITY_FILTERS,
   REGIONS,
   REGION_VIEWPORTS,
-  SPACE_CATEGORIES,
   STORAGE_SPACES,
-  calculateDailyRateForSqFt,
   type SpaceCategory,
   type StorageSpace,
 } from "@/lib/spaces-data"
+import {
+  CATEGORY_NOUNS,
+  DEFAULT_FILTERS,
+  NO_BUDGET_LIMIT,
+  SORT_OPTIONS,
+  describeResults,
+  filterSpaces,
+  isDefaultFilters,
+  priceForSize,
+  shortRegion,
+  type SearchFilters,
+} from "@/lib/search-filters"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Slider } from "@/components/ui/slider"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { SpaceEstimatorSheet } from "@/components/renter/space-estimator-modal"
 import { CoordMap } from "@/components/renter/coord-map"
+import { FiltersSheet, SmartSearch } from "@/components/renter/smart-search"
 
 export function ExploreSpaces() {
   const searchParams = useSearchParams()
 
-  const initialRegion = searchParams.get("location") || "All Locations"
-  const initialCategory =
-    (searchParams.get("category") as "all" | SpaceCategory) || "all"
-  const initialSqFt = Number(searchParams.get("sqft")) || 0
-  const initialEstimatorOpen = searchParams.get("estimator") === "open"
+  const [filters, setFilters] = React.useState<SearchFilters>(() => {
+    const location = searchParams.get("location") || ""
+    return {
+      ...DEFAULT_FILTERS,
+      region: REGIONS.includes(location as (typeof REGIONS)[number])
+        ? location
+        : DEFAULT_FILTERS.region,
+      category:
+        (searchParams.get("category") as "all" | SpaceCategory) || "all",
+      sqft: Number(searchParams.get("sqft")) || 0,
+    }
+  })
+  const requiredSqFt = filters.sqft
 
-  const [searchQuery, setSearchQuery] = React.useState("")
-  const [selectedRegion, setSelectedRegion] = React.useState<string>(
-    REGIONS.includes(initialRegion as (typeof REGIONS)[number])
-      ? initialRegion
-      : "All Locations"
-  )
-  const [selectedCategory, setSelectedCategory] = React.useState<
-    "all" | SpaceCategory
-  >(initialCategory)
-  const [requiredSqFt, setRequiredSqFt] = React.useState<number>(initialSqFt)
-  const [maxDailyBudget, setMaxDailyBudget] = React.useState<number>(80)
-  const [instantBookOnly, setInstantBookOnly] = React.useState<boolean>(false)
-  const [selectedAmenities, setSelectedAmenities] = React.useState<string[]>([])
-  const [sortBy, setSortBy] = React.useState<
-    "recommended" | "price-asc" | "sqft-desc" | "rating"
-  >("recommended")
-  const [viewMode, setViewMode] = React.useState<"split" | "grid" | "map">(
-    "split"
-  )
   const [savedIds, setSavedIds] = React.useState<string[]>([
     "bayan-lepas-ftz-sme-bay",
   ])
   const [activeSpaceId, setActiveSpaceId] = React.useState<string>(
     STORAGE_SPACES[0].id
   )
-  const [estimatorOpen, setEstimatorOpen] =
-    React.useState<boolean>(initialEstimatorOpen)
+  const [estimatorOpen, setEstimatorOpen] = React.useState<boolean>(
+    searchParams.get("estimator") === "open"
+  )
+  const [inViewSpaceIds, setInViewSpaceIds] = React.useState<
+    Record<string, boolean>
+  >({})
+  const spaceCardRefs = React.useRef<Record<string, HTMLDivElement | null>>({})
 
   // Map camera state driven by region selection or active listing selection
-  const initialViewport =
-    REGION_VIEWPORTS[selectedRegion] || REGION_VIEWPORTS["All Locations"]
   const [mapCenter, setMapCenter] = React.useState<{
     lat: number
     lng: number
     zoom: number
-  }>(initialViewport)
+  }>(
+    () =>
+      REGION_VIEWPORTS[filters.region] || REGION_VIEWPORTS["All Locations"]
+  )
 
-  const handleRegionChange = (region: string) => {
-    setSelectedRegion(region)
-    const vp = REGION_VIEWPORTS[region] || REGION_VIEWPORTS["All Locations"]
-    setMapCenter(vp)
+  const replaceFilters = (next: SearchFilters) => {
+    if (next.region !== filters.region) {
+      setMapCenter(
+        REGION_VIEWPORTS[next.region] || REGION_VIEWPORTS["All Locations"]
+      )
+    }
+    setFilters(next)
   }
 
-  const toggleAmenity = (amenity: string) => {
-    setSelectedAmenities((prev) =>
-      prev.includes(amenity)
-        ? prev.filter((a) => a !== amenity)
-        : [...prev, amenity]
-    )
-  }
+  const updateFilters = (patch: Partial<SearchFilters>) =>
+    replaceFilters({ ...filters, ...patch })
+
+  const resetFilters = () => replaceFilters(DEFAULT_FILTERS)
 
   const toggleSaved = (id: string, e: React.MouseEvent) => {
     e.preventDefault()
@@ -122,83 +105,51 @@ export function ExploreSpaces() {
     )
   }
 
-  const resetFilters = () => {
-    setSearchQuery("")
-    setSelectedRegion("All Locations")
-    setSelectedCategory("all")
-    setRequiredSqFt(0)
-    setMaxDailyBudget(80)
-    setInstantBookOnly(false)
-    setSelectedAmenities([])
-    setSortBy("recommended")
-    setMapCenter(REGION_VIEWPORTS["All Locations"])
-  }
-
-  const filteredSpaces = React.useMemo(() => {
-    return STORAGE_SPACES.filter((space) => {
-      if (
-        selectedRegion !== "All Locations" &&
-        space.region !== selectedRegion
-      ) {
-        return false
-      }
-      if (selectedCategory !== "all" && space.category !== selectedCategory) {
-        return false
-      }
-      if (requiredSqFt > 0 && space.availableSqFt < requiredSqFt) {
-        return false
-      }
-      const effectiveDailyPrice =
-        requiredSqFt > 0
-          ? calculateDailyRateForSqFt(
-              space,
-              Math.max(space.minSqFt, requiredSqFt)
-            )
-          : space.pricePerDay
-      if (effectiveDailyPrice > maxDailyBudget) {
-        return false
-      }
-      if (instantBookOnly && !space.instantBook) {
-        return false
-      }
-      if (selectedAmenities.length > 0) {
-        const hasAll = selectedAmenities.every((am) =>
-          space.amenities.includes(am)
-        )
-        if (!hasAll) return false
-      }
-      if (searchQuery.trim().length > 0) {
-        const q = searchQuery.toLowerCase()
-        const matchTitle = space.title.toLowerCase().includes(q)
-        const matchLoc = space.location.toLowerCase().includes(q)
-        const matchSub = space.subtitle.toLowerCase().includes(q)
-        const matchIdeal = space.idealFor.some((tag) =>
-          tag.toLowerCase().includes(q)
-        )
-        if (!matchTitle && !matchLoc && !matchSub && !matchIdeal) return false
-      }
-      return true
-    }).sort((a, b) => {
-      if (sortBy === "price-asc") return a.pricePerDay - b.pricePerDay
-      if (sortBy === "sqft-desc") return b.availableSqFt - a.availableSqFt
-      if (sortBy === "rating") return b.rating - a.rating
-      return (b.featured ? 1 : 0) - (a.featured ? 1 : 0)
-    })
-  }, [
-    selectedRegion,
-    selectedCategory,
-    requiredSqFt,
-    maxDailyBudget,
-    instantBookOnly,
-    selectedAmenities,
-    searchQuery,
-    sortBy,
-  ])
+  const filteredSpaces = React.useMemo(() => filterSpaces(filters), [filters])
 
   const activeSpace: StorageSpace =
     filteredSpaces.find((s) => s.id === activeSpaceId) ||
     filteredSpaces[0] ||
     STORAGE_SPACES[0]
+
+  React.useEffect(() => {
+    const mql = window.matchMedia("(max-width: 767px)")
+    let observer: IntersectionObserver | null = null
+
+    const setup = () => {
+      observer?.disconnect()
+      if (!mql.matches) {
+        setInViewSpaceIds({})
+        return
+      }
+
+      observer = new IntersectionObserver(
+        (entries) => {
+          setInViewSpaceIds((prev) => {
+            const next = { ...prev }
+            entries.forEach((entry) => {
+              const id = entry.target.getAttribute("data-space-card-id")
+              if (id) next[id] = entry.isIntersecting
+            })
+            return next
+          })
+        },
+        { threshold: 0.55, rootMargin: "-12% 0px -15% 0px" }
+      )
+
+      Object.values(spaceCardRefs.current).forEach((el) => {
+        if (el) observer?.observe(el)
+      })
+    }
+
+    setup()
+    mql.addEventListener("change", setup)
+
+    return () => {
+      mql.removeEventListener("change", setup)
+      observer?.disconnect()
+    }
+  }, [filteredSpaces])
 
   const selectAndFocusSpace = (space: StorageSpace) => {
     setActiveSpaceId(space.id)
@@ -211,404 +162,147 @@ export function ExploreSpaces() {
 
   const mapMarkers = React.useMemo(
     () =>
-      filteredSpaces.map((space) => {
-        const displayPrice =
-          requiredSqFt > 0
-            ? calculateDailyRateForSqFt(
-                space,
-                Math.max(space.minSqFt, requiredSqFt)
-              )
-            : space.pricePerDay
-        return {
-          id: space.id,
-          lat: space.mapCoords.lat,
-          lng: space.mapCoords.lng,
-          priceLabel: `RM ${displayPrice}/d`,
-          title: space.title,
-          subtitle: space.location,
-          image: space.images[0],
-        }
-      }),
+      filteredSpaces.map((space) => ({
+        id: space.id,
+        lat: space.mapCoords.lat,
+        lng: space.mapCoords.lng,
+        priceLabel: `RM ${priceForSize(space, requiredSqFt)}/d`,
+        title: space.title,
+        subtitle: space.location,
+        image: space.images[0],
+      })),
     [filteredSpaces, requiredSqFt]
   )
 
-  const activeFilterCount =
-    (selectedRegion !== "All Locations" ? 1 : 0) +
-    (selectedCategory !== "all" ? 1 : 0) +
-    (requiredSqFt > 0 ? 1 : 0) +
-    (maxDailyBudget < 80 ? 1 : 0) +
-    (instantBookOnly ? 1 : 0) +
-    selectedAmenities.length
+  // Removable chips that explain exactly what is being shown
+  const activeChips: { key: string; label: string; clear: () => void }[] = [
+    filters.query && {
+      key: "query",
+      label: `“${filters.query}”`,
+      clear: () => updateFilters({ query: "" }),
+    },
+    filters.region !== "All Locations" && {
+      key: "region",
+      label: shortRegion(filters.region),
+      clear: () => updateFilters({ region: "All Locations" }),
+    },
+    filters.category !== "all" && {
+      key: "category",
+      label: CATEGORY_NOUNS[filters.category].many.replace(/^./, (c) =>
+        c.toUpperCase()
+      ),
+      clear: () => updateFilters({ category: "all" }),
+    },
+    filters.sqft > 0 && {
+      key: "sqft",
+      label: `Fits ${filters.sqft} sq.ft`,
+      clear: () => updateFilters({ sqft: 0 }),
+    },
+    filters.maxBudget < NO_BUDGET_LIMIT && {
+      key: "budget",
+      label: `≤ RM ${filters.maxBudget}/day`,
+      clear: () => updateFilters({ maxBudget: NO_BUDGET_LIMIT }),
+    },
+    filters.instantBook && {
+      key: "instant",
+      label: "Instant book",
+      clear: () => updateFilters({ instantBook: false }),
+    },
+    ...filters.amenities.map((amenity) => ({
+      key: `amenity-${amenity}`,
+      label: amenity,
+      clear: () =>
+        updateFilters({
+          amenities: filters.amenities.filter((a) => a !== amenity),
+        }),
+    })),
+    filters.sortBy !== "recommended" && {
+      key: "sort",
+      label: SORT_OPTIONS.find((o) => o.id === filters.sortBy)?.label ?? "",
+      clear: () => updateFilters({ sortBy: "recommended" }),
+    },
+  ].filter(Boolean) as { key: string; label: string; clear: () => void }[]
 
   return (
-    <div className="bg-background flex flex-1 flex-col">
-      {/* Top Sticky Filter & Search Control Bar */}
-      <div className="bg-background/95 sticky top-18 z-30 border-b border-zinc-200/80 backdrop-blur-md dark:border-zinc-800">
-        <div className="mx-auto max-w-7xl px-4 py-3.5 sm:px-6 lg:px-8">
-          {/* Primary Row: Search Input, Region, Space Estimator Trigger & View Toggle */}
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            {/* Search & Region Group */}
-            <div className="flex flex-1 flex-wrap items-center gap-2.5">
-              <div className="relative min-w-[220px] flex-1 sm:max-w-xs">
-                <Search className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-zinc-400" />
-                <Input
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search Penang, PJ, pallet bay, shoplot..."
-                  className="h-9 rounded-full border-zinc-200/90 bg-white pr-8 pl-9 text-xs shadow-2xs dark:border-zinc-800 dark:bg-zinc-900"
-                />
-                {searchQuery && (
-                  <button
-                    type="button"
-                    onClick={() => setSearchQuery("")}
-                    className="absolute top-1/2 right-2.5 -translate-y-1/2 text-zinc-400 hover:text-zinc-700"
-                    aria-label="Clear search"
-                  >
-                    <X className="size-3.5" />
-                  </button>
-                )}
-              </div>
-
-              {/* Region Select */}
-              <Select value={selectedRegion} onValueChange={handleRegionChange}>
-                <SelectTrigger
-                  size="sm"
-                  className="h-9 rounded-full border-zinc-200/90 bg-white px-3.5 text-xs font-semibold shadow-2xs dark:border-zinc-800 dark:bg-zinc-900"
-                >
-                  <MapPin className="size-3.5 text-lime-600 dark:text-lime-400" />
-                  <SelectValue placeholder="Location" />
-                </SelectTrigger>
-                <SelectContent className="rounded-2xl">
-                  {REGIONS.map((region) => (
-                    <SelectItem
-                      key={region}
-                      value={region}
-                      className="text-xs font-medium"
-                    >
-                      {region}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              {/* Sq.Ft Filter Popover */}
-              <Popover>
-                <PopoverTrigger asChild>
-                  <button
-                    type="button"
-                    className={cn(
-                      "inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-xs font-semibold transition-colors",
-                      requiredSqFt > 0
-                        ? "border-lime-500/50 bg-lime-50/80 text-lime-900 dark:border-lime-500/40 dark:bg-lime-950/30 dark:text-lime-300"
-                        : "border-zinc-200/90 bg-white text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200"
-                    )}
-                  >
-                    <Maximize2 className="size-3.5 text-lime-600 dark:text-lime-400" />
-                    <span>
-                      {requiredSqFt > 0
-                        ? `Min ${requiredSqFt} sq.ft`
-                        : "Space Size (sq.ft)"}
-                    </span>
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent
-                  align="start"
-                  className="w-72 rounded-3xl border-zinc-200/80 p-4 shadow-xl dark:border-zinc-800"
-                >
-                  <div className="flex flex-col gap-3.5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-zinc-900 dark:text-white">
-                        Minimum Space Needed
-                      </span>
-                      <span className="font-mono text-xs font-bold text-lime-700 dark:text-lime-400">
-                        {requiredSqFt === 0
-                          ? "Any size"
-                          : `${requiredSqFt} sq.ft`}
-                      </span>
-                    </div>
-                    <Slider
-                      value={[requiredSqFt]}
-                      min={0}
-                      max={1500}
-                      step={50}
-                      onValueChange={(val) => setRequiredSqFt(val[0] ?? 0)}
-                    />
-                    <div className="flex justify-between text-[10px] text-zinc-400">
-                      <span>Any</span>
-                      <span>300 sq.ft</span>
-                      <span>800 sq.ft</span>
-                      <span>1,500+ sq.ft</span>
-                    </div>
-                  </div>
-                </PopoverContent>
-              </Popover>
-
-              {/* Daily Rate Filter Popover */}
-              <Popover>
-                <PopoverTrigger asChild>
-                  <button
-                    type="button"
-                    className={cn(
-                      "inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-xs font-semibold transition-colors",
-                      maxDailyBudget < 80
-                        ? "border-lime-500/50 bg-lime-50/80 text-lime-900 dark:border-lime-500/40 dark:bg-lime-950/30 dark:text-lime-300"
-                        : "border-zinc-200/90 bg-white text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200"
-                    )}
-                  >
-                    <SlidersHorizontal className="size-3.5 text-lime-600 dark:text-lime-400" />
-                    <span>
-                      {maxDailyBudget < 80
-                        ? `Up to RM ${maxDailyBudget}/day`
-                        : "Daily Budget"}
-                    </span>
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent
-                  align="start"
-                  className="w-72 rounded-3xl border-zinc-200/80 p-4 shadow-xl dark:border-zinc-800"
-                >
-                  <div className="flex flex-col gap-3.5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-zinc-900 dark:text-white">
-                        Max Daily Rate
-                      </span>
-                      <span className="font-mono text-xs font-bold text-lime-700 dark:text-lime-400">
-                        RM {maxDailyBudget} / day
-                      </span>
-                    </div>
-                    <Slider
-                      value={[maxDailyBudget]}
-                      min={12}
-                      max={80}
-                      step={2}
-                      onValueChange={(val) => setMaxDailyBudget(val[0] ?? 80)}
-                    />
-                    <div className="flex justify-between text-[10px] text-zinc-400">
-                      <span>RM 12/day</span>
-                      <span>RM 40/day</span>
-                      <span>RM 80+/day</span>
-                    </div>
-                  </div>
-                </PopoverContent>
-              </Popover>
-
-              {/* Box & Pallet Space Estimator Sheet Trigger */}
-              <SpaceEstimatorSheet
-                open={estimatorOpen}
-                onOpenChange={setEstimatorOpen}
-                onApply={(sqFt, suggestedCat) => {
-                  setRequiredSqFt(sqFt)
-                  if (suggestedCat && suggestedCat !== "all") {
-                    setSelectedCategory(suggestedCat)
-                  }
-                }}
-              />
-            </div>
-
-            {/* Right Controls: Sort + View Mode Switcher */}
-            <div className="flex items-center gap-2">
-              <Select
-                value={sortBy}
-                onValueChange={(val) =>
-                  setSortBy(
-                    val as
-                      | "recommended"
-                      | "price-asc"
-                      | "sqft-desc"
-                      | "rating"
-                  )
-                }
-              >
-                <SelectTrigger
-                  size="sm"
-                  className="hidden h-9 rounded-full border-zinc-200/90 bg-white px-3 text-xs font-medium lg:flex dark:border-zinc-800 dark:bg-zinc-900"
-                >
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent className="rounded-2xl">
-                  <SelectItem value="recommended" className="text-xs">
-                    Sort: Recommended
-                  </SelectItem>
-                  <SelectItem value="price-asc" className="text-xs">
-                    Daily Rate: Low to High
-                  </SelectItem>
-                  <SelectItem value="sqft-desc" className="text-xs">
-                    Available Sq.Ft: High to Low
-                  </SelectItem>
-                  <SelectItem value="rating" className="text-xs">
-                    Highest Rated Hubs
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-
-              {/* View Mode Pill Switcher */}
-              <div className="inline-flex items-center rounded-full border border-zinc-200/80 bg-zinc-100/80 p-0.5 dark:border-zinc-800 dark:bg-zinc-900">
-                <button
-                  type="button"
-                  onClick={() => setViewMode("split")}
-                  className={cn(
-                    "inline-flex items-center gap-1 rounded-full px-2.5 py-1.5 text-xs font-semibold transition-all",
-                    viewMode === "split"
-                      ? "bg-white text-zinc-950 shadow-2xs dark:bg-zinc-800 dark:text-white"
-                      : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400"
-                  )}
-                  title="Split View (Listings + Map)"
-                >
-                  <Columns2 className="size-3.5" />
-                  <span className="hidden sm:inline">Split</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setViewMode("grid")}
-                  className={cn(
-                    "inline-flex items-center gap-1 rounded-full px-2.5 py-1.5 text-xs font-semibold transition-all",
-                    viewMode === "grid"
-                      ? "bg-white text-zinc-950 shadow-2xs dark:bg-zinc-800 dark:text-white"
-                      : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400"
-                  )}
-                  title="Grid View"
-                >
-                  <LayoutGrid className="size-3.5" />
-                  <span className="hidden sm:inline">Grid</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setViewMode("map")}
-                  className={cn(
-                    "inline-flex items-center gap-1 rounded-full px-2.5 py-1.5 text-xs font-semibold transition-all",
-                    viewMode === "map"
-                      ? "bg-white text-zinc-950 shadow-2xs dark:bg-zinc-800 dark:text-white"
-                      : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400"
-                  )}
-                  title="Full Map View"
-                >
-                  <MapIcon className="size-3.5" />
-                  <span className="hidden sm:inline">Map</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Secondary Row: Category Tabs + Amenity Filter Pills */}
-          <div className="mt-3 flex items-center justify-between gap-3 overflow-x-auto pb-1 no-scrollbar">
-            {/* Category Switcher */}
-            <div className="flex shrink-0 items-center gap-1.5">
-              {SPACE_CATEGORIES.map((cat) => {
-                const isActive = selectedCategory === cat.id
-                return (
-                  <button
-                    key={cat.id}
-                    type="button"
-                    onClick={() => setSelectedCategory(cat.id)}
-                    className={cn(
-                      "rounded-full px-3.5 py-1.5 text-xs font-semibold whitespace-nowrap transition-all",
-                      isActive
-                        ? "bg-primary text-primary-foreground shadow-2xs"
-                        : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200/70 hover:text-zinc-950 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
-                    )}
-                  >
-                    {cat.shortLabel}
-                  </button>
-                )
-              })}
-            </div>
-
-            <div className="h-4 w-px shrink-0 bg-zinc-200 dark:bg-zinc-800" />
-
-            {/* Instant Book + Amenity Quick Pills */}
-            <div className="flex flex-1 items-center gap-1.5">
-              <button
-                type="button"
-                onClick={() => setInstantBookOnly((prev) => !prev)}
-                className={cn(
-                  "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-medium whitespace-nowrap transition-colors",
-                  instantBookOnly
-                    ? "border-lime-600 bg-lime-500/15 text-lime-800 dark:border-lime-400 dark:text-lime-300"
-                    : "border-zinc-200/80 bg-white text-zinc-600 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400"
-                )}
-              >
-                <Zap className="size-3 text-lime-600 dark:text-lime-400" />
-                <span>Instant Book</span>
-              </button>
-
-              {AMENITY_FILTERS.slice(0, 5).map((amenity) => {
-                const isSelected = selectedAmenities.includes(amenity)
-                return (
-                  <button
-                    key={amenity}
-                    type="button"
-                    onClick={() => toggleAmenity(amenity)}
-                    className={cn(
-                      "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-medium whitespace-nowrap transition-colors",
-                      isSelected
-                        ? "border-lime-600 bg-lime-500/15 text-lime-800 dark:border-lime-400 dark:text-lime-300"
-                        : "border-zinc-200/80 bg-white text-zinc-600 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400"
-                    )}
-                  >
-                    {isSelected && <Check className="size-3" />}
-                    <span>{amenity}</span>
-                  </button>
-                )
-              })}
-
-              {activeFilterCount > 0 && (
-                <button
-                  type="button"
-                  onClick={resetFilters}
-                  className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold whitespace-nowrap text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
-                >
-                  <RotateCcw className="size-3" />
-                  <span>Reset ({activeFilterCount})</span>
-                </button>
-              )}
-            </div>
-          </div>
+    <div className="bg-background relative flex flex-1 flex-col pb-16 lg:pb-0">
+      {/* Top Sticky Smart Search Bar */}
+      <div className="bg-background/90 sticky top-16 z-30 border-b border-zinc-200/70 backdrop-blur-md sm:top-18 dark:border-zinc-800">
+        <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3.5 sm:px-6">
+          <SmartSearch
+            filters={filters}
+            onChange={updateFilters}
+            onReplace={replaceFilters}
+            resultCount={filteredSpaces.length}
+            onOpenEstimator={() => setEstimatorOpen(true)}
+          />
+          <FiltersSheet
+            filters={filters}
+            onChange={updateFilters}
+            resultCount={filteredSpaces.length}
+          />
+          <SpaceEstimatorSheet
+            open={estimatorOpen}
+            onOpenChange={setEstimatorOpen}
+            trigger={null}
+            onApply={(sqft, suggestedCat) =>
+              updateFilters({
+                sqft,
+                ...(suggestedCat && suggestedCat !== "all"
+                  ? { category: suggestedCat }
+                  : {}),
+              })
+            }
+          />
         </div>
       </div>
 
-      {/* Main Content Area: Split View / Grid View / Map View */}
+      {/* Main Content Area: Split View (Listings + Map) */}
       <div className="mx-auto flex w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 lg:px-8">
-        <div
-          className={cn(
-            "grid w-full gap-6",
-            viewMode === "split"
-              ? "grid-cols-1 lg:grid-cols-12"
-              : "grid-cols-1"
-          )}
-        >
+        <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-12">
           {/* Left / Main Listings Column */}
-          {viewMode !== "map" && (
-            <div
-              className={cn(
-                "flex flex-col gap-5",
-                viewMode === "split" ? "lg:col-span-7" : "w-full"
-              )}
-            >
-              {/* Results Count & Active Estimator Banner */}
-              <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex flex-col gap-5 lg:col-span-7">
+              {/* Results summary */}
+              <div className="flex flex-col gap-2.5">
                 <div>
                   <h1 className="text-lg font-bold tracking-tight text-zinc-950 dark:text-white">
-                    {filteredSpaces.length} verified storage{" "}
-                    {filteredSpaces.length === 1 ? "hub" : "hubs"} available
+                    {describeResults(filters, filteredSpaces.length)}
                   </h1>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                    Pay-per-day rates in MYR • Zero lease lock-in • Click any
-                    card to locate on map
+                    {requiredSqFt > 0
+                      ? `Daily rates shown for ${requiredSqFt} sq.ft`
+                      : "Pay-per-day rates in MYR"}{" "}
+                    • No lease lock-in
                   </p>
                 </div>
 
-                {requiredSqFt > 0 && (
-                  <div className="inline-flex items-center gap-2 rounded-full border border-lime-500/40 bg-lime-50/70 px-3 py-1 text-xs font-semibold text-lime-900 dark:border-lime-500/30 dark:bg-lime-950/30 dark:text-lime-300">
-                    <Sparkles className="size-3.5 text-lime-600 dark:text-lime-400" />
-                    <span>Showing rates for {requiredSqFt} sq.ft</span>
-                    <button
-                      type="button"
-                      onClick={() => setRequiredSqFt(0)}
-                      className="ml-1 rounded-full p-0.5 hover:bg-lime-200/60 dark:hover:bg-lime-900"
-                      aria-label="Clear sq.ft filter"
-                    >
-                      <X className="size-3" />
-                    </button>
+                {activeChips.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {activeChips.map((chip) => (
+                      <span
+                        key={chip.key}
+                        className="inline-flex items-center gap-1 rounded-full bg-zinc-100 py-1 pr-1 pl-2.5 text-[11px] font-medium text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300"
+                      >
+                        {chip.label}
+                        <button
+                          type="button"
+                          onClick={chip.clear}
+                          className="rounded-full p-0.5 text-zinc-400 hover:bg-zinc-200 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-white"
+                          aria-label={`Remove ${chip.label}`}
+                        >
+                          <X className="size-3" />
+                        </button>
+                      </span>
+                    ))}
+                    {!isDefaultFilters(filters) && (
+                      <button
+                        type="button"
+                        onClick={resetFilters}
+                        className="inline-flex items-center gap-1 px-1.5 text-[11px] font-semibold text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+                      >
+                        <RotateCcw className="size-3" />
+                        Clear all
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
@@ -620,50 +314,50 @@ export function ExploreSpaces() {
                     <Filter className="size-6" />
                   </div>
                   <h2 className="mt-4 text-base font-bold text-zinc-950 dark:text-white">
-                    No storage hubs match those exact filters
+                    Nothing matches that yet
                   </h2>
                   <p className="mt-1 max-w-sm text-xs text-zinc-500 dark:text-zinc-400">
-                    Try adjusting your square footage requirement, daily budget,
-                    or switching to &ldquo;All Locations&rdquo;.
+                    Try removing a filter above, or describe what you need differently.
                   </p>
                   <Button
                     onClick={resetFilters}
                     className="mt-5 rounded-full px-5 text-xs font-semibold"
                   >
-                    Reset All Filters
+                    Start over
                   </Button>
                 </div>
               ) : (
                 /* Cards Grid */
                 <div
                   className={cn(
-                    "grid gap-5",
-                    viewMode === "split"
-                      ? "grid-cols-1 sm:grid-cols-2"
-                      : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                    "grid grid-cols-1 gap-5 sm:grid-cols-2"
                   )}
                 >
                   {filteredSpaces.map((space) => {
                     const isSelected = activeSpace.id === space.id
                     const isSaved = savedIds.includes(space.id)
+                    const isInView = Boolean(inViewSpaceIds[space.id])
                     const targetSqFt =
                       requiredSqFt > 0
                         ? Math.max(space.minSqFt, requiredSqFt)
                         : space.defaultSqFt
-                    const displayDailyPrice =
-                      requiredSqFt > 0
-                        ? calculateDailyRateForSqFt(space, targetSqFt)
-                        : space.pricePerDay
+                    const displayDailyPrice = priceForSize(space, requiredSqFt)
 
                     return (
                       <div
                         key={space.id}
+                        data-space-card-id={space.id}
+                        ref={(el) => {
+                          spaceCardRefs.current[space.id] = el
+                        }}
                         onClick={() => selectAndFocusSpace(space)}
                         className={cn(
-                          "group relative flex cursor-pointer flex-col justify-between overflow-hidden rounded-3xl border bg-white p-3 transition-all duration-200 dark:bg-zinc-900",
+                          "group relative flex cursor-pointer flex-col justify-between overflow-hidden rounded-3xl border bg-white p-3 transition-all duration-300 dark:bg-zinc-900",
                           isSelected
                             ? "border-primary ring-primary/30 shadow-[0_14px_40px_rgba(132,204,22,0.12)] ring-2"
-                            : "border-zinc-200/80 shadow-2xs hover:border-zinc-300 hover:shadow-md dark:border-zinc-800"
+                            : isInView
+                              ? "-translate-y-0.5 border-zinc-300 shadow-md dark:border-zinc-700"
+                              : "border-zinc-200/80 shadow-2xs hover:border-zinc-300 hover:shadow-md dark:border-zinc-800"
                         )}
                       >
                         <div>
@@ -672,7 +366,10 @@ export function ExploreSpaces() {
                             <img
                               src={space.images[0]}
                               alt={space.title}
-                              className="size-full object-cover transition-transform duration-300 group-hover:scale-105"
+                              className={cn(
+                                "size-full object-cover transition-transform duration-500 group-hover:scale-105",
+                                isInView && "scale-105"
+                              )}
                             />
 
                             {/* Top Left Category Pill */}
@@ -815,18 +512,10 @@ export function ExploreSpaces() {
                 </div>
               )}
             </div>
-          )}
 
           {/* Right / Sticky Coordinate-Accurate Map Column */}
-          {viewMode !== "grid" && (
-            <div
-              className={cn(
-                viewMode === "split"
-                  ? "lg:col-span-5"
-                  : "h-[680px] w-full"
-              )}
-            >
-              <div className="sticky top-42 h-[580px] w-full overflow-hidden rounded-3xl border border-zinc-200/80 bg-zinc-100 shadow-sm lg:h-[calc(100vh-12rem)] dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="lg:col-span-5">
+              <div className="sticky top-42 h-[480px] w-full overflow-hidden rounded-3xl border border-zinc-200/80 bg-zinc-100 shadow-sm sm:h-[580px] lg:h-[calc(100vh-12rem)] dark:border-zinc-800 dark:bg-zinc-900">
                 <CoordMap
                   centerLat={mapCenter.lat}
                   centerLng={mapCenter.lng}
@@ -841,9 +530,9 @@ export function ExploreSpaces() {
                   {/* Top Map Corridor Switcher Overlay */}
                   <div
                     data-map-interactive="true"
-                    className="absolute inset-x-3 top-3 z-30 flex flex-wrap items-center justify-between gap-2"
+                    className="absolute inset-x-2.5 top-2.5 z-30 flex items-center justify-between gap-2 sm:inset-x-3 sm:top-3"
                   >
-                    <div className="flex flex-wrap items-center gap-1 rounded-full border border-zinc-200/80 bg-white/95 p-1 shadow-sm backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-900/95">
+                    <div className="flex max-w-full items-center gap-1 overflow-x-auto rounded-full border border-zinc-200/80 bg-white/95 p-1 shadow-sm backdrop-blur-md [-ms-overflow-style:none] [scrollbar-width:none] dark:border-zinc-800 dark:bg-zinc-900/95 [&::-webkit-scrollbar]:hidden">
                       {[
                         {
                           label: "Penang",
@@ -866,7 +555,7 @@ export function ExploreSpaces() {
                           key={corridor.label}
                           type="button"
                           onClick={() => setMapCenter(corridor.vp)}
-                          className="rounded-full px-2.5 py-1 text-[11px] font-semibold text-zinc-700 transition-colors hover:bg-lime-500/20 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white"
+                          className="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold whitespace-nowrap text-zinc-700 transition-colors hover:bg-lime-500/20 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white"
                         >
                           {corridor.label}
                         </button>
@@ -878,36 +567,36 @@ export function ExploreSpaces() {
                   {activeSpace && (
                     <div
                       data-map-interactive="true"
-                      className="absolute inset-x-3 bottom-8 z-30"
+                      className="absolute inset-x-2.5 bottom-7 z-30 sm:inset-x-3 sm:bottom-8"
                     >
-                      <div className="flex flex-col gap-3 rounded-3xl border border-zinc-200/90 bg-white/95 p-3.5 shadow-[0_20px_50px_rgba(0,0,0,0.18)] backdrop-blur-md sm:flex-row sm:items-center dark:border-zinc-800 dark:bg-zinc-900/95">
+                      <div className="flex items-center gap-3 rounded-3xl border border-zinc-200/90 bg-white/95 p-2.5 shadow-[0_20px_50px_rgba(0,0,0,0.18)] backdrop-blur-md sm:p-3.5 dark:border-zinc-800 dark:bg-zinc-900/95">
                         <img
                           src={activeSpace.images[0]}
                           alt={activeSpace.title}
-                          className="h-24 w-full shrink-0 rounded-2xl object-cover sm:w-28"
+                          className="size-18 shrink-0 rounded-2xl object-cover sm:h-24 sm:w-28"
                         />
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5">
                             <Badge className="bg-primary text-primary-foreground rounded-full border-0 px-2 py-0 text-[10px] font-bold">
                               {activeSpace.categoryLabel}
                             </Badge>
-                            <span className="font-mono text-[10px] font-semibold text-zinc-500 dark:text-zinc-400">
+                            <span className="hidden font-mono text-[10px] font-semibold text-zinc-500 sm:inline dark:text-zinc-400">
                               {activeSpace.mapCoords.latLabel},{" "}
                               {activeSpace.mapCoords.lngLabel}
                             </span>
                           </div>
-                          <h3 className="mt-1 truncate text-sm font-bold text-zinc-950 dark:text-white">
+                          <h3 className="mt-1 truncate text-xs font-bold text-zinc-950 sm:text-sm dark:text-white">
                             {activeSpace.title}
                           </h3>
-                          <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
+                          <p className="truncate text-[11px] text-zinc-500 sm:text-xs dark:text-zinc-400">
                             {activeSpace.address}
                           </p>
-                          <div className="mt-2 flex items-center justify-between">
+                          <div className="mt-1.5 flex items-center justify-between gap-2 sm:mt-2">
                             <div className="flex items-baseline gap-1">
-                              <span className="text-sm font-bold text-zinc-950 dark:text-white">
-                                RM {activeSpace.pricePerDay} / day
+                              <span className="text-xs font-bold text-zinc-950 sm:text-sm dark:text-white">
+                                RM {activeSpace.pricePerDay}/d
                               </span>
-                              <span className="text-[11px] font-medium text-lime-700 dark:text-lime-400">
+                              <span className="hidden text-[11px] font-medium text-lime-700 sm:inline dark:text-lime-400">
                                 • {activeSpace.availableSqFt} sq.ft open
                               </span>
                             </div>
@@ -928,7 +617,6 @@ export function ExploreSpaces() {
                 </CoordMap>
               </div>
             </div>
-          )}
         </div>
       </div>
     </div>

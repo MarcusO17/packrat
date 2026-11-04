@@ -141,10 +141,10 @@ export function RenterDashboard() {
     <div className="bg-background flex-1 pb-20">
       {/* Top Renter Dashboard Header */}
       <div className="border-b border-zinc-200/80 bg-white dark:border-zinc-800 dark:bg-zinc-900/50">
-        <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-lime-500/15 px-3 py-0.5 text-[11px] font-bold text-lime-800 dark:text-lime-300">
                   <span className="size-1.5 rounded-full bg-lime-500" />
                   Verified SME Renter Account
@@ -153,7 +153,7 @@ export function RenterDashboard() {
                   Straits Goods Enterprise
                 </span>
               </div>
-              <h1 className="mt-2 text-2xl font-bold tracking-tight text-zinc-950 sm:text-3xl dark:text-white">
+              <h1 className="mt-2 text-xl font-bold tracking-tight text-zinc-950 sm:text-3xl dark:text-white">
                 My Storage Footprint & Access Passes
               </h1>
               <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
@@ -162,12 +162,12 @@ export function RenterDashboard() {
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2.5">
+            <div className="flex items-center gap-2 sm:gap-2.5">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setActiveTab("estimator")}
-                className="h-9 rounded-full px-4 text-xs font-semibold"
+                className="h-9 flex-1 rounded-full px-3.5 text-xs font-semibold sm:flex-initial sm:px-4"
               >
                 <Box className="size-3.5 text-lime-600 dark:text-lime-400" />
                 <span>Space Estimator</span>
@@ -175,7 +175,7 @@ export function RenterDashboard() {
               <Button
                 size="sm"
                 asChild
-                className="h-9 gap-1.5 rounded-full px-5 text-xs font-bold"
+                className="h-9 flex-1 gap-1.5 rounded-full px-4 text-xs font-bold sm:flex-initial sm:px-5"
               >
                 <Link href="/explore">
                   <Plus className="size-3.5" />
@@ -186,15 +186,15 @@ export function RenterDashboard() {
           </div>
 
           {/* 4 Renter KPI Summary Cards */}
-          <div className="mt-7 grid grid-cols-2 gap-3.5 lg:grid-cols-4">
-            <div className="rounded-3xl border border-zinc-200/80 bg-zinc-50/70 p-4 dark:border-zinc-800 dark:bg-zinc-900">
-              <div className="flex items-center justify-between">
+          <div className="mt-6 grid grid-cols-2 gap-2.5 sm:mt-7 sm:gap-3.5 lg:grid-cols-4">
+            <div className="rounded-3xl border border-zinc-200/80 bg-zinc-50/70 p-3.5 sm:p-4 dark:border-zinc-800 dark:bg-zinc-900">
+              <div className="flex items-center justify-between gap-1">
                 <span className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
                   Active Space Booked
                 </span>
-                <Maximize2 className="size-4 text-lime-600 dark:text-lime-400" />
+                <Maximize2 className="size-4 shrink-0 text-lime-600 dark:text-lime-400" />
               </div>
-              <p className="mt-2 font-mono text-2xl font-bold text-zinc-950 dark:text-white">
+              <p className="mt-1.5 font-mono text-xl font-bold text-zinc-950 sm:mt-2 sm:text-2xl dark:text-white">
                 {totalActiveSqFt.toLocaleString()}{" "}
                 <span className="text-xs font-normal text-zinc-500">sq.ft</span>
               </p>
@@ -204,14 +204,14 @@ export function RenterDashboard() {
               </p>
             </div>
 
-            <div className="rounded-3xl border border-zinc-200/80 bg-zinc-50/70 p-4 dark:border-zinc-800 dark:bg-zinc-900">
-              <div className="flex items-center justify-between">
+            <div className="rounded-3xl border border-zinc-200/80 bg-zinc-50/70 p-3.5 sm:p-4 dark:border-zinc-800 dark:bg-zinc-900">
+              <div className="flex items-center justify-between gap-1">
                 <span className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
                   Current Daily Rate
                 </span>
-                <CalendarClock className="size-4 text-lime-600 dark:text-lime-400" />
+                <CalendarClock className="size-4 shrink-0 text-lime-600 dark:text-lime-400" />
               </div>
-              <p className="mt-2 font-mono text-2xl font-bold text-zinc-950 dark:text-white">
+              <p className="mt-1.5 font-mono text-xl font-bold text-zinc-950 sm:mt-2 sm:text-2xl dark:text-white">
                 RM {totalDailyBurn}{" "}
                 <span className="text-xs font-normal text-zinc-500">/ day</span>
               </p>
@@ -220,14 +220,14 @@ export function RenterDashboard() {
               </p>
             </div>
 
-            <div className="rounded-3xl border border-zinc-200/80 bg-zinc-50/70 p-4 dark:border-zinc-800 dark:bg-zinc-900">
-              <div className="flex items-center justify-between">
+            <div className="rounded-3xl border border-zinc-200/80 bg-zinc-50/70 p-3.5 sm:p-4 dark:border-zinc-800 dark:bg-zinc-900">
+              <div className="flex items-center justify-between gap-1">
                 <span className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
                   24/7 Smart Gate Passes
                 </span>
-                <KeyRound className="size-4 text-lime-600 dark:text-lime-400" />
+                <KeyRound className="size-4 shrink-0 text-lime-600 dark:text-lime-400" />
               </div>
-              <p className="mt-2 font-mono text-2xl font-bold text-zinc-950 dark:text-white">
+              <p className="mt-1.5 font-mono text-xl font-bold text-zinc-950 sm:mt-2 sm:text-2xl dark:text-white">
                 {activeBookings.length} Active
               </p>
               <p className="mt-1 text-[11px] text-lime-700 dark:text-lime-400">
@@ -235,14 +235,14 @@ export function RenterDashboard() {
               </p>
             </div>
 
-            <div className="rounded-3xl border border-zinc-200/80 bg-zinc-50/70 p-4 dark:border-zinc-800 dark:bg-zinc-900">
-              <div className="flex items-center justify-between">
+            <div className="rounded-3xl border border-zinc-200/80 bg-zinc-50/70 p-3.5 sm:p-4 dark:border-zinc-800 dark:bg-zinc-900">
+              <div className="flex items-center justify-between gap-1">
                 <span className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
                   Packrat Shield Coverage
                 </span>
-                <ShieldCheck className="size-4 text-lime-600 dark:text-lime-400" />
+                <ShieldCheck className="size-4 shrink-0 text-lime-600 dark:text-lime-400" />
               </div>
-              <p className="mt-2 font-mono text-2xl font-bold text-zinc-950 dark:text-white">
+              <p className="mt-1.5 font-mono text-xl font-bold text-zinc-950 sm:mt-2 sm:text-2xl dark:text-white">
                 RM 50,000
               </p>
               <p className="mt-1 text-[11px] text-zinc-500">
@@ -252,7 +252,7 @@ export function RenterDashboard() {
           </div>
 
           {/* Dashboard Sub-Navigation Tabs */}
-          <div className="mt-7 flex items-center gap-2 overflow-x-auto pb-1">
+          <div className="mt-6 flex items-center gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] sm:mt-7 [&::-webkit-scrollbar]:hidden">
             {[
               {
                 id: "active",
@@ -516,9 +516,9 @@ export function RenterDashboard() {
 
                     {/* Expandable Digital QR Pass & Lalamove Driver Share Drawer */}
                     {isPassOpen && (
-                      <div className="mt-5 rounded-2xl border border-zinc-800 bg-zinc-950 p-5 text-white">
+                      <div className="mt-5 rounded-2xl border border-zinc-800 bg-zinc-950 p-4 text-white sm:p-5">
                         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-                          <div className="flex items-center gap-4">
+                          <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
                             <div className="flex size-20 shrink-0 items-center justify-center rounded-2xl bg-white p-2 text-zinc-950">
                               <QrCode className="size-16" />
                             </div>
@@ -549,7 +549,7 @@ export function RenterDashboard() {
                                 `Generated 4-hour Lalamove driver pass (PIN: 992-104) for #${booking.id}.`
                               )
                             }}
-                            className="rounded-full px-4 text-xs font-bold"
+                            className="w-full shrink-0 rounded-full px-4 text-xs font-bold sm:w-auto"
                           >
                             <Share2 className="size-3.5" />
                             <span>

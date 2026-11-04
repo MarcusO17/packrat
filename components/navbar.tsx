@@ -98,7 +98,7 @@ export function Navbar() {
 
   return (
     <header className="bg-background/95 sticky top-0 z-50 w-full border-b border-zinc-200/70 backdrop-blur-md dark:border-zinc-800">
-      <div className="mx-auto flex h-18 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:h-18 sm:px-6 lg:px-8">
         {/* Left: Brand Logo */}
         <Link
           href="/"
@@ -110,9 +110,11 @@ export function Navbar() {
             width={34}
             height={34}
             priority
-            className="size-8.5 object-contain"
+            className="size-8 object-contain sm:size-8.5"
           />
-          <span className="text-lg font-bold tracking-tight">Packrat</span>
+          <span className="text-base font-bold tracking-tight sm:text-lg">
+            Packrat
+          </span>
         </Link>
 
         {/* Center: Navigation Links wrapped in Suspense for Cache Components */}
@@ -135,7 +137,7 @@ export function Navbar() {
         </React.Suspense>
 
         {/* Right: Theme Toggle, Renter Actions & Mobile Trigger */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-1.5 sm:gap-2.5">
           <ThemeToggle />
 
           <Button
@@ -153,7 +155,7 @@ export function Navbar() {
           <Button
             size="sm"
             asChild
-            className="hidden h-9 gap-1 rounded-full px-5 text-xs font-semibold shadow-none sm:inline-flex"
+            className="h-8 gap-1 rounded-full px-3.5 text-xs font-semibold shadow-none sm:h-9 sm:px-5"
           >
             <Link href="/explore">
               <span>Book Space</span>
@@ -167,14 +169,14 @@ export function Navbar() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="rounded-full md:hidden"
+                className="size-9 rounded-full md:hidden"
                 aria-label="Open menu"
               >
                 <Menu className="size-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-72">
-              <SheetHeader className="text-left">
+            <SheetContent side="right" className="w-[82vw] max-w-xs p-5">
+              <SheetHeader className="p-0 text-left">
                 <SheetTitle className="flex items-center gap-2">
                   <Image
                     src={logoPackrat}
@@ -186,32 +188,33 @@ export function Navbar() {
                   <span className="font-bold tracking-tight">Packrat</span>
                 </SheetTitle>
               </SheetHeader>
-              <nav className="mt-6 flex flex-col gap-1 px-2">
+              <nav className="mt-6 flex flex-col gap-1.5">
                 <React.Suspense fallback={null}>
                   <MobileNavLinks onSelect={() => setMobileMenuOpen(false)} />
                 </React.Suspense>
-                <div className="mt-4 flex flex-col gap-2 pt-2">
+                <div className="mt-4 flex flex-col gap-2.5 border-t border-zinc-200/80 pt-4 dark:border-zinc-800">
                   <Button
                     variant="outline"
                     asChild
-                    className="h-9 w-full rounded-full"
+                    className="h-10 w-full gap-1.5 rounded-full text-xs font-semibold"
                   >
                     <Link
                       href="/dashboard"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Renter Portal
+                      <KeyRound className="size-3.5 text-lime-600 dark:text-lime-400" />
+                      <span>Renter Portal & Digital Passes</span>
                     </Link>
                   </Button>
                   <Button
                     asChild
-                    className="h-9 w-full gap-1 rounded-full"
+                    className="h-10 w-full gap-1 rounded-full text-xs font-bold"
                   >
                     <Link
                       href="/explore"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      <span>Book Space</span>
+                      <span>Explore & Book Space</span>
                       <ChevronRight className="size-3.5" />
                     </Link>
                   </Button>
