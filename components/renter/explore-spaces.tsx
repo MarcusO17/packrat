@@ -6,11 +6,8 @@ import { useSearchParams } from "next/navigation"
 import {
   Check,
   ChevronRight,
-  Columns2,
   Filter,
   Heart,
-  LayoutGrid,
-  Map as MapIcon,
   MapPin,
   Maximize2,
   RotateCcw,
@@ -79,9 +76,6 @@ export function ExploreSpaces() {
   const [sortBy, setSortBy] = React.useState<
     "recommended" | "price-asc" | "sqft-desc" | "rating"
   >("recommended")
-  const [viewMode, setViewMode] = React.useState<"split" | "grid" | "map">(
-    "split"
-  )
   const [savedIds, setSavedIds] = React.useState<string[]>([
     "bayan-lepas-ftz-sme-bay",
   ])
@@ -241,7 +235,7 @@ export function ExploreSpaces() {
       mql.removeEventListener("change", setup)
       observer?.disconnect()
     }
-  }, [filteredSpaces, viewMode])
+  }, [filteredSpaces])
 
   const selectAndFocusSpace = (space: StorageSpace) => {
     setActiveSpaceId(space.id)
@@ -312,51 +306,6 @@ export function ExploreSpaces() {
                 )}
               </div>
 
-              {/* Mobile View Mode Pill Switcher (shown inline with search on < lg) */}
-              <div className="inline-flex shrink-0 items-center rounded-full border border-zinc-200/80 bg-zinc-100/80 p-0.5 lg:hidden dark:border-zinc-800 dark:bg-zinc-900">
-                <button
-                  type="button"
-                  onClick={() => setViewMode("split")}
-                  className={cn(
-                    "inline-flex items-center gap-1 rounded-full px-2.5 py-1.5 text-xs font-semibold transition-all",
-                    viewMode === "split"
-                      ? "bg-white text-zinc-950 shadow-2xs dark:bg-zinc-800 dark:text-white"
-                      : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400"
-                  )}
-                  title="Split View"
-                >
-                  <Columns2 className="size-3.5" />
-                  <span className="hidden sm:inline">Split</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setViewMode("grid")}
-                  className={cn(
-                    "inline-flex items-center gap-1 rounded-full px-2.5 py-1.5 text-xs font-semibold transition-all",
-                    viewMode === "grid"
-                      ? "bg-white text-zinc-950 shadow-2xs dark:bg-zinc-800 dark:text-white"
-                      : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400"
-                  )}
-                  title="List / Grid View"
-                >
-                  <LayoutGrid className="size-3.5" />
-                  <span className="hidden sm:inline">Grid</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setViewMode("map")}
-                  className={cn(
-                    "inline-flex items-center gap-1 rounded-full px-2.5 py-1.5 text-xs font-semibold transition-all",
-                    viewMode === "map"
-                      ? "bg-white text-zinc-950 shadow-2xs dark:bg-zinc-800 dark:text-white"
-                      : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400"
-                  )}
-                  title="Full Map View"
-                >
-                  <MapIcon className="size-3.5" />
-                  <span className="hidden sm:inline">Map</span>
-                </button>
-              </div>
             </div>
 
             {/* Horizontally Scrollable Filter Pills Row on Mobile, Flex-Wrap on Desktop */}
@@ -534,52 +483,6 @@ export function ExploreSpaces() {
                   </SelectItem>
                 </SelectContent>
               </Select>
-
-              {/* View Mode Pill Switcher */}
-              <div className="inline-flex items-center rounded-full border border-zinc-200/80 bg-zinc-100/80 p-0.5 dark:border-zinc-800 dark:bg-zinc-900">
-                <button
-                  type="button"
-                  onClick={() => setViewMode("split")}
-                  className={cn(
-                    "inline-flex items-center gap-1 rounded-full px-2.5 py-1.5 text-xs font-semibold transition-all",
-                    viewMode === "split"
-                      ? "bg-white text-zinc-950 shadow-2xs dark:bg-zinc-800 dark:text-white"
-                      : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400"
-                  )}
-                  title="Split View (Listings + Map)"
-                >
-                  <Columns2 className="size-3.5" />
-                  <span>Split</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setViewMode("grid")}
-                  className={cn(
-                    "inline-flex items-center gap-1 rounded-full px-2.5 py-1.5 text-xs font-semibold transition-all",
-                    viewMode === "grid"
-                      ? "bg-white text-zinc-950 shadow-2xs dark:bg-zinc-800 dark:text-white"
-                      : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400"
-                  )}
-                  title="Grid View"
-                >
-                  <LayoutGrid className="size-3.5" />
-                  <span>Grid</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setViewMode("map")}
-                  className={cn(
-                    "inline-flex items-center gap-1 rounded-full px-2.5 py-1.5 text-xs font-semibold transition-all",
-                    viewMode === "map"
-                      ? "bg-white text-zinc-950 shadow-2xs dark:bg-zinc-800 dark:text-white"
-                      : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400"
-                  )}
-                  title="Full Map View"
-                >
-                  <MapIcon className="size-3.5" />
-                  <span>Map</span>
-                </button>
-              </div>
             </div>
           </div>
 
@@ -660,24 +563,11 @@ export function ExploreSpaces() {
         </div>
       </div>
 
-      {/* Main Content Area: Split View / Grid View / Map View */}
+      {/* Main Content Area: Split View (Listings + Map) */}
       <div className="mx-auto flex w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 lg:px-8">
-        <div
-          className={cn(
-            "grid w-full gap-6",
-            viewMode === "split"
-              ? "grid-cols-1 lg:grid-cols-12"
-              : "grid-cols-1"
-          )}
-        >
+        <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-12">
           {/* Left / Main Listings Column */}
-          {viewMode !== "map" && (
-            <div
-              className={cn(
-                "flex flex-col gap-5",
-                viewMode === "split" ? "lg:col-span-7" : "w-full"
-              )}
-            >
+            <div className="flex flex-col gap-5 lg:col-span-7">
               {/* Results Count & Active Estimator Banner */}
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
@@ -731,10 +621,7 @@ export function ExploreSpaces() {
                 /* Cards Grid */
                 <div
                   className={cn(
-                    "grid gap-5",
-                    viewMode === "split"
-                      ? "grid-cols-1 sm:grid-cols-2"
-                      : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                    "grid grid-cols-1 gap-5 sm:grid-cols-2"
                   )}
                 >
                   {filteredSpaces.map((space) => {
@@ -919,17 +806,9 @@ export function ExploreSpaces() {
                 </div>
               )}
             </div>
-          )}
 
           {/* Right / Sticky Coordinate-Accurate Map Column */}
-          {viewMode !== "grid" && (
-            <div
-              className={cn(
-                viewMode === "split"
-                  ? "lg:col-span-5"
-                  : "h-[calc(100dvh-13rem)] min-h-[480px] w-full sm:h-[680px]"
-              )}
-            >
+            <div className="lg:col-span-5">
               <div className="sticky top-42 h-[480px] w-full overflow-hidden rounded-3xl border border-zinc-200/80 bg-zinc-100 shadow-sm sm:h-[580px] lg:h-[calc(100vh-12rem)] dark:border-zinc-800 dark:bg-zinc-900">
                 <CoordMap
                   centerLat={mapCenter.lat}
@@ -1032,31 +911,7 @@ export function ExploreSpaces() {
                 </CoordMap>
               </div>
             </div>
-          )}
         </div>
-      </div>
-
-      {/* Floating Mobile Map / List Quick Toggle Pill */}
-      <div className="fixed bottom-5 left-1/2 z-40 -translate-x-1/2 lg:hidden">
-        <button
-          type="button"
-          onClick={() =>
-            setViewMode((prev) => (prev === "map" ? "split" : "map"))
-          }
-          className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-zinc-950 px-5 py-2.5 text-xs font-bold text-white shadow-[0_12px_32px_rgba(0,0,0,0.3)] transition-transform active:scale-95 dark:border-zinc-700 dark:bg-white dark:text-zinc-950"
-        >
-          {viewMode === "map" ? (
-            <>
-              <LayoutGrid className="size-3.5 text-lime-400 dark:text-lime-600" />
-              <span>Show List ({filteredSpaces.length})</span>
-            </>
-          ) : (
-            <>
-              <MapIcon className="size-3.5 text-lime-400 dark:text-lime-600" />
-              <span>Full Map ({filteredSpaces.length})</span>
-            </>
-          )}
-        </button>
       </div>
     </div>
   )
