@@ -14,6 +14,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 const navLinks = [
   { title: "Home", href: "/" },
@@ -65,8 +66,10 @@ export function Navbar() {
           })}
         </nav>
 
-        {/* Right: Auth Actions & Mobile Trigger */}
+        {/* Right: Theme Toggle, Auth Actions & Mobile Trigger */}
         <div className="flex items-center gap-2.5">
+          <ThemeToggle />
+
           <Button
             variant="outline"
             size="sm"

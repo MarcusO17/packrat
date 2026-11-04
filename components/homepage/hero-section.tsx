@@ -6,8 +6,8 @@ import {
   Search,
   MapPin,
   Maximize2,
-  BedDouble,
-  Bath,
+  Truck,
+  ShieldCheck,
   ChevronDown,
   Calendar as CalendarIcon,
 } from "lucide-react"
@@ -91,48 +91,48 @@ const floatingMarkers = [
     top: "38%",
     left: "14%",
     image:
-      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=160&q=80",
-    label: "Suburban Villa",
+      "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=160&q=80",
+    label: "Shah Alam Pallet Bay • RM 25/day",
   },
   {
     id: 2,
     top: "32%",
     left: "29%",
     image:
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=160&q=80",
-    label: "Modern Townhouse",
+      "https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=160&q=80",
+    label: "PJ SME Fulfillment Hub • RM 32/day",
   },
   {
     id: 3,
     top: "68%",
     left: "21%",
     image:
-      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=160&q=80",
-    label: "Glass Residence",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=160&q=80",
+    label: "Subang Spare Room • RM 12/day",
   },
   {
     id: 4,
     top: "58%",
     left: "32%",
     image:
-      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=160&q=80",
-    label: "Lakefront Loft",
+      "https://images.unsplash.com/photo-1565891741441-64926e441838?auto=format&fit=crop&w=160&q=80",
+    label: "Bangsar Ground Shoplot • RM 28/day",
   },
   {
     id: 5,
     top: "36%",
     left: "82%",
     image:
-      "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=160&q=80",
-    label: "Hillside Estate",
+      "https://images.unsplash.com/photo-1580674285054-bed31e145f59?auto=format&fit=crop&w=160&q=80",
+    label: "Ampang Climate Unit • RM 22/day",
   },
   {
     id: 6,
     top: "66%",
     left: "81%",
     image:
-      "https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=160&q=80",
-    label: "Penthouse Suite",
+      "https://images.unsplash.com/photo-1590247813693-5541d1c609fd?auto=format&fit=crop&w=160&q=80",
+    label: "Cheras E-Commerce Locker • RM 15/day",
   },
 ]
 
@@ -351,7 +351,7 @@ export function HeroSection() {
           {/* Search Button */}
           <Button
             size="icon"
-            aria-label="Search properties"
+            aria-label="Search storage spaces"
             className="size-10 shrink-0 self-end rounded-full sm:self-center"
           >
             <Search className="size-4" />
@@ -363,7 +363,7 @@ export function HeroSection() {
       <div className="relative -mt-20 h-[550px] w-full pt-16 sm:-mt-24 sm:h-[590px] sm:pt-20">
         {/* OpenStreetMap iframe centered on Kuala Lumpur / Klang Valley, Malaysia */}
         <iframe
-          title="OpenStreetMap Malaysia Real Estate Explorer"
+          title="OpenStreetMap Malaysia Storage Hub Explorer"
           src="https://www.openstreetmap.org/export/embed.html?bbox=101.58%2C3.08%2C101.78%2C3.20&layer=mapnik"
           className="pointer-events-none absolute inset-0 size-full border-0 opacity-75 grayscale contrast-95 filter dark:invert dark:hue-rotate-180 dark:opacity-40"
           loading="lazy"
@@ -385,7 +385,7 @@ export function HeroSection() {
           © OpenStreetMap
         </a>
 
-        {/* Circular Property Thumbnail Markers on Map */}
+        {/* Circular Storage Hub Thumbnail Markers on Map */}
         {floatingMarkers.map((marker) => (
           <div
             key={marker.id}
@@ -400,21 +400,24 @@ export function HeroSection() {
               />
             </div>
             <span className="pointer-events-none absolute -bottom-1 left-1/2 size-2 -translate-x-1/2 rotate-45 bg-white shadow-xs dark:bg-zinc-800" />
+            <div className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 rounded-full bg-zinc-900/90 px-2.5 py-0.5 text-[10px] font-medium whitespace-nowrap text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100">
+              {marker.label}
+            </div>
           </div>
         ))}
 
-        {/* Center Featured Property Card Overlay */}
+        {/* Center Featured Storage Hub Card Overlay */}
         <div className="absolute top-1/2 left-1/2 z-20 w-[300px] -translate-x-1/2 -translate-y-[54%] sm:w-[320px]">
           <div className="rounded-3xl border border-zinc-200/80 bg-white p-3 shadow-[0_20px_50px_rgba(0,0,0,0.12)] dark:border-zinc-800 dark:bg-zinc-900">
-            {/* Property Image */}
+            {/* Storage Hub Image */}
             <div className="relative h-40 w-full overflow-hidden rounded-2xl bg-zinc-100">
               <img
-                src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=700&q=80"
-                alt="Luxury Oceanfront Bungalow"
+                src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=700&q=80"
+                alt="Climate-Controlled SME Warehouse Bay"
                 className="size-full object-cover"
               />
               <Badge className="bg-primary text-primary-foreground hover:bg-primary/90 absolute top-2.5 right-2.5 rounded-full border-0 px-2.5 py-0.5 text-[11px] font-semibold shadow-xs">
-                New
+                Instant Book
               </Badge>
 
               {/* Carousel Dots */}
@@ -429,24 +432,26 @@ export function HeroSection() {
             {/* Card Details */}
             <div className="mt-3 px-1">
               <h3 className="text-sm font-bold text-zinc-950 dark:text-white">
-                Luxury Oceanfront Bungalow
+                Climate-Controlled SME Bay
               </h3>
               <p className="mt-1 flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400">
                 <MapPin className="text-primary size-3.5" />
-                <span>Kuala Lumpur, Malaysia</span>
+                <span>Glenmarie, Shah Alam</span>
               </p>
 
-              {/* Specs Row */}
+              {/* Storage Specs Row */}
               <div className="mt-2.5 flex items-center gap-3 border-b border-zinc-100 pb-3 text-[11px] text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
                 <span className="inline-flex items-center gap-1">
                   <Maximize2 className="size-3 text-zinc-400" />
-                  1,500 sq.ft
+                  350 sq.ft
                 </span>
                 <span className="inline-flex items-center gap-1">
-                  <BedDouble className="size-3 text-zinc-400" />3 bed
+                  <Truck className="size-3 text-zinc-400" />
+                  Loading Bay
                 </span>
                 <span className="inline-flex items-center gap-1">
-                  <Bath className="size-3 text-zinc-400" />2 bath
+                  <ShieldCheck className="size-3 text-zinc-400" />
+                  24/7 Access
                 </span>
               </div>
 
@@ -454,17 +459,17 @@ export function HeroSection() {
               <div className="mt-3 flex items-center justify-between">
                 <div className="flex items-baseline gap-1.5">
                   <span className="text-sm font-bold text-zinc-950 dark:text-white">
-                    $520,000
+                    RM 28 / day
                   </span>
                   <span className="text-primary text-[11px] font-semibold">
-                    (10.8%)
+                    (0 Lock-in)
                   </span>
                 </div>
                 <Button
                   size="sm"
                   className="h-7 rounded-full px-3 text-[11px] font-semibold"
                 >
-                  Invest Now
+                  Book Space
                 </Button>
               </div>
             </div>
