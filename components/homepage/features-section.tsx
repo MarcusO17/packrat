@@ -72,7 +72,7 @@ export function FeaturesSection() {
               <p className="max-w-md text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
                 {audience === "renters"
                   ? "Skip multi-year commercial contracts and hefty deposits. Book exact square footage across neighborhood rooms, shoplots, and warehouse bays—for a few days or a few months."
-                  : "Whether you have an empty warehouse bay in Shah Alam, a backroom shoplot in PJ, or a spare room at home, list your square footage and get paid by verified renters."}
+                  : "Whether you have an empty warehouse bay in Bayan Lepas, a heritage shoplot backroom in George Town, or a spare room at home, list your square footage and get paid by verified renters."}
               </p>
 
               {/* Dual CTA Buttons */}
@@ -199,12 +199,12 @@ export function FeaturesSection() {
 
                   <div>
                     <h3 className="text-base font-semibold text-zinc-950 dark:text-white">
-                      Hyper-Local Hubs Across Malaysia
+                      Hyper-Local Hubs Across Penang & Malaysia
                     </h3>
                     <p className="mt-1.5 text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
-                      Position your inventory closer to buyers in KL, PJ, Shah
-                      Alam, Penang, and JB for faster last-mile dispatch and
-                      self-pickup.
+                      Position your inventory closer to buyers in George Town,
+                      Bayan Lepas, Seberang Perai, KL, and JB for faster
+                      last-mile dispatch and self-pickup.
                     </p>
                   </div>
                 </div>
@@ -221,7 +221,7 @@ export function FeaturesSection() {
                     <div className="relative h-24 w-full overflow-hidden rounded-xl bg-zinc-100">
                       <img
                         src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=400&q=80"
-                        alt="PJ Section 13 Micro-Hub"
+                        alt="George Town Shoplot Micro-Hub"
                         className="size-full object-cover"
                       />
                       <span className="bg-primary text-primary-foreground absolute top-1.5 right-1.5 rounded-full px-2 py-0.5 text-[9px] font-bold">
@@ -230,12 +230,12 @@ export function FeaturesSection() {
                     </div>
                     <div className="mt-2 px-1">
                       <p className="truncate text-[11px] font-bold text-zinc-900 dark:text-white">
-                        PJ Section 13 Micro-Hub
+                        George Town Micro-Hub
                       </p>
                       <p className="mt-0.5 flex items-center gap-1 text-[10px] text-zinc-400">
                         <MapPin className="size-2.5 shrink-0 text-lime-600 dark:text-lime-400" />
                         <span className="truncate">
-                          Petaling Jaya, Selangor
+                          George Town, Penang
                         </span>
                       </p>
                     </div>

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Instrument_Serif, Space_Grotesk } from "next/font/go
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Navbar } from "@/components/navbar";
+import { Footer } from "@/components/footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,6 +43,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <ThemeProvider defaultTheme="system" storageKey="packrat-ui-theme">
           <Navbar />
           <div className="flex-1 flex flex-col">{children}</div>
+          <Footer />
         </ThemeProvider>
       </body>
     </html>

@@ -54,28 +54,28 @@ const suggestedLocations = [
       "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=120&q=80",
   },
   {
-    name: "Kuala Lumpur",
-    subtitle: "City center commercial & shoplot bays",
+    name: "George Town, Penang",
+    subtitle: "Heritage shoplots, retail & city micro-hubs",
     image:
-      "https://images.unsplash.com/photo-1596422846543-75c6fc197f07?auto=format&fit=crop&w=120&q=80",
+      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=120&q=80",
   },
   {
-    name: "Petaling Jaya, Selangor",
-    subtitle: "Popular for e-commerce & SME fulfillment",
-    image:
-      "https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=120&q=80",
-  },
-  {
-    name: "Shah Alam, Selangor",
-    subtitle: "High-ceiling pallet & industrial warehouses",
+    name: "Bayan Lepas, Penang",
+    subtitle: "FTZ industrial pallet & e-commerce fulfillment bays",
     image:
       "https://images.unsplash.com/photo-1565891741441-64926e441838?auto=format&fit=crop&w=120&q=80",
   },
   {
-    name: "George Town, Penang",
-    subtitle: "Northern hub residential & retail overflow",
+    name: "Butterworth & Bukit Mertajam",
+    subtitle: "Mainland Penang logistics & high-ceiling warehouses",
     image:
-      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=120&q=80",
+      "https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=120&q=80",
+  },
+  {
+    name: "Kuala Lumpur & PJ",
+    subtitle: "Central Klang Valley commercial & SME bays",
+    image:
+      "https://images.unsplash.com/photo-1596422846543-75c6fc197f07?auto=format&fit=crop&w=120&q=80",
   },
   {
     name: "Johor Bahru, Johor",
@@ -92,7 +92,7 @@ const floatingMarkers = [
     left: "14%",
     image:
       "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=160&q=80",
-    label: "Shah Alam Pallet Bay • RM 25/day",
+    label: "Bayan Lepas FTZ Bay • RM 25/day",
   },
   {
     id: 2,
@@ -100,7 +100,7 @@ const floatingMarkers = [
     left: "29%",
     image:
       "https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=160&q=80",
-    label: "PJ SME Fulfillment Hub • RM 32/day",
+    label: "George Town Shoplot • RM 22/day",
   },
   {
     id: 3,
@@ -108,7 +108,7 @@ const floatingMarkers = [
     left: "21%",
     image:
       "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=160&q=80",
-    label: "Subang Spare Room • RM 12/day",
+    label: "Tanjung Tokong Room • RM 12/day",
   },
   {
     id: 4,
@@ -116,7 +116,7 @@ const floatingMarkers = [
     left: "32%",
     image:
       "https://images.unsplash.com/photo-1565891741441-64926e441838?auto=format&fit=crop&w=160&q=80",
-    label: "Bangsar Ground Shoplot • RM 28/day",
+    label: "Jelutong SME Hub • RM 20/day",
   },
   {
     id: 5,
@@ -124,7 +124,7 @@ const floatingMarkers = [
     left: "82%",
     image:
       "https://images.unsplash.com/photo-1580674285054-bed31e145f59?auto=format&fit=crop&w=160&q=80",
-    label: "Ampang Climate Unit • RM 22/day",
+    label: "Butterworth Pallet Unit • RM 18/day",
   },
   {
     id: 6,
@@ -132,7 +132,7 @@ const floatingMarkers = [
     left: "81%",
     image:
       "https://images.unsplash.com/photo-1590247813693-5541d1c609fd?auto=format&fit=crop&w=160&q=80",
-    label: "Cheras E-Commerce Locker • RM 15/day",
+    label: "Bukit Mertajam Locker • RM 14/day",
   },
 ]
 
@@ -361,10 +361,10 @@ export function HeroSection() {
 
       {/* Interactive OpenStreetMap Canvas Area (Pulled up with taller top gradient fade) */}
       <div className="relative -mt-20 h-[550px] w-full pt-16 sm:-mt-24 sm:h-[590px] sm:pt-20">
-        {/* OpenStreetMap iframe centered on Kuala Lumpur / Klang Valley, Malaysia */}
+        {/* OpenStreetMap iframe centered on Penang (George Town & Seberang Perai), Malaysia */}
         <iframe
-          title="OpenStreetMap Malaysia Storage Hub Explorer"
-          src="https://www.openstreetmap.org/export/embed.html?bbox=101.58%2C3.08%2C101.78%2C3.20&layer=mapnik"
+          title="OpenStreetMap Penang Storage Hub Explorer"
+          src="https://www.openstreetmap.org/export/embed.html?bbox=100.25%2C5.32%2C100.43%2C5.45&layer=mapnik"
           className="pointer-events-none absolute inset-0 size-full border-0 opacity-75 grayscale contrast-95 filter dark:invert dark:hue-rotate-180 dark:opacity-40"
           loading="lazy"
         />
@@ -436,7 +436,7 @@ export function HeroSection() {
               </h3>
               <p className="mt-1 flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400">
                 <MapPin className="size-3.5 text-lime-600 dark:text-lime-400" />
-                <span>Glenmarie, Shah Alam</span>
+                <span>Bayan Lepas, Penang</span>
               </p>
 
               {/* Storage Specs Row */}
