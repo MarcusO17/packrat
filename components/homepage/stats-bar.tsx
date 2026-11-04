@@ -2,26 +2,26 @@ import * as React from "react"
 
 const stats = [
   {
-    value: "$1B+",
-    label: "TOTAL\nINVESTED",
+    value: "2.5M+",
+    label: "SQ.FT SPACE\nBOOKED",
   },
   {
     value: "20K+",
-    label: "HAPPY\nCUSTOMERS",
+    label: "ACTIVE\nRENTERS & SMES",
   },
   {
-    value: "150K+",
-    label: "PROPERTY\nLISTED",
+    value: "1,200+",
+    label: "LOCATIONS\nLISTED",
   },
   {
-    value: "8-12%",
-    label: "AVERAGE\nRETURN VALUE",
+    value: "0 Days",
+    label: "LEASE\nLOCK-IN",
   },
 ]
 
 export function StatsBar() {
   return (
-    <section className="border-b border-zinc-200/80 bg-white dark:border-zinc-800 dark:bg-zinc-950">
+    <section className="bg-background border-b border-zinc-200/80 dark:border-zinc-800">
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
           {stats.map((stat) => (
@@ -42,4 +42,3 @@ export function StatsBar() {
     </section>
   )
 }
-
