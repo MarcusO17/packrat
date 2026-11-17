@@ -22,6 +22,7 @@ import {
 
 import { cn } from "@/lib/utils"
 import {
+  INITIAL_RENTER_BOOKINGS,
   getStoredBookings,
   saveStoredBookings,
   type RenterBooking,
@@ -50,9 +51,14 @@ function downloadTextDocument(filename: string, content: string) {
 }
 
 export function RenterDashboard() {
-  const [bookings, setBookings] = React.useState<RenterBooking[]>(() =>
-    getStoredBookings()
+  const [bookings, setBookings] = React.useState<RenterBooking[]>(
+    INITIAL_RENTER_BOOKINGS
   )
+
+  React.useEffect(() => {
+    const frame = requestAnimationFrame(() => setBookings(getStoredBookings()))
+    return () => cancelAnimationFrame(frame)
+  }, [])
   const [activeTab, setActiveTab] = React.useState<"active" | "past">("active")
   const [scalingBookingId, setScalingBookingId] = React.useState<string | null>(
     null
