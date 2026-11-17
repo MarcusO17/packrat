@@ -278,7 +278,7 @@ export function FeaturesSection() {
                         inViewCards["feat-3"] && "-translate-y-0.5 scale-105"
                       )}
                     >
-                      <span className="size-1.5 rounded-full bg-[#1a2e05]" />
+                      <span className="size-1.5 rounded-full bg-primary-foreground" />
                       RM 18 / day
                     </span>
                     <svg

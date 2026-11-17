@@ -21,7 +21,6 @@ import { ThemeToggle } from "@/components/theme-toggle"
 const navLinks = [
   { title: "Home", href: "/" },
   { title: "Explore Spaces", href: "/explore" },
-  { title: "Space Estimator", href: "/explore?estimator=open" },
   { title: "My Bookings", href: "/dashboard" },
 ]
 
@@ -35,9 +34,7 @@ function DesktopNavLinks() {
         const isActive =
           link.href === "/"
             ? pathname === "/"
-            : link.href.includes("estimator")
-              ? false
-              : pathname.startsWith(baseHref)
+            : pathname.startsWith(baseHref)
         return (
           <Link
             key={link.title}
@@ -70,9 +67,7 @@ function MobileNavLinks({ onSelect }: { onSelect: () => void }) {
         const isActive =
           link.href === "/"
             ? pathname === "/"
-            : link.href.includes("estimator")
-              ? false
-              : pathname.startsWith(baseHref)
+            : pathname.startsWith(baseHref)
         return (
           <Link
             key={link.title}

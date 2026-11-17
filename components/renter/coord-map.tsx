@@ -289,15 +289,17 @@ export function CoordMap({
               data-map-interactive="true"
               onClick={() => {
                 onSelectMarker?.(marker.id)
-                setView((prev) => ({
-                  ...prev,
-                  lat: marker.lat,
-                  lng: marker.lng,
-                }))
+                if (interactive) {
+                  setView((prev) => ({
+                    ...prev,
+                    lat: marker.lat,
+                    lng: marker.lng,
+                  }))
+                }
               }}
               style={{ left: `${left}px`, top: `${top}px` }}
               className={cn(
-                "group absolute -translate-x-1/2 -translate-y-full transition-all duration-200",
+                "group absolute -translate-x-1/2 -translate-y-full transition-transform duration-200",
                 isSelected ? "z-30 scale-110" : "z-20 hover:z-30 hover:scale-105"
               )}
             >

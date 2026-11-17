@@ -7,12 +7,11 @@ import {
   ChevronRight,
   Filter,
   Heart,
+  List,
+  Map as MapIcon,
   MapPin,
-  Maximize2,
   RotateCcw,
-  ShieldCheck,
   Star,
-  Truck,
   X,
 } from "lucide-react"
 
@@ -68,6 +67,7 @@ export function ExploreSpaces() {
   const [estimatorOpen, setEstimatorOpen] = React.useState<boolean>(
     searchParams.get("estimator") === "open"
   )
+  const [mobileView, setMobileView] = React.useState<"list" | "map">("list")
   const [inViewSpaceIds, setInViewSpaceIds] = React.useState<
     Record<string, boolean>
   >({})
@@ -118,7 +118,7 @@ export function ExploreSpaces() {
 
     const setup = () => {
       observer?.disconnect()
-      if (!mql.matches) {
+      if (!mql.matches || mobileView === "map") {
         setInViewSpaceIds({})
         return
       }
@@ -149,7 +149,7 @@ export function ExploreSpaces() {
       mql.removeEventListener("change", setup)
       observer?.disconnect()
     }
-  }, [filteredSpaces])
+  }, [filteredSpaces, mobileView])
 
   const selectAndFocusSpace = (space: StorageSpace) => {
     setActiveSpaceId(space.id)
@@ -260,19 +260,36 @@ export function ExploreSpaces() {
       <div className="mx-auto flex w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 lg:px-8">
         <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-12">
           {/* Left / Main Listings Column */}
-            <div className="flex flex-col gap-5 lg:col-span-7">
+            <div
+              className={cn(
+                "flex flex-col gap-5 lg:col-span-7",
+                mobileView === "map" && "hidden lg:flex"
+              )}
+            >
               {/* Results summary */}
               <div className="flex flex-col gap-2.5">
-                <div>
-                  <h1 className="text-lg font-bold tracking-tight text-zinc-950 dark:text-white">
-                    {describeResults(filters, filteredSpaces.length)}
-                  </h1>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                    {requiredSqFt > 0
-                      ? `Daily rates shown for ${requiredSqFt} sq.ft`
-                      : "Pay-per-day rates in MYR"}{" "}
-                    • No lease lock-in
-                  </p>
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h1 className="text-lg font-bold tracking-tight text-zinc-950 dark:text-white">
+                      {describeResults(filters, filteredSpaces.length)}
+                    </h1>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      {requiredSqFt > 0
+                        ? `Daily rates shown for ${requiredSqFt} sq.ft`
+                        : "Pay-per-day rates in MYR"}{" "}
+                      • No lease lock-in
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setMobileView("map")}
+                    className="h-8 shrink-0 gap-1.5 rounded-full px-3 text-xs font-semibold lg:hidden"
+                  >
+                    <MapIcon className="size-3.5" />
+                    <span>Map</span>
+                  </Button>
                 </div>
 
                 {activeChips.length > 0 && (
@@ -354,7 +371,7 @@ export function ExploreSpaces() {
                         className={cn(
                           "group relative flex cursor-pointer flex-col justify-between overflow-hidden rounded-3xl border bg-white p-3 transition-all duration-300 dark:bg-zinc-900",
                           isSelected
-                            ? "border-primary ring-primary/30 shadow-[0_14px_40px_rgba(132,204,22,0.12)] ring-2"
+                            ? "border-primary ring-primary/30 shadow-[0_14px_40px_rgba(61,52,139,0.2)] ring-2"
                             : isInView
                               ? "-translate-y-0.5 border-zinc-300 shadow-md dark:border-zinc-700"
                               : "border-zinc-200/80 shadow-2xs hover:border-zinc-300 hover:shadow-md dark:border-zinc-800"
@@ -377,42 +394,21 @@ export function ExploreSpaces() {
                               {space.categoryLabel}
                             </span>
 
-                            {/* Top Right Save Button + Instant Book */}
-                            <div className="absolute top-2.5 right-2.5 flex items-center gap-1.5">
-                              {space.instantBook && (
-                                <Badge className="bg-primary text-primary-foreground rounded-full border-0 px-2.5 py-0.5 text-[10px] font-bold shadow-xs">
-                                  Instant Book
-                                </Badge>
-                              )}
-                              <button
-                                type="button"
-                                onClick={(e) => toggleSaved(space.id, e)}
-                                aria-label="Save space"
-                                className="flex size-7 items-center justify-center rounded-full bg-white/90 text-zinc-700 shadow-xs backdrop-blur-xs transition-transform hover:scale-105 dark:bg-zinc-900/90 dark:text-zinc-200"
-                              >
-                                <Heart
-                                  className={cn(
-                                    "size-3.5",
-                                    isSaved &&
-                                      "fill-rose-500 text-rose-500"
-                                  )}
-                                />
-                              </button>
-                            </div>
-
-                            {/* Bottom Sq.Ft Availability Bar */}
-                            <div className="absolute inset-x-2.5 bottom-2.5 flex items-center justify-between rounded-xl bg-black/60 px-2.5 py-1.5 text-[10px] font-medium text-white backdrop-blur-xs">
-                              <span className="inline-flex items-center gap-1">
-                                <Maximize2 className="size-3 text-lime-400" />
-                                {space.minSqFt} – {space.availableSqFt} sq.ft
-                                available
-                              </span>
-                              {space.palletCapacity && (
-                                <span className="text-lime-300">
-                                  Up to {space.palletCapacity} pallets
-                                </span>
-                              )}
-                            </div>
+                            {/* Top Right Save Button */}
+                            <button
+                              type="button"
+                              onClick={(e) => toggleSaved(space.id, e)}
+                              aria-label="Save space"
+                              className="absolute top-2.5 right-2.5 flex size-7 items-center justify-center rounded-full bg-white/90 text-zinc-700 shadow-xs backdrop-blur-xs transition-transform hover:scale-105 dark:bg-zinc-900/90 dark:text-zinc-200"
+                            >
+                              <Heart
+                                className={cn(
+                                  "size-3.5",
+                                  isSaved &&
+                                    "fill-rose-500 text-rose-500"
+                                )}
+                              />
+                            </button>
                           </div>
 
                           {/* Card Body */}
@@ -427,69 +423,37 @@ export function ExploreSpaces() {
                               <span className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-zinc-800 dark:text-zinc-200">
                                 <Star className="size-3.5 fill-amber-400 text-amber-400" />
                                 {space.rating}
-                                <span className="text-[11px] font-normal text-zinc-400">
-                                  ({space.reviewCount})
-                                </span>
                               </span>
                             </div>
 
-                            <p className="mt-0.5 flex items-center justify-between gap-1 text-xs text-zinc-500 dark:text-zinc-400">
-                              <span className="inline-flex items-center gap-1 truncate">
-                                <MapPin className="size-3.5 shrink-0 text-lime-600 dark:text-lime-400" />
-                                <span className="truncate">
-                                  {space.location}
-                                </span>
-                              </span>
-                              <span className="font-mono text-[10px] text-zinc-400">
-                                {space.mapCoords.latLabel}
-                              </span>
+                            <p className="mt-1 flex items-center gap-1 truncate text-xs text-zinc-500 dark:text-zinc-400">
+                              <MapPin className="size-3.5 shrink-0 text-lime-600 dark:text-lime-400" />
+                              <span className="truncate">{space.location}</span>
                             </p>
 
-                            {/* Key Specs Row */}
-                            <div className="mt-2.5 flex flex-wrap items-center gap-2 border-y border-zinc-100 py-2 text-[11px] text-zinc-500 dark:border-zinc-800/80 dark:text-zinc-400">
-                              <span className="inline-flex items-center gap-1">
-                                <Truck className="size-3 text-zinc-400" />
-                                {space.specs.loadingAccess.split(" ")[0]}{" "}
-                                {space.specs.loadingAccess.split(" ")[1]}
-                              </span>
-                              <span>•</span>
-                              <span className="inline-flex items-center gap-1">
-                                <ShieldCheck className="size-3 text-zinc-400" />
-                                {space.specs.accessHours}
-                              </span>
-                            </div>
-
-                            {/* Ideal For Tags */}
-                            <div className="mt-2.5 flex flex-wrap gap-1">
-                              {space.idealFor.slice(0, 2).map((tag) => (
-                                <span
-                                  key={tag}
-                                  className="rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
-                                >
-                                  {tag}
-                                </span>
-                              ))}
-                            </div>
+                            <p className="mt-1 truncate text-xs text-zinc-500 dark:text-zinc-400">
+                              {space.minSqFt}–{space.availableSqFt} sq.ft
+                              {space.palletCapacity
+                                ? ` • ${space.palletCapacity} pallets`
+                                : ""}
+                            </p>
                           </div>
                         </div>
 
                         {/* Price & CTA Footer */}
-                        <div className="mt-3.5 flex items-center justify-between px-1 pt-1">
+                        <div className="mt-4 flex items-center justify-between px-1 pt-1">
                           <div>
-                            <div className="flex items-baseline gap-1.5">
+                            <div className="flex items-baseline gap-1">
                               <span className="text-base font-bold text-zinc-950 dark:text-white">
                                 RM {displayDailyPrice}
                               </span>
                               <span className="text-xs text-zinc-500">
                                 / day
                               </span>
-                              <span className="text-[10px] font-semibold text-lime-700 dark:text-lime-400">
-                                (0 Lock-in)
-                              </span>
                             </div>
-                            <p className="text-[10px] text-zinc-400">
-                              For {targetSqFt} sq.ft • RM{" "}
-                              {space.pricePerSqFtPerDay.toFixed(2)}/sq.ft
+                            <p className="text-[11px] text-zinc-400">
+                              {targetSqFt} sq.ft
+                              {space.instantBook ? " • Instant Book" : ""}
                             </p>
                           </div>
 
@@ -514,8 +478,13 @@ export function ExploreSpaces() {
             </div>
 
           {/* Right / Sticky Coordinate-Accurate Map Column */}
-            <div className="lg:col-span-5">
-              <div className="sticky top-42 h-[480px] w-full overflow-hidden rounded-3xl border border-zinc-200/80 bg-zinc-100 shadow-sm sm:h-[580px] lg:h-[calc(100vh-12rem)] dark:border-zinc-800 dark:bg-zinc-900">
+            <div
+              className={cn(
+                "lg:col-span-5",
+                mobileView === "list" ? "hidden lg:block" : "block"
+              )}
+            >
+              <div className="h-[calc(100dvh-9.5rem)] min-h-[440px] w-full overflow-hidden rounded-3xl border border-zinc-200/80 bg-zinc-100 shadow-sm lg:sticky lg:top-42 lg:h-[calc(100vh-12rem)] dark:border-zinc-800 dark:bg-zinc-900">
                 <CoordMap
                   centerLat={mapCenter.lat}
                   centerLng={mapCenter.lng}
@@ -567,7 +536,7 @@ export function ExploreSpaces() {
                   {activeSpace && (
                     <div
                       data-map-interactive="true"
-                      className="absolute inset-x-2.5 bottom-7 z-30 sm:inset-x-3 sm:bottom-8"
+                      className="absolute inset-x-2.5 bottom-14 z-30 sm:inset-x-3 lg:bottom-8"
                     >
                       <div className="flex items-center gap-3 rounded-3xl border border-zinc-200/90 bg-white/95 p-2.5 shadow-[0_20px_50px_rgba(0,0,0,0.18)] backdrop-blur-md sm:p-3.5 dark:border-zinc-800 dark:bg-zinc-900/95">
                         <img
@@ -580,10 +549,6 @@ export function ExploreSpaces() {
                             <Badge className="bg-primary text-primary-foreground rounded-full border-0 px-2 py-0 text-[10px] font-bold">
                               {activeSpace.categoryLabel}
                             </Badge>
-                            <span className="hidden font-mono text-[10px] font-semibold text-zinc-500 sm:inline dark:text-zinc-400">
-                              {activeSpace.mapCoords.latLabel},{" "}
-                              {activeSpace.mapCoords.lngLabel}
-                            </span>
                           </div>
                           <h3 className="mt-1 truncate text-xs font-bold text-zinc-950 sm:text-sm dark:text-white">
                             {activeSpace.title}
@@ -618,6 +583,29 @@ export function ExploreSpaces() {
               </div>
             </div>
         </div>
+      </div>
+
+      {/* Floating Mobile Map / List Toggle Pill */}
+      <div className="fixed bottom-5 left-1/2 z-40 -translate-x-1/2 lg:hidden">
+        <Button
+          type="button"
+          onClick={() =>
+            setMobileView((prev) => (prev === "list" ? "map" : "list"))
+          }
+          className="h-10 gap-2 rounded-full px-5 text-xs font-semibold shadow-[0_12px_32px_rgba(0,0,0,0.28)] transition-transform active:scale-95"
+        >
+          {mobileView === "list" ? (
+            <>
+              <MapIcon className="size-4" />
+              <span>Map ({filteredSpaces.length})</span>
+            </>
+          ) : (
+            <>
+              <List className="size-4" />
+              <span>List ({filteredSpaces.length})</span>
+            </>
+          )}
+        </Button>
       </div>
     </div>
   )
