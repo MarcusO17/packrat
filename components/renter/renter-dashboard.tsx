@@ -217,9 +217,9 @@ export function RenterDashboard() {
     <div className="bg-background flex-1 pb-20">
       {/* Header */}
       <div className="border-b border-zinc-200/80 bg-white dark:border-zinc-800 dark:bg-zinc-900/50">
-        <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-            <div>
+        <div className="mx-auto max-w-5xl px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
+          <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4">
+            <div className="min-w-0">
               <h1 className="text-2xl font-bold tracking-tight text-zinc-950 sm:text-3xl dark:text-white">
                 My Bookings
               </h1>
@@ -228,46 +228,49 @@ export function RenterDashboard() {
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="flex items-center gap-2.5 rounded-2xl border border-zinc-200/80 bg-zinc-50/80 px-3.5 py-2 dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="order-3 flex w-full items-center justify-between gap-2.5 rounded-2xl border border-zinc-200/80 bg-zinc-50/80 px-3.5 py-2 sm:order-2 sm:ml-auto sm:w-auto sm:justify-start dark:border-zinc-800 dark:bg-zinc-900">
+              <div className="flex items-center gap-2">
                 <CalendarClock className="size-4 shrink-0 text-lime-600 dark:text-lime-400" />
-                <div>
-                  <p className="text-[10px] font-medium text-zinc-500 uppercase dark:text-zinc-400">
-                    Current Daily Rate
-                  </p>
-                  <p className="font-mono text-sm font-bold text-zinc-950 dark:text-white">
-                    RM {totalDailyBurn} / day
-                    <span className="ml-1.5 font-sans text-[11px] font-normal text-zinc-500 dark:text-zinc-400">
-                      • {activeBookings.length}{" "}
-                      {activeBookings.length === 1 ? "booking" : "bookings"}
-                    </span>
-                  </p>
-                </div>
+                <p className="text-[10px] font-medium text-zinc-500 uppercase sm:hidden dark:text-zinc-400">
+                  Current Daily Rate
+                </p>
               </div>
-
-              <Button
-                size="sm"
-                asChild
-                className="h-10 gap-1.5 rounded-full px-5 text-xs font-semibold"
-              >
-                <Link href="/explore">
-                  <Plus className="size-3.5" />
-                  <span>Book a Space</span>
-                </Link>
-              </Button>
+              <div className="text-right sm:text-left">
+                <p className="hidden text-[10px] font-medium text-zinc-500 uppercase sm:block dark:text-zinc-400">
+                  Current Daily Rate
+                </p>
+                <p className="font-mono text-sm font-bold text-zinc-950 dark:text-white">
+                  RM {totalDailyBurn} / day
+                  <span className="ml-1.5 font-sans text-[11px] font-normal text-zinc-500 dark:text-zinc-400">
+                    • {activeBookings.length}{" "}
+                    {activeBookings.length === 1 ? "booking" : "bookings"}
+                  </span>
+                </p>
+              </div>
             </div>
+
+            <Button
+              size="sm"
+              asChild
+              className="order-2 h-9 shrink-0 gap-1.5 rounded-full px-4 text-xs font-semibold sm:order-3 sm:h-10 sm:px-5"
+            >
+              <Link href="/explore">
+                <Plus className="size-3.5" />
+                <span>Book a Space</span>
+              </Link>
+            </Button>
           </div>
 
           {/* 2-Tab Switcher */}
-          <div className="mt-6 flex items-center gap-2">
+          <div className="mt-5 grid w-full grid-cols-2 gap-1.5 rounded-full bg-zinc-100 p-1 sm:mt-6 sm:inline-flex sm:w-auto sm:gap-2 sm:bg-transparent sm:p-0 dark:bg-zinc-800/80 sm:dark:bg-transparent">
             <button
               type="button"
               onClick={() => setActiveTab("active")}
               className={cn(
-                "rounded-full px-4 py-2 text-xs font-semibold whitespace-nowrap transition-all",
+                "rounded-full px-3 py-2 text-center text-xs font-semibold whitespace-nowrap transition-all sm:px-4",
                 activeTab === "active"
                   ? "bg-primary text-primary-foreground shadow-2xs"
-                  : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200/70 hover:text-zinc-950 dark:bg-zinc-800/80 dark:text-zinc-400 dark:hover:text-white"
+                  : "text-zinc-600 hover:text-zinc-950 sm:bg-zinc-100 sm:hover:bg-zinc-200/70 dark:text-zinc-400 dark:hover:text-white sm:dark:bg-zinc-800/80"
               )}
             >
               Active &amp; Upcoming ({activeBookings.length})
@@ -276,10 +279,10 @@ export function RenterDashboard() {
               type="button"
               onClick={() => setActiveTab("past")}
               className={cn(
-                "rounded-full px-4 py-2 text-xs font-semibold whitespace-nowrap transition-all",
+                "rounded-full px-3 py-2 text-center text-xs font-semibold whitespace-nowrap transition-all sm:px-4",
                 activeTab === "past"
                   ? "bg-primary text-primary-foreground shadow-2xs"
-                  : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200/70 hover:text-zinc-950 dark:bg-zinc-800/80 dark:text-zinc-400 dark:hover:text-white"
+                  : "text-zinc-600 hover:text-zinc-950 sm:bg-zinc-100 sm:hover:bg-zinc-200/70 dark:text-zinc-400 dark:hover:text-white sm:dark:bg-zinc-800/80"
               )}
             >
               Past ({completedBookings.length})
@@ -338,10 +341,10 @@ export function RenterDashboard() {
                     className="overflow-hidden rounded-3xl border border-zinc-200/90 bg-white p-4 shadow-2xs sm:p-5 dark:border-zinc-800 dark:bg-zinc-900"
                   >
                     {/* Top Info Row */}
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="flex flex-col gap-3.5 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                       {/* Left: Thumbnail + Space Details */}
-                      <div className="flex min-w-0 flex-1 flex-col gap-4 sm:flex-row sm:items-center">
-                        <div className="h-40 w-full shrink-0 overflow-hidden rounded-2xl bg-zinc-100 sm:h-28 sm:w-40 dark:bg-zinc-800">
+                      <div className="grid min-w-0 flex-1 grid-cols-[4.5rem_minmax(0,1fr)] items-center gap-x-3.5 gap-y-3 sm:grid-cols-[10rem_minmax(0,1fr)] sm:gap-x-4 sm:gap-y-0">
+                        <div className="size-18 overflow-hidden rounded-2xl bg-zinc-100 sm:row-span-2 sm:h-28 sm:w-40 dark:bg-zinc-800">
                           <img
                             src={booking.image}
                             alt={booking.spaceTitle}
@@ -349,7 +352,7 @@ export function RenterDashboard() {
                           />
                         </div>
 
-                        <div className="min-w-0 flex-1">
+                        <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px]">
                             <Badge
                               className={cn(
@@ -366,17 +369,17 @@ export function RenterDashboard() {
                             <span className="font-semibold text-lime-700 dark:text-lime-400">
                               {booking.spaceCategory}
                             </span>
-                            <span className="text-zinc-300 dark:text-zinc-700">
+                            <span className="hidden text-zinc-300 sm:inline dark:text-zinc-700">
                               •
                             </span>
-                            <span className="font-mono text-zinc-400">
+                            <span className="hidden font-mono text-zinc-400 sm:inline">
                               #{booking.id}
                             </span>
                           </div>
 
                           <Link
                             href={`/spaces/${booking.spaceId}`}
-                            className="mt-1.5 inline-flex max-w-full items-center gap-1 text-base font-bold text-zinc-950 hover:underline dark:text-white"
+                            className="mt-1 inline-flex max-w-full items-center gap-1 text-sm font-bold text-zinc-950 hover:underline sm:mt-1.5 sm:text-base dark:text-white"
                           >
                             <span className="truncate">
                               {booking.spaceTitle}
@@ -388,33 +391,33 @@ export function RenterDashboard() {
                             <MapPin className="size-3 shrink-0" />
                             <span className="truncate">{booking.location}</span>
                           </p>
+                        </div>
 
-                          <div className="mt-2.5">
-                            <div className="flex items-center justify-between gap-2 text-xs text-zinc-500 dark:text-zinc-400">
-                              <span>
-                                {booking.startDate} → {booking.endDate}
-                              </span>
-                              <span className="font-medium text-zinc-700 dark:text-zinc-300">
-                                {booking.status === "active"
-                                  ? `Day ${booking.daysElapsed} of ${booking.durationDays}`
-                                  : `${booking.durationDays} days`}
-                              </span>
-                            </div>
-                            <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
-                              <div
-                                className="bg-primary h-full rounded-full transition-all"
-                                style={{
-                                  width: `${booking.status === "active" ? Math.max(8, progressPct) : 0}%`,
-                                }}
-                              />
-                            </div>
+                        <div className="col-span-2 sm:col-span-1 sm:col-start-2 sm:mt-2.5">
+                          <div className="flex items-center justify-between gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+                            <span>
+                              {booking.startDate} → {booking.endDate}
+                            </span>
+                            <span className="font-medium text-zinc-700 dark:text-zinc-300">
+                              {booking.status === "active"
+                                ? `Day ${booking.daysElapsed} of ${booking.durationDays}`
+                                : `${booking.durationDays} days`}
+                            </span>
+                          </div>
+                          <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+                            <div
+                              className="bg-primary h-full rounded-full transition-all"
+                              style={{
+                                width: `${booking.status === "active" ? Math.max(8, progressPct) : 0}%`,
+                              }}
+                            />
                           </div>
                         </div>
                       </div>
 
                       {/* Right: Pricing & Footprint */}
                       <div className="flex items-baseline justify-between border-t border-zinc-100 pt-3 sm:shrink-0 sm:flex-col sm:items-end sm:border-t-0 sm:pt-0 sm:text-right dark:border-zinc-800/80">
-                        <p className="font-mono text-xl font-bold text-zinc-950 dark:text-white">
+                        <p className="font-mono text-lg font-bold text-zinc-950 sm:text-xl dark:text-white">
                           RM {booking.pricePerDay}
                           <span className="font-sans text-xs font-normal text-zinc-500">
                             {" "}
@@ -429,17 +432,20 @@ export function RenterDashboard() {
                     </div>
 
                     {/* Bottom Action Footer Bar */}
-                    <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-zinc-100 pt-3.5 dark:border-zinc-800/80">
-                      <div className="flex flex-wrap items-center gap-2">
+                    <div className="mt-3.5 grid grid-cols-3 gap-2 border-t border-zinc-100 pt-3.5 sm:mt-4 sm:flex sm:items-center sm:justify-between dark:border-zinc-800/80">
+                      <div className="contents sm:flex sm:items-center sm:gap-2">
                         <Button
                           type="button"
                           variant="outline"
                           size="sm"
                           onClick={() => openDetails(booking.id, "order")}
-                          className="h-8 gap-1.5 rounded-full px-3.5 text-xs font-semibold"
+                          className="h-8 gap-1.5 rounded-full px-2.5 text-xs font-semibold sm:px-3.5"
                         >
-                          <Receipt className="size-3.5" />
-                          <span>Order &amp; Receipt</span>
+                          <Receipt className="size-3.5 shrink-0" />
+                          <span className="sm:hidden">Details</span>
+                          <span className="hidden sm:inline">
+                            Order &amp; Receipt
+                          </span>
                         </Button>
                         <Button
                           type="button"
@@ -453,9 +459,9 @@ export function RenterDashboard() {
                               setTempSqFt(booking.sqFtBooked)
                             }
                           }}
-                          className="h-8 gap-1.5 rounded-full px-3.5 text-xs font-semibold"
+                          className="h-8 gap-1.5 rounded-full px-2.5 text-xs font-semibold sm:px-3.5"
                         >
-                          <RefreshCw className="size-3" />
+                          <RefreshCw className="size-3 shrink-0" />
                           <span>Adjust</span>
                         </Button>
                       </div>
@@ -467,9 +473,9 @@ export function RenterDashboard() {
                         onClick={() =>
                           setPassModalBookingId(isPassOpen ? null : booking.id)
                         }
-                        className="h-8 gap-1.5 rounded-full px-4 text-xs font-semibold"
+                        className="h-8 gap-1.5 rounded-full px-2.5 text-xs font-semibold sm:px-4"
                       >
-                        <QrCode className="size-3.5" />
+                        <QrCode className="size-3.5 shrink-0" />
                         <span>{isPassOpen ? "Hide QR" : "QR Pass"}</span>
                       </Button>
                     </div>
@@ -478,15 +484,15 @@ export function RenterDashboard() {
                     {isPassOpen && (
                       <div className="mt-4 rounded-2xl border border-zinc-800 bg-zinc-950 p-4 text-white sm:p-5">
                         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-                          <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
-                            <div className="flex size-20 shrink-0 items-center justify-center rounded-2xl bg-white p-2 text-zinc-950">
-                              <QrCode className="size-16" />
+                          <div className="flex items-center gap-3.5 sm:gap-4">
+                            <div className="flex size-16 shrink-0 items-center justify-center rounded-2xl bg-white p-1.5 text-zinc-950 sm:size-20 sm:p-2">
+                              <QrCode className="size-12 sm:size-16" />
                             </div>
-                            <div>
+                            <div className="min-w-0">
                               <Badge className="bg-primary text-primary-foreground rounded-full border-0 text-[10px] font-bold">
                                 24/7 Smart Access Pass
                               </Badge>
-                              <h4 className="mt-1.5 text-sm font-bold text-white">
+                              <h4 className="mt-1.5 truncate text-sm font-bold text-white">
                                 {booking.bayAssignment}
                               </h4>
                               <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-zinc-300">
@@ -685,22 +691,25 @@ export function RenterDashboard() {
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-2">
+                  <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:items-center">
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
                       onClick={() => openDetails(booking.id, "order")}
-                      className="h-8 gap-1.5 rounded-full px-3.5 text-xs font-semibold"
+                      className="h-8 gap-1.5 rounded-full px-3 text-xs font-semibold sm:px-3.5"
                     >
-                      <Receipt className="size-3.5" />
-                      <span>Order &amp; Receipt</span>
+                      <Receipt className="size-3.5 shrink-0" />
+                      <span className="sm:hidden">Details</span>
+                      <span className="hidden sm:inline">
+                        Order &amp; Receipt
+                      </span>
                     </Button>
                     <Button
                       variant="outline"
                       size="sm"
                       asChild
-                      className="h-8 shrink-0 rounded-full px-3.5 text-xs font-semibold"
+                      className="h-8 shrink-0 rounded-full px-3 text-xs font-semibold sm:px-3.5"
                     >
                       <Link
                         href={`/spaces/${booking.spaceId}?sqft=${booking.sqFtBooked}`}
@@ -758,9 +767,24 @@ export function RenterDashboard() {
                 {/* 3-Pill View Switcher */}
                 <div className="mt-3 grid grid-cols-3 gap-1 rounded-2xl border border-zinc-200/80 bg-zinc-100/80 p-1 dark:border-zinc-800 dark:bg-zinc-900">
                   {[
-                    { id: "order", label: "Order Details", icon: FileText },
-                    { id: "receipt", label: "Receipt", icon: Receipt },
-                    { id: "contract", label: "Contract", icon: FileText },
+                    {
+                      id: "order",
+                      label: "Order Details",
+                      mobileLabel: "Details",
+                      icon: FileText,
+                    },
+                    {
+                      id: "receipt",
+                      label: "Receipt",
+                      mobileLabel: "Receipt",
+                      icon: Receipt,
+                    },
+                    {
+                      id: "contract",
+                      label: "Contract",
+                      mobileLabel: "Contract",
+                      icon: FileText,
+                    },
                   ].map((item) => {
                     const Icon = item.icon
                     const active = detailsView === item.id
@@ -780,8 +804,9 @@ export function RenterDashboard() {
                             : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
                         )}
                       >
-                        <Icon className="size-3.5" />
-                        <span>{item.label}</span>
+                        <Icon className="size-3.5 shrink-0" />
+                        <span className="sm:hidden">{item.mobileLabel}</span>
+                        <span className="hidden sm:inline">{item.label}</span>
                       </button>
                     )
                   })}

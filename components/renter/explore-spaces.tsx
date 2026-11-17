@@ -7,6 +7,8 @@ import {
   ChevronRight,
   Filter,
   Heart,
+  List,
+  Map as MapIcon,
   MapPin,
   RotateCcw,
   Star,
@@ -65,6 +67,7 @@ export function ExploreSpaces() {
   const [estimatorOpen, setEstimatorOpen] = React.useState<boolean>(
     searchParams.get("estimator") === "open"
   )
+  const [mobileView, setMobileView] = React.useState<"list" | "map">("list")
   const [inViewSpaceIds, setInViewSpaceIds] = React.useState<
     Record<string, boolean>
   >({})
@@ -115,7 +118,7 @@ export function ExploreSpaces() {
 
     const setup = () => {
       observer?.disconnect()
-      if (!mql.matches) {
+      if (!mql.matches || mobileView === "map") {
         setInViewSpaceIds({})
         return
       }
@@ -146,7 +149,7 @@ export function ExploreSpaces() {
       mql.removeEventListener("change", setup)
       observer?.disconnect()
     }
-  }, [filteredSpaces])
+  }, [filteredSpaces, mobileView])
 
   const selectAndFocusSpace = (space: StorageSpace) => {
     setActiveSpaceId(space.id)
@@ -257,19 +260,36 @@ export function ExploreSpaces() {
       <div className="mx-auto flex w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 lg:px-8">
         <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-12">
           {/* Left / Main Listings Column */}
-            <div className="flex flex-col gap-5 lg:col-span-7">
+            <div
+              className={cn(
+                "flex flex-col gap-5 lg:col-span-7",
+                mobileView === "map" && "hidden lg:flex"
+              )}
+            >
               {/* Results summary */}
               <div className="flex flex-col gap-2.5">
-                <div>
-                  <h1 className="text-lg font-bold tracking-tight text-zinc-950 dark:text-white">
-                    {describeResults(filters, filteredSpaces.length)}
-                  </h1>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                    {requiredSqFt > 0
-                      ? `Daily rates shown for ${requiredSqFt} sq.ft`
-                      : "Pay-per-day rates in MYR"}{" "}
-                    • No lease lock-in
-                  </p>
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h1 className="text-lg font-bold tracking-tight text-zinc-950 dark:text-white">
+                      {describeResults(filters, filteredSpaces.length)}
+                    </h1>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      {requiredSqFt > 0
+                        ? `Daily rates shown for ${requiredSqFt} sq.ft`
+                        : "Pay-per-day rates in MYR"}{" "}
+                      • No lease lock-in
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setMobileView("map")}
+                    className="h-8 shrink-0 gap-1.5 rounded-full px-3 text-xs font-semibold lg:hidden"
+                  >
+                    <MapIcon className="size-3.5" />
+                    <span>Map</span>
+                  </Button>
                 </div>
 
                 {activeChips.length > 0 && (
@@ -458,8 +478,13 @@ export function ExploreSpaces() {
             </div>
 
           {/* Right / Sticky Coordinate-Accurate Map Column */}
-            <div className="lg:col-span-5">
-              <div className="sticky top-42 h-[480px] w-full overflow-hidden rounded-3xl border border-zinc-200/80 bg-zinc-100 shadow-sm sm:h-[580px] lg:h-[calc(100vh-12rem)] dark:border-zinc-800 dark:bg-zinc-900">
+            <div
+              className={cn(
+                "lg:col-span-5",
+                mobileView === "list" ? "hidden lg:block" : "block"
+              )}
+            >
+              <div className="h-[calc(100dvh-9.5rem)] min-h-[440px] w-full overflow-hidden rounded-3xl border border-zinc-200/80 bg-zinc-100 shadow-sm lg:sticky lg:top-42 lg:h-[calc(100vh-12rem)] dark:border-zinc-800 dark:bg-zinc-900">
                 <CoordMap
                   centerLat={mapCenter.lat}
                   centerLng={mapCenter.lng}
@@ -511,7 +536,7 @@ export function ExploreSpaces() {
                   {activeSpace && (
                     <div
                       data-map-interactive="true"
-                      className="absolute inset-x-2.5 bottom-7 z-30 sm:inset-x-3 sm:bottom-8"
+                      className="absolute inset-x-2.5 bottom-14 z-30 sm:inset-x-3 lg:bottom-8"
                     >
                       <div className="flex items-center gap-3 rounded-3xl border border-zinc-200/90 bg-white/95 p-2.5 shadow-[0_20px_50px_rgba(0,0,0,0.18)] backdrop-blur-md sm:p-3.5 dark:border-zinc-800 dark:bg-zinc-900/95">
                         <img
@@ -558,6 +583,29 @@ export function ExploreSpaces() {
               </div>
             </div>
         </div>
+      </div>
+
+      {/* Floating Mobile Map / List Toggle Pill */}
+      <div className="fixed bottom-5 left-1/2 z-40 -translate-x-1/2 lg:hidden">
+        <Button
+          type="button"
+          onClick={() =>
+            setMobileView((prev) => (prev === "list" ? "map" : "list"))
+          }
+          className="h-10 gap-2 rounded-full px-5 text-xs font-semibold shadow-[0_12px_32px_rgba(0,0,0,0.28)] transition-transform active:scale-95"
+        >
+          {mobileView === "list" ? (
+            <>
+              <MapIcon className="size-4" />
+              <span>Map ({filteredSpaces.length})</span>
+            </>
+          ) : (
+            <>
+              <List className="size-4" />
+              <span>List ({filteredSpaces.length})</span>
+            </>
+          )}
+        </Button>
       </div>
     </div>
   )

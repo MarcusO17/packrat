@@ -18,8 +18,7 @@ import {
   MessageSquare,
   Ruler,
   Share2,
-  ShieldCheck,
-  Sparkles,
+  SlidersHorizontal,
   Star,
   Thermometer,
   Truck,
@@ -42,7 +41,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { SpaceEstimatorContent } from "@/components/renter/space-estimator-modal"
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet"
+import { SpaceEstimatorSheet } from "@/components/renter/space-estimator-modal"
 import { CoordMap } from "@/components/renter/coord-map"
 
 const DURATION_PRESETS = [
@@ -51,6 +57,291 @@ const DURATION_PRESETS = [
   { days: 30, label: "30 Days", discount: 0.05, badge: "-5%" },
   { days: 90, label: "90 Days", discount: 0.12, badge: "-12%" },
 ]
+
+interface BookingCalculatorProps {
+  space: StorageSpace
+  allocatedSqFt: number
+  onAllocatedSqFtChange: (sqFt: number) => void
+  durationDays: number
+  onDurationDaysChange: (days: number) => void
+  moveInDate: Date
+  onMoveInDateChange: (date: Date) => void
+  moveOutDate: Date
+  dailyRate: number
+  discountRate: number
+  grossSubtotal: number
+  discountAmount: number
+  totalMYR: number
+  approxPallets: number
+  approxBoxes: number
+  onOpenEstimator: () => void
+  onProceedToCheckout: () => void
+}
+
+function BookingCalculator({
+  space,
+  allocatedSqFt,
+  onAllocatedSqFtChange,
+  durationDays,
+  onDurationDaysChange,
+  moveInDate,
+  onMoveInDateChange,
+  moveOutDate,
+  dailyRate,
+  discountRate,
+  grossSubtotal,
+  discountAmount,
+  totalMYR,
+  approxPallets,
+  approxBoxes,
+  onOpenEstimator,
+  onProceedToCheckout,
+}: BookingCalculatorProps) {
+  const [dateOpen, setDateOpen] = React.useState(false)
+
+  return (
+    <div>
+      {/* Top Price Banner */}
+      <div className="flex items-baseline justify-between border-b border-zinc-100 pb-4 dark:border-zinc-800">
+        <div>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-2xl font-bold tracking-tight text-zinc-950 dark:text-white">
+              RM {dailyRate}
+            </span>
+            <span className="text-xs text-zinc-500">/ day</span>
+          </div>
+          <p className="mt-0.5 text-[11px] text-zinc-400">
+            For {allocatedSqFt} sq.ft • RM{" "}
+            {space.pricePerSqFtPerDay.toFixed(2)}/sq.ft/day
+          </p>
+        </div>
+
+        <Badge className="bg-primary text-primary-foreground rounded-full border-0 px-3 py-1 text-xs font-bold">
+          0 Lock-in
+        </Badge>
+      </div>
+
+      {/* Space size */}
+      <div className="mt-5">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <label className="text-xs font-bold text-zinc-900 dark:text-white">
+              Space size
+            </label>
+            <button
+              type="button"
+              onClick={onOpenEstimator}
+              className="inline-flex items-center gap-1 rounded-full bg-zinc-100 px-2.5 py-0.5 text-[11px] font-semibold text-zinc-700 transition-colors hover:bg-zinc-200/80 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+            >
+              <Box className="size-3 text-lime-600 dark:text-lime-400" />
+              <span>Calculate size</span>
+            </button>
+          </div>
+          <span className="font-mono text-sm font-bold text-lime-700 dark:text-lime-400">
+            {allocatedSqFt} sq.ft
+          </span>
+        </div>
+
+        <Slider
+          value={[allocatedSqFt]}
+          min={space.minSqFt}
+          max={space.availableSqFt}
+          step={10}
+          onValueChange={(val) =>
+            onAllocatedSqFtChange(val[0] ?? space.defaultSqFt)
+          }
+          className="my-3.5"
+        />
+
+        <div className="flex items-center justify-between text-[11px] text-zinc-400">
+          <span>Min: {space.minSqFt} sq.ft</span>
+          <span>Available: {space.availableSqFt} sq.ft</span>
+        </div>
+
+        <div className="mt-2.5 flex items-center justify-between rounded-2xl bg-zinc-50 px-3.5 py-2 text-[11px] text-zinc-600 dark:bg-zinc-950 dark:text-zinc-300">
+          <span className="inline-flex items-center gap-1.5 font-medium">
+            <Warehouse className="size-3.5 text-lime-600 dark:text-lime-400" />
+            Fits ~{approxPallets} standard pallets
+          </span>
+          <span>or ~{approxBoxes} cartons</span>
+        </div>
+      </div>
+
+      {/* Move-in & duration */}
+      <div className="mt-5">
+        <label className="text-xs font-bold text-zinc-900 dark:text-white">
+          Move-in &amp; duration
+        </label>
+
+        <div className="mt-2 grid grid-cols-2 gap-2.5">
+          <Popover open={dateOpen} onOpenChange={setDateOpen}>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                className="flex flex-col items-start rounded-2xl border border-zinc-200/90 bg-zinc-50/60 p-2.5 text-left transition-colors hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-950"
+              >
+                <span className="text-[10px] font-medium text-zinc-400 uppercase">
+                  Move-In Date
+                </span>
+                <span className="mt-0.5 flex w-full items-center justify-between text-xs font-bold text-zinc-900 dark:text-white">
+                  <span>
+                    {moveInDate.toLocaleDateString("en-MY", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </span>
+                  <CalendarIcon className="size-3.5 text-lime-600 dark:text-lime-400" />
+                </span>
+              </button>
+            </PopoverTrigger>
+            <PopoverContent align="start" className="w-auto rounded-3xl p-2">
+              <Calendar
+                selected={moveInDate}
+                onSelect={(d) => {
+                  onMoveInDateChange(d)
+                  setDateOpen(false)
+                }}
+              />
+            </PopoverContent>
+          </Popover>
+
+          <div className="flex flex-col items-start rounded-2xl border border-zinc-200/90 bg-zinc-50/60 p-2.5 dark:border-zinc-800 dark:bg-zinc-950">
+            <span className="text-[10px] font-medium text-zinc-400 uppercase">
+              Est. Check-Out
+            </span>
+            <span className="mt-0.5 text-xs font-bold text-zinc-900 dark:text-white">
+              {moveOutDate.toLocaleDateString("en-MY", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })}
+            </span>
+          </div>
+        </div>
+
+        {/* Quick Duration Pills */}
+        <div className="mt-3 grid grid-cols-4 gap-1.5">
+          {DURATION_PRESETS.map((preset) => {
+            const isSelected = durationDays === preset.days
+            return (
+              <button
+                key={preset.days}
+                type="button"
+                onClick={() => onDurationDaysChange(preset.days)}
+                className={cn(
+                  "relative flex flex-col items-center justify-center rounded-xl border py-2 text-xs font-semibold transition-all",
+                  isSelected
+                    ? "border-primary bg-primary text-primary-foreground shadow-2xs"
+                    : "border-zinc-200/80 bg-white text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300"
+                )}
+              >
+                <span>{preset.label}</span>
+                {preset.badge && (
+                  <span
+                    className={cn(
+                      "text-[9px] font-bold",
+                      isSelected
+                        ? "text-primary-foreground/90"
+                        : "text-lime-600 dark:text-lime-400"
+                    )}
+                  >
+                    {preset.badge}
+                  </span>
+                )}
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Custom Days Slider */}
+        <div className="mt-3 flex items-center gap-3">
+          <span className="text-[11px] font-medium whitespace-nowrap text-zinc-500">
+            Custom days:
+          </span>
+          <Slider
+            value={[durationDays]}
+            min={1}
+            max={120}
+            step={1}
+            onValueChange={(val) => onDurationDaysChange(val[0] ?? 14)}
+            className="flex-1"
+          />
+          <span className="w-16 text-right font-mono text-xs font-bold text-zinc-900 dark:text-white">
+            {durationDays} {durationDays === 1 ? "day" : "days"}
+          </span>
+        </div>
+      </div>
+
+      {/* Price Breakdown */}
+      <div className="mt-5 space-y-2.5 rounded-2xl border border-zinc-200/80 bg-zinc-50/70 p-4 text-xs dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="flex items-center justify-between text-zinc-600 dark:text-zinc-400">
+          <span>
+            RM {dailyRate}/day × {durationDays}{" "}
+            {durationDays === 1 ? "day" : "days"} ({allocatedSqFt} sq.ft)
+          </span>
+          <span className="font-mono font-semibold text-zinc-900 dark:text-white">
+            RM {grossSubtotal.toLocaleString()}
+          </span>
+        </div>
+
+        {discountAmount > 0 && (
+          <div className="flex items-center justify-between text-lime-700 dark:text-lime-400">
+            <span>
+              Multi-day flexible discount ({Math.round(discountRate * 100)}%
+              off)
+            </span>
+            <span className="font-mono font-bold">
+              -RM {discountAmount.toLocaleString()}
+            </span>
+          </div>
+        )}
+
+        <div className="flex items-center justify-between text-zinc-600 dark:text-zinc-400">
+          <span>Security Deposit</span>
+          <span className="font-mono font-semibold text-zinc-900 dark:text-white">
+            RM 0
+          </span>
+        </div>
+
+        <div className="flex items-baseline justify-between border-t border-zinc-200/80 pt-2.5 dark:border-zinc-800">
+          <div>
+            <span className="text-sm font-bold text-zinc-950 dark:text-white">
+              Total (MYR)
+            </span>
+            <p className="text-[10px] text-zinc-400">
+              Extend or move out early anytime with RM 0 penalty
+            </p>
+          </div>
+          <span className="font-mono text-xl font-bold text-zinc-950 dark:text-white">
+            RM {totalMYR.toLocaleString()}
+          </span>
+        </div>
+      </div>
+
+      {/* Primary CTA Button */}
+      <Button
+        type="button"
+        onClick={onProceedToCheckout}
+        className="mt-5 h-11 w-full gap-2 rounded-full text-sm font-bold shadow-sm"
+      >
+        <span>Continue to Book Space</span>
+        <ChevronRight className="size-4" />
+      </Button>
+
+      <div className="mt-3.5 flex items-center justify-center gap-4 text-[11px] text-zinc-500 dark:text-zinc-400">
+        <span className="inline-flex items-center gap-1">
+          <Check className="size-3.5 text-lime-600 dark:text-lime-400" />
+          Instant Booking
+        </span>
+        <span className="inline-flex items-center gap-1">
+          <Check className="size-3.5 text-lime-600 dark:text-lime-400" />
+          Lalamove Pickup Option
+        </span>
+      </div>
+    </div>
+  )
+}
 
 export function SpaceDetail({ space }: { space: StorageSpace }) {
   const router = useRouter()
@@ -70,8 +361,8 @@ export function SpaceDetail({ space }: { space: StorageSpace }) {
   const [moveInDate, setMoveInDate] = React.useState<Date>(
     () => new Date(2026, 10, 5)
   )
-  const [dateOpen, setDateOpen] = React.useState(false)
-  const [showEstimator, setShowEstimator] = React.useState(false)
+  const [estimatorOpen, setEstimatorOpen] = React.useState(false)
+  const [mobileBookingOpen, setMobileBookingOpen] = React.useState(false)
   const [hostMsgSent, setHostMsgSent] = React.useState(false)
   const [hostQuestion, setHostQuestion] = React.useState("")
 
@@ -102,6 +393,26 @@ export function SpaceDetail({ space }: { space: StorageSpace }) {
     0,
     3
   )
+
+  const calculatorProps: BookingCalculatorProps = {
+    space,
+    allocatedSqFt,
+    onAllocatedSqFtChange: setAllocatedSqFt,
+    durationDays,
+    onDurationDaysChange: setDurationDays,
+    moveInDate,
+    onMoveInDateChange: setMoveInDate,
+    moveOutDate,
+    dailyRate,
+    discountRate,
+    grossSubtotal,
+    discountAmount,
+    totalMYR,
+    approxPallets,
+    approxBoxes,
+    onOpenEstimator: () => setEstimatorOpen(true),
+    onProceedToCheckout: handleProceedToCheckout,
+  }
 
   return (
     <div className="bg-background flex-1 pb-28 lg:pb-20">
@@ -175,16 +486,6 @@ export function SpaceDetail({ space }: { space: StorageSpace }) {
               alt={space.title}
               className="size-full object-cover"
             />
-            <div className="absolute top-3.5 left-3.5 flex flex-wrap items-center gap-2">
-              <Badge className="bg-primary text-primary-foreground rounded-full border-0 px-3 py-1 text-xs font-bold shadow-sm">
-                <Zap className="size-3" />
-                Instant Book
-              </Badge>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-950/80 px-3 py-1 text-xs font-semibold text-white backdrop-blur-xs">
-                <ShieldCheck className="size-3.5 text-lime-400" />
-                Verified Packrat Hub
-              </span>
-            </div>
             <div className="absolute right-3.5 bottom-3.5 rounded-full bg-black/65 px-3 py-1 text-xs font-medium text-white backdrop-blur-xs">
               Photo {activeImageIdx + 1} of {space.images.length}
             </div>
@@ -216,7 +517,7 @@ export function SpaceDetail({ space }: { space: StorageSpace }) {
 
         {/* Main Two-Column Content + Sticky Booking Calculator */}
         <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-12">
-          {/* Left Column: Details, Specs, Space Estimator, Host & Reviews */}
+          {/* Left Column: Details, Specs, Access, Host & Reviews */}
           <div className="flex flex-col gap-8 lg:col-span-7">
             {/* Title & Location Header */}
             <div className="border-b border-zinc-200/80 pb-6 dark:border-zinc-800">
@@ -224,12 +525,15 @@ export function SpaceDetail({ space }: { space: StorageSpace }) {
                 <span className="rounded-full bg-lime-500/15 px-3 py-1 text-xs font-bold text-lime-800 dark:text-lime-300">
                   {space.categoryLabel}
                 </span>
-                <span className="rounded-full border border-zinc-200 px-3 py-1 text-xs font-semibold text-zinc-600 dark:border-zinc-800 dark:text-zinc-300">
-                  0 Days Lease Lock-In
-                </span>
+                {space.instantBook && (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-zinc-200 px-3 py-1 text-xs font-semibold text-zinc-700 dark:border-zinc-800 dark:text-zinc-200">
+                    <Zap className="size-3 text-lime-600 dark:text-lime-400" />
+                    Instant Book
+                  </span>
+                )}
                 <span className="inline-flex items-center gap-1 text-xs font-semibold text-zinc-800 dark:text-zinc-200">
                   <Star className="size-3.5 fill-amber-400 text-amber-400" />
-                  {space.rating} ({space.reviewCount} verified reviews)
+                  {space.rating} ({space.reviewCount} reviews)
                 </span>
               </div>
 
@@ -240,21 +544,16 @@ export function SpaceDetail({ space }: { space: StorageSpace }) {
                 {space.subtitle}
               </p>
 
-              <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-zinc-500 dark:text-zinc-400">
-                <span className="inline-flex items-center gap-1.5 font-medium text-zinc-800 dark:text-zinc-200">
-                  <MapPin className="size-4 text-lime-600 dark:text-lime-400" />
-                  {space.address}
-                </span>
-                <span className="rounded-full bg-zinc-100 px-2.5 py-0.5 font-mono text-[11px] text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
-                  {space.mapCoords.latLabel}, {space.mapCoords.lngLabel}
-                </span>
-              </div>
+              <p className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-zinc-800 dark:text-zinc-200">
+                <MapPin className="size-4 shrink-0 text-lime-600 dark:text-lime-400" />
+                <span>{space.address}</span>
+              </p>
             </div>
 
-            {/* Technical Storage Specs Grid */}
+            {/* Key Specifications Grid */}
             <div>
               <h2 className="text-base font-bold text-zinc-950 dark:text-white">
-                Technical Hub Specifications
+                Key Specifications
               </h2>
               <div className="mt-3.5 grid grid-cols-2 gap-3 sm:grid-cols-3">
                 <div className="rounded-2xl border border-zinc-200/80 bg-white p-3.5 dark:border-zinc-800 dark:bg-zinc-900/60">
@@ -270,7 +569,7 @@ export function SpaceDetail({ space }: { space: StorageSpace }) {
                 <div className="rounded-2xl border border-zinc-200/80 bg-white p-3.5 dark:border-zinc-800 dark:bg-zinc-900/60">
                   <Layers className="size-4 text-lime-600 dark:text-lime-400" />
                   <p className="mt-2 text-[11px] text-zinc-400">
-                    Floor & Dock Level
+                    Floor &amp; Dock Level
                   </p>
                   <p className="text-xs font-bold text-zinc-900 dark:text-white">
                     {space.specs.floorLevel}
@@ -280,7 +579,7 @@ export function SpaceDetail({ space }: { space: StorageSpace }) {
                 <div className="rounded-2xl border border-zinc-200/80 bg-white p-3.5 dark:border-zinc-800 dark:bg-zinc-900/60">
                   <Truck className="size-4 text-lime-600 dark:text-lime-400" />
                   <p className="mt-2 text-[11px] text-zinc-400">
-                    Loading Bay Access
+                    Loading Access
                   </p>
                   <p className="text-xs font-bold text-zinc-900 dark:text-white">
                     {space.specs.loadingAccess}
@@ -289,9 +588,7 @@ export function SpaceDetail({ space }: { space: StorageSpace }) {
 
                 <div className="rounded-2xl border border-zinc-200/80 bg-white p-3.5 dark:border-zinc-800 dark:bg-zinc-900/60">
                   <Clock className="size-4 text-lime-600 dark:text-lime-400" />
-                  <p className="mt-2 text-[11px] text-zinc-400">
-                    Renter Access Hours
-                  </p>
+                  <p className="mt-2 text-[11px] text-zinc-400">Access Hours</p>
                   <p className="text-xs font-bold text-zinc-900 dark:text-white">
                     {space.specs.accessHours}
                   </p>
@@ -299,9 +596,7 @@ export function SpaceDetail({ space }: { space: StorageSpace }) {
 
                 <div className="rounded-2xl border border-zinc-200/80 bg-white p-3.5 dark:border-zinc-800 dark:bg-zinc-900/60">
                   <Thermometer className="size-4 text-lime-600 dark:text-lime-400" />
-                  <p className="mt-2 text-[11px] text-zinc-400">
-                    Environment Control
-                  </p>
+                  <p className="mt-2 text-[11px] text-zinc-400">Environment</p>
                   <p className="text-xs font-bold text-zinc-900 dark:text-white">
                     {space.specs.climateControl}
                   </p>
@@ -309,9 +604,7 @@ export function SpaceDetail({ space }: { space: StorageSpace }) {
 
                 <div className="rounded-2xl border border-zinc-200/80 bg-white p-3.5 dark:border-zinc-800 dark:bg-zinc-900/60">
                   <Lock className="size-4 text-lime-600 dark:text-lime-400" />
-                  <p className="mt-2 text-[11px] text-zinc-400">
-                    Security & CCTV
-                  </p>
+                  <p className="mt-2 text-[11px] text-zinc-400">Security</p>
                   <p className="text-xs font-bold text-zinc-900 dark:text-white">
                     {space.specs.security}
                   </p>
@@ -319,80 +612,28 @@ export function SpaceDetail({ space }: { space: StorageSpace }) {
               </div>
             </div>
 
-            {/* Interactive Inline Space Estimator Callout */}
-            <div className="rounded-3xl border border-lime-500/35 bg-lime-50/40 p-4 sm:p-5 dark:border-lime-500/25 dark:bg-lime-950/15">
-              <div className="flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">
-                <div className="flex items-center gap-3">
-                  <div className="bg-primary text-primary-foreground flex size-10 shrink-0 items-center justify-center rounded-2xl shadow-xs">
-                    <Box className="size-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-zinc-950 dark:text-white">
-                      Not sure how much sq.ft to book at this hub?
-                    </h3>
-                    <p className="text-xs text-zinc-600 dark:text-zinc-400">
-                      Count your boxes, Shopee/TikTok totes, or pallets to
-                      auto-calculate your footprint.
-                    </p>
-                  </div>
-                </div>
-                <Button
-                  type="button"
-                  variant={showEstimator ? "secondary" : "default"}
-                  size="sm"
-                  onClick={() => setShowEstimator((prev) => !prev)}
-                  className="w-full rounded-full px-4 text-xs font-semibold sm:w-auto"
-                >
-                  {showEstimator ? "Hide Estimator" : "Open Space Estimator"}
-                </Button>
-              </div>
-
-              {showEstimator && (
-                <div className="mt-5 border-t border-lime-500/20 pt-5">
-                  <SpaceEstimatorContent
-                    ctaLabel="Sync to Booking Calculator"
-                    onApply={(sqFt) => {
-                      const clamped = Math.min(
-                        space.availableSqFt,
-                        Math.max(space.minSqFt, sqFt)
-                      )
-                      setAllocatedSqFt(clamped)
-                      setShowEstimator(false)
-                    }}
-                  />
-                </div>
-              )}
-            </div>
-
-            {/* About Space & Access Protocol */}
+            {/* About Space, Access & Location Map */}
             <div className="space-y-4 border-b border-zinc-200/80 pb-6 dark:border-zinc-800">
               <h2 className="text-base font-bold text-zinc-950 dark:text-white">
-                About This Storage Space
+                About This Space
               </h2>
               <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
                 {space.description}
               </p>
 
               <div className="rounded-2xl border border-zinc-200/80 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900">
-                <p className="flex items-center gap-1.5 text-xs font-bold text-zinc-900 dark:text-white">
-                  <Sparkles className="size-3.5 text-lime-600 dark:text-lime-400" />
-                  <span>Digital Move-In & Access Protocol</span>
+                <p className="text-xs font-bold text-zinc-900 dark:text-white">
+                  Move-In &amp; Access Instructions
                 </p>
                 <p className="mt-1 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">
                   {space.accessInstructions}
                 </p>
               </div>
 
-              {/* Exact GPS Coordinate Map Preview */}
               <div className="pt-2">
-                <div className="mb-2.5 flex items-center justify-between">
-                  <span className="text-xs font-bold text-zinc-900 dark:text-white">
-                    Exact Hub Coordinates & Loading Access
-                  </span>
-                  <span className="font-mono text-[11px] text-lime-700 dark:text-lime-400">
-                    {space.mapCoords.latLabel}, {space.mapCoords.lngLabel}
-                  </span>
-                </div>
+                <p className="mb-2.5 text-xs font-bold text-zinc-900 dark:text-white">
+                  Location &amp; Loading Access
+                </p>
                 <div className="h-60 w-full overflow-hidden rounded-3xl border border-zinc-200/80 dark:border-zinc-800">
                   <CoordMap
                     centerLat={space.mapCoords.lat}
@@ -413,11 +654,11 @@ export function SpaceDetail({ space }: { space: StorageSpace }) {
               </div>
             </div>
 
-            {/* Amenities & Lalamove Vehicle Compatibility */}
+            {/* Amenities & Vehicle Access */}
             <div className="grid grid-cols-1 gap-6 border-b border-zinc-200/80 pb-6 sm:grid-cols-2 dark:border-zinc-800">
               <div>
                 <h3 className="text-sm font-bold text-zinc-950 dark:text-white">
-                  Included Hub Amenities
+                  Amenities
                 </h3>
                 <ul className="mt-3 space-y-2">
                   {space.amenities.map((amenity) => (
@@ -434,10 +675,10 @@ export function SpaceDetail({ space }: { space: StorageSpace }) {
 
               <div>
                 <h3 className="text-sm font-bold text-zinc-950 dark:text-white">
-                  Lalamove & Lorry Compatibility
+                  Vehicle Access
                 </h3>
                 <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-                  Direct loading access verified for these vehicle types:
+                  Loading access verified for:
                 </p>
                 <div className="mt-3 flex flex-wrap gap-1.5">
                   {space.compatibleVehicles.map((v) => (
@@ -453,33 +694,30 @@ export function SpaceDetail({ space }: { space: StorageSpace }) {
               </div>
             </div>
 
-            {/* Verified Space Host Card */}
+            {/* Space Host Card */}
             <div className="rounded-3xl border border-zinc-200/80 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900/60">
-              <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-                <div className="flex items-center gap-3.5">
-                  <img
-                    src={space.host.avatar}
-                    alt={space.host.name}
-                    className="size-13 rounded-full object-cover ring-2 ring-lime-500/40"
-                  />
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-bold text-zinc-950 dark:text-white">
-                        Hosted by {space.host.name}
-                      </h3>
-                      <Badge
-                        variant="secondary"
-                        className="rounded-full text-[10px]"
-                      >
-                        {space.host.role}
-                      </Badge>
-                    </div>
-                    <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-                      {space.host.completedBookings} completed bookings • Avg.
-                      response {space.host.responseTime} • Hosting since{" "}
-                      {space.host.joinedYear}
-                    </p>
+              <div className="flex items-center gap-3.5">
+                <img
+                  src={space.host.avatar}
+                  alt={space.host.name}
+                  className="size-13 rounded-full object-cover ring-2 ring-lime-500/40"
+                />
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="text-sm font-bold text-zinc-950 dark:text-white">
+                      Hosted by {space.host.name}
+                    </h3>
+                    <Badge
+                      variant="secondary"
+                      className="rounded-full text-[10px]"
+                    >
+                      {space.host.role}
+                    </Badge>
                   </div>
+                  <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                    {space.host.completedBookings} bookings • Responds in{" "}
+                    {space.host.responseTime} • Since {space.host.joinedYear}
+                  </p>
                 </div>
               </div>
 
@@ -489,7 +727,7 @@ export function SpaceDetail({ space }: { space: StorageSpace }) {
                   type="text"
                   value={hostQuestion}
                   onChange={(e) => setHostQuestion(e.target.value)}
-                  placeholder="Ask host about forklift hours, racking height, or container unloading..."
+                  placeholder="Ask host about access hours, racking height, or unloading..."
                   className="h-9 flex-1 rounded-full border border-zinc-200 bg-zinc-50 px-4 text-xs outline-none focus:border-lime-500 dark:border-zinc-800 dark:bg-zinc-950"
                 />
                 <Button
@@ -509,11 +747,11 @@ export function SpaceDetail({ space }: { space: StorageSpace }) {
               </div>
             </div>
 
-            {/* Verified Renter Reviews */}
+            {/* Renter Reviews */}
             {space.reviews.length > 0 && (
               <div>
                 <h2 className="text-base font-bold text-zinc-950 dark:text-white">
-                  What Renters & SMEs Stored Here
+                  Reviews
                 </h2>
                 <div className="mt-3.5 grid grid-cols-1 gap-4 sm:grid-cols-2">
                   {space.reviews.map((rev) => (
@@ -550,249 +788,13 @@ export function SpaceDetail({ space }: { space: StorageSpace }) {
             )}
           </div>
 
-          {/* Right Column: Sticky Interactive Daily Rate & Space Calculator */}
-          <div id="booking-calculator" className="scroll-mt-20 lg:col-span-5">
-            <div className="sticky top-24 rounded-3xl border border-zinc-200/90 bg-white p-5 shadow-[0_20px_60px_rgba(0,0,0,0.08)] sm:p-6 dark:border-zinc-800 dark:bg-zinc-900">
-              {/* Top Price Banner */}
-              <div className="flex items-baseline justify-between border-b border-zinc-100 pb-4 dark:border-zinc-800">
-                <div>
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-2xl font-bold tracking-tight text-zinc-950 dark:text-white">
-                      RM {dailyRate}
-                    </span>
-                    <span className="text-xs text-zinc-500">/ day</span>
-                  </div>
-                  <p className="mt-0.5 text-[11px] text-zinc-400">
-                    For {allocatedSqFt} sq.ft allocated • RM{" "}
-                    {space.pricePerSqFtPerDay.toFixed(2)}/sq.ft/day
-                  </p>
-                </div>
-
-                <Badge className="bg-primary text-primary-foreground rounded-full border-0 px-3 py-1 text-xs font-bold">
-                  0 Lock-in
-                </Badge>
-              </div>
-
-              {/* 1. Space Footprint Allocation Slider */}
-              <div className="mt-5">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold text-zinc-900 dark:text-white">
-                    1. Select Space Footprint
-                  </label>
-                  <span className="font-mono text-sm font-bold text-lime-700 dark:text-lime-400">
-                    {allocatedSqFt} sq.ft
-                  </span>
-                </div>
-
-                <Slider
-                  value={[allocatedSqFt]}
-                  min={space.minSqFt}
-                  max={space.availableSqFt}
-                  step={10}
-                  onValueChange={(val) =>
-                    setAllocatedSqFt(val[0] ?? space.defaultSqFt)
-                  }
-                  className="my-3.5"
-                />
-
-                <div className="flex items-center justify-between text-[11px] text-zinc-400">
-                  <span>Min: {space.minSqFt} sq.ft</span>
-                  <span>Available: {space.availableSqFt} sq.ft</span>
-                </div>
-
-                {/* Live Capacity Equivalence Pill */}
-                <div className="mt-2.5 flex items-center justify-between rounded-2xl bg-zinc-50 px-3.5 py-2 text-[11px] text-zinc-600 dark:bg-zinc-950 dark:text-zinc-300">
-                  <span className="inline-flex items-center gap-1.5 font-medium">
-                    <Warehouse className="size-3.5 text-lime-600 dark:text-lime-400" />
-                    Fits ~{approxPallets} standard pallets
-                  </span>
-                  <span>or ~{approxBoxes} cartons</span>
-                </div>
-              </div>
-
-              {/* 2. Move-In Date & Flexible Duration */}
-              <div className="mt-5">
-                <label className="text-xs font-bold text-zinc-900 dark:text-white">
-                  2. Move-In Date & Duration (Days)
-                </label>
-
-                <div className="mt-2 grid grid-cols-2 gap-2.5">
-                  <Popover open={dateOpen} onOpenChange={setDateOpen}>
-                    <PopoverTrigger asChild>
-                      <button
-                        type="button"
-                        className="flex flex-col items-start rounded-2xl border border-zinc-200/90 bg-zinc-50/60 p-2.5 text-left transition-colors hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-950"
-                      >
-                        <span className="text-[10px] font-medium text-zinc-400 uppercase">
-                          Move-In Date
-                        </span>
-                        <span className="mt-0.5 flex w-full items-center justify-between text-xs font-bold text-zinc-900 dark:text-white">
-                          <span>
-                            {moveInDate.toLocaleDateString("en-MY", {
-                              day: "2-digit",
-                              month: "short",
-                              year: "numeric",
-                            })}
-                          </span>
-                          <CalendarIcon className="size-3.5 text-lime-600 dark:text-lime-400" />
-                        </span>
-                      </button>
-                    </PopoverTrigger>
-                    <PopoverContent
-                      align="start"
-                      className="w-auto rounded-3xl p-2"
-                    >
-                      <Calendar
-                        selected={moveInDate}
-                        onSelect={(d) => {
-                          setMoveInDate(d)
-                          setDateOpen(false)
-                        }}
-                      />
-                    </PopoverContent>
-                  </Popover>
-
-                  <div className="flex flex-col items-start rounded-2xl border border-zinc-200/90 bg-zinc-50/60 p-2.5 dark:border-zinc-800 dark:bg-zinc-950">
-                    <span className="text-[10px] font-medium text-zinc-400 uppercase">
-                      Est. Check-Out
-                    </span>
-                    <span className="mt-0.5 text-xs font-bold text-zinc-900 dark:text-white">
-                      {moveOutDate.toLocaleDateString("en-MY", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Quick Duration Pills */}
-                <div className="mt-3 grid grid-cols-4 gap-1.5">
-                  {DURATION_PRESETS.map((preset) => {
-                    const isSelected = durationDays === preset.days
-                    return (
-                      <button
-                        key={preset.days}
-                        type="button"
-                        onClick={() => setDurationDays(preset.days)}
-                        className={cn(
-                          "relative flex flex-col items-center justify-center rounded-xl border py-2 text-xs font-semibold transition-all",
-                          isSelected
-                            ? "border-primary bg-primary text-primary-foreground shadow-2xs"
-                            : "border-zinc-200/80 bg-white text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300"
-                        )}
-                      >
-                        <span>{preset.label}</span>
-                        {preset.badge && (
-                          <span
-                            className={cn(
-                              "text-[9px] font-bold",
-                              isSelected
-                                ? "text-primary-foreground/90"
-                                : "text-lime-600 dark:text-lime-400"
-                            )}
-                          >
-                            {preset.badge}
-                          </span>
-                        )}
-                      </button>
-                    )
-                  })}
-                </div>
-
-                {/* Custom Days Slider */}
-                <div className="mt-3 flex items-center gap-3">
-                  <span className="text-[11px] font-medium whitespace-nowrap text-zinc-500">
-                    Custom days:
-                  </span>
-                  <Slider
-                    value={[durationDays]}
-                    min={1}
-                    max={120}
-                    step={1}
-                    onValueChange={(val) => setDurationDays(val[0] ?? 14)}
-                    className="flex-1"
-                  />
-                  <span className="w-16 text-right font-mono text-xs font-bold text-zinc-900 dark:text-white">
-                    {durationDays} {durationDays === 1 ? "day" : "days"}
-                  </span>
-                </div>
-              </div>
-
-              {/* 3. Transparent Price Breakdown */}
-              <div className="mt-5 space-y-2.5 rounded-2xl border border-zinc-200/80 bg-zinc-50/70 p-4 text-xs dark:border-zinc-800 dark:bg-zinc-950">
-                <div className="flex items-center justify-between text-zinc-600 dark:text-zinc-400">
-                  <span>
-                    RM {dailyRate}/day × {durationDays}{" "}
-                    {durationDays === 1 ? "day" : "days"} ({allocatedSqFt}{" "}
-                    sq.ft)
-                  </span>
-                  <span className="font-mono font-semibold text-zinc-900 dark:text-white">
-                    RM {grossSubtotal.toLocaleString()}
-                  </span>
-                </div>
-
-                {discountAmount > 0 && (
-                  <div className="flex items-center justify-between text-lime-700 dark:text-lime-400">
-                    <span>
-                      Multi-day flexible discount (
-                      {Math.round(discountRate * 100)}% off)
-                    </span>
-                    <span className="font-mono font-bold">
-                      -RM {discountAmount.toLocaleString()}
-                    </span>
-                  </div>
-                )}
-
-                <div className="flex items-center justify-between text-zinc-600 dark:text-zinc-400">
-                  <span>Packrat Shield (Up to RM 50k Coverage)</span>
-                  <span className="font-semibold text-lime-700 dark:text-lime-400">
-                    Included
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between text-zinc-600 dark:text-zinc-400">
-                  <span>Security Deposit & Lease Lock-In</span>
-                  <span className="font-mono font-semibold text-zinc-900 dark:text-white">
-                    RM 0
-                  </span>
-                </div>
-
-                <div className="flex items-baseline justify-between border-t border-zinc-200/80 pt-2.5 dark:border-zinc-800">
-                  <div>
-                    <span className="text-sm font-bold text-zinc-950 dark:text-white">
-                      Total (MYR)
-                    </span>
-                    <p className="text-[10px] text-zinc-400">
-                      Extend or move out early anytime with RM 0 penalty
-                    </p>
-                  </div>
-                  <span className="font-mono text-xl font-bold text-zinc-950 dark:text-white">
-                    RM {totalMYR.toLocaleString()}
-                  </span>
-                </div>
-              </div>
-
-              {/* Primary CTA Button */}
-              <Button
-                type="button"
-                onClick={handleProceedToCheckout}
-                className="mt-5 h-11 w-full gap-2 rounded-full text-sm font-bold shadow-sm"
-              >
-                <span>Continue to Book Space</span>
-                <ChevronRight className="size-4" />
-              </Button>
-
-              <div className="mt-3.5 flex items-center justify-center gap-4 text-[11px] text-zinc-500 dark:text-zinc-400">
-                <span className="inline-flex items-center gap-1">
-                  <Check className="size-3.5 text-lime-600 dark:text-lime-400" />
-                  Instant Smart PIN
-                </span>
-                <span className="inline-flex items-center gap-1">
-                  <Check className="size-3.5 text-lime-600 dark:text-lime-400" />
-                  Lalamove Pickup Option
-                </span>
-              </div>
+          {/* Right Column: Desktop Sticky Daily Rate & Space Calculator */}
+          <div
+            id="booking-calculator"
+            className="hidden scroll-mt-20 lg:col-span-5 lg:block"
+          >
+            <div className="sticky top-24 rounded-3xl border border-zinc-200/90 bg-white p-6 shadow-[0_20px_60px_rgba(0,0,0,0.08)] dark:border-zinc-800 dark:bg-zinc-900">
+              <BookingCalculator {...calculatorProps} />
             </div>
           </div>
         </div>
@@ -802,7 +804,7 @@ export function SpaceDetail({ space }: { space: StorageSpace }) {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-xl font-bold text-zinc-950 dark:text-white">
-                Other Verified Hubs Nearby
+                Other Hubs Nearby
               </h2>
               <p className="text-xs text-zinc-500 dark:text-zinc-400">
                 Compare alternative square footage and daily rates
@@ -849,16 +851,44 @@ export function SpaceDetail({ space }: { space: StorageSpace }) {
         </div>
       </div>
 
+      {/* Controlled Space Estimator Sheet */}
+      <SpaceEstimatorSheet
+        open={estimatorOpen}
+        onOpenChange={setEstimatorOpen}
+        trigger={null}
+        onApply={(sqFt) => {
+          const clamped = Math.min(
+            space.availableSqFt,
+            Math.max(space.minSqFt, sqFt)
+          )
+          setAllocatedSqFt(clamped)
+        }}
+      />
+
+      {/* Mobile Booking Sheet (< lg) */}
+      <Sheet open={mobileBookingOpen} onOpenChange={setMobileBookingOpen}>
+        <SheetContent
+          side="bottom"
+          className="max-h-[90dvh] overflow-y-auto rounded-t-3xl p-5 lg:hidden"
+        >
+          <SheetHeader className="p-0 pb-4 text-left">
+            <SheetTitle className="pr-6 text-base font-bold">
+              {space.title}
+            </SheetTitle>
+            <SheetDescription className="text-xs">
+              Adjust space size, move-in date, and duration
+            </SheetDescription>
+          </SheetHeader>
+          <BookingCalculator {...calculatorProps} />
+        </SheetContent>
+      </Sheet>
+
       {/* Sticky Mobile Bottom Booking Bar */}
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-zinc-200/90 bg-white/95 px-4 py-3 shadow-[0_-10px_30px_rgba(0,0,0,0.08)] backdrop-blur-md lg:hidden dark:border-zinc-800 dark:bg-zinc-900/95">
         <div className="mx-auto flex max-w-lg items-center justify-between gap-3">
           <button
             type="button"
-            onClick={() => {
-              document
-                .getElementById("booking-calculator")
-                ?.scrollIntoView({ behavior: "smooth", block: "start" })
-            }}
+            onClick={() => setMobileBookingOpen(true)}
             className="min-w-0 text-left"
           >
             <div className="flex items-baseline gap-1.5">
@@ -870,9 +900,12 @@ export function SpaceDetail({ space }: { space: StorageSpace }) {
                 0 Lock-in
               </span>
             </div>
-            <p className="truncate text-[11px] text-zinc-500 underline decoration-dotted underline-offset-2 dark:text-zinc-400">
-              {allocatedSqFt} sq.ft • {durationDays}d (RM{" "}
-              {totalMYR.toLocaleString()}) · Edit
+            <p className="inline-flex max-w-full items-center gap-1 truncate text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+              <SlidersHorizontal className="size-3 shrink-0" />
+              <span className="truncate">
+                {allocatedSqFt} sq.ft • {durationDays}d (RM{" "}
+                {totalMYR.toLocaleString()}) · Customize
+              </span>
             </p>
           </button>
 
@@ -889,4 +922,3 @@ export function SpaceDetail({ space }: { space: StorageSpace }) {
     </div>
   )
 }
-
