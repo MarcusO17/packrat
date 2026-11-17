@@ -289,11 +289,13 @@ export function CoordMap({
               data-map-interactive="true"
               onClick={() => {
                 onSelectMarker?.(marker.id)
-                setView((prev) => ({
-                  ...prev,
-                  lat: marker.lat,
-                  lng: marker.lng,
-                }))
+                if (interactive) {
+                  setView((prev) => ({
+                    ...prev,
+                    lat: marker.lat,
+                    lng: marker.lng,
+                  }))
+                }
               }}
               style={{ left: `${left}px`, top: `${top}px` }}
               className={cn(

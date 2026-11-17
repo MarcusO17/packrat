@@ -167,6 +167,18 @@ export function HeroSection() {
   const [budgetOpen, setBudgetOpen] = React.useState(false)
   const [wordIndex, setWordIndex] = React.useState(0)
   const [isVisible, setIsVisible] = React.useState(true)
+  const [isMobile, setIsMobile] = React.useState(false)
+
+  React.useEffect(() => {
+    const mql = window.matchMedia("(max-width: 767px)")
+    const onChange = () => setIsMobile(mql.matches)
+    const frame = requestAnimationFrame(onChange)
+    mql.addEventListener("change", onChange)
+    return () => {
+      cancelAnimationFrame(frame)
+      mql.removeEventListener("change", onChange)
+    }
+  }, [])
 
   React.useEffect(() => {
     const interval = setInterval(() => {
@@ -392,8 +404,9 @@ export function HeroSection() {
           zoom={12}
           markers={heroCoordMarkers}
           markerStyle="photo-pin"
+          interactive={!isMobile}
           showControls={false}
-          className="absolute inset-0 size-full"
+          className="absolute inset-0 size-full max-md:touch-pan-y"
         >
           {/* Soft Top & Side Radial/Linear Fade Overlays matching #f9fafb / #0c0d0e */}
           <div className="from-background via-background/70 pointer-events-none absolute inset-x-0 top-0 z-20 h-28 bg-gradient-to-b to-transparent sm:via-background/80 sm:h-56" />
