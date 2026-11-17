@@ -8,11 +8,8 @@ import {
   Filter,
   Heart,
   MapPin,
-  Maximize2,
   RotateCcw,
-  ShieldCheck,
   Star,
-  Truck,
   X,
 } from "lucide-react"
 
@@ -354,7 +351,7 @@ export function ExploreSpaces() {
                         className={cn(
                           "group relative flex cursor-pointer flex-col justify-between overflow-hidden rounded-3xl border bg-white p-3 transition-all duration-300 dark:bg-zinc-900",
                           isSelected
-                            ? "border-primary ring-primary/30 shadow-[0_14px_40px_rgba(132,204,22,0.12)] ring-2"
+                            ? "border-primary ring-primary/30 shadow-[0_14px_40px_rgba(61,52,139,0.2)] ring-2"
                             : isInView
                               ? "-translate-y-0.5 border-zinc-300 shadow-md dark:border-zinc-700"
                               : "border-zinc-200/80 shadow-2xs hover:border-zinc-300 hover:shadow-md dark:border-zinc-800"
@@ -377,42 +374,21 @@ export function ExploreSpaces() {
                               {space.categoryLabel}
                             </span>
 
-                            {/* Top Right Save Button + Instant Book */}
-                            <div className="absolute top-2.5 right-2.5 flex items-center gap-1.5">
-                              {space.instantBook && (
-                                <Badge className="bg-primary text-primary-foreground rounded-full border-0 px-2.5 py-0.5 text-[10px] font-bold shadow-xs">
-                                  Instant Book
-                                </Badge>
-                              )}
-                              <button
-                                type="button"
-                                onClick={(e) => toggleSaved(space.id, e)}
-                                aria-label="Save space"
-                                className="flex size-7 items-center justify-center rounded-full bg-white/90 text-zinc-700 shadow-xs backdrop-blur-xs transition-transform hover:scale-105 dark:bg-zinc-900/90 dark:text-zinc-200"
-                              >
-                                <Heart
-                                  className={cn(
-                                    "size-3.5",
-                                    isSaved &&
-                                      "fill-rose-500 text-rose-500"
-                                  )}
-                                />
-                              </button>
-                            </div>
-
-                            {/* Bottom Sq.Ft Availability Bar */}
-                            <div className="absolute inset-x-2.5 bottom-2.5 flex items-center justify-between rounded-xl bg-black/60 px-2.5 py-1.5 text-[10px] font-medium text-white backdrop-blur-xs">
-                              <span className="inline-flex items-center gap-1">
-                                <Maximize2 className="size-3 text-lime-400" />
-                                {space.minSqFt} – {space.availableSqFt} sq.ft
-                                available
-                              </span>
-                              {space.palletCapacity && (
-                                <span className="text-lime-300">
-                                  Up to {space.palletCapacity} pallets
-                                </span>
-                              )}
-                            </div>
+                            {/* Top Right Save Button */}
+                            <button
+                              type="button"
+                              onClick={(e) => toggleSaved(space.id, e)}
+                              aria-label="Save space"
+                              className="absolute top-2.5 right-2.5 flex size-7 items-center justify-center rounded-full bg-white/90 text-zinc-700 shadow-xs backdrop-blur-xs transition-transform hover:scale-105 dark:bg-zinc-900/90 dark:text-zinc-200"
+                            >
+                              <Heart
+                                className={cn(
+                                  "size-3.5",
+                                  isSaved &&
+                                    "fill-rose-500 text-rose-500"
+                                )}
+                              />
+                            </button>
                           </div>
 
                           {/* Card Body */}
@@ -427,69 +403,37 @@ export function ExploreSpaces() {
                               <span className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-zinc-800 dark:text-zinc-200">
                                 <Star className="size-3.5 fill-amber-400 text-amber-400" />
                                 {space.rating}
-                                <span className="text-[11px] font-normal text-zinc-400">
-                                  ({space.reviewCount})
-                                </span>
                               </span>
                             </div>
 
-                            <p className="mt-0.5 flex items-center justify-between gap-1 text-xs text-zinc-500 dark:text-zinc-400">
-                              <span className="inline-flex items-center gap-1 truncate">
-                                <MapPin className="size-3.5 shrink-0 text-lime-600 dark:text-lime-400" />
-                                <span className="truncate">
-                                  {space.location}
-                                </span>
-                              </span>
-                              <span className="font-mono text-[10px] text-zinc-400">
-                                {space.mapCoords.latLabel}
-                              </span>
+                            <p className="mt-1 flex items-center gap-1 truncate text-xs text-zinc-500 dark:text-zinc-400">
+                              <MapPin className="size-3.5 shrink-0 text-lime-600 dark:text-lime-400" />
+                              <span className="truncate">{space.location}</span>
                             </p>
 
-                            {/* Key Specs Row */}
-                            <div className="mt-2.5 flex flex-wrap items-center gap-2 border-y border-zinc-100 py-2 text-[11px] text-zinc-500 dark:border-zinc-800/80 dark:text-zinc-400">
-                              <span className="inline-flex items-center gap-1">
-                                <Truck className="size-3 text-zinc-400" />
-                                {space.specs.loadingAccess.split(" ")[0]}{" "}
-                                {space.specs.loadingAccess.split(" ")[1]}
-                              </span>
-                              <span>•</span>
-                              <span className="inline-flex items-center gap-1">
-                                <ShieldCheck className="size-3 text-zinc-400" />
-                                {space.specs.accessHours}
-                              </span>
-                            </div>
-
-                            {/* Ideal For Tags */}
-                            <div className="mt-2.5 flex flex-wrap gap-1">
-                              {space.idealFor.slice(0, 2).map((tag) => (
-                                <span
-                                  key={tag}
-                                  className="rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
-                                >
-                                  {tag}
-                                </span>
-                              ))}
-                            </div>
+                            <p className="mt-1 truncate text-xs text-zinc-500 dark:text-zinc-400">
+                              {space.minSqFt}–{space.availableSqFt} sq.ft
+                              {space.palletCapacity
+                                ? ` • ${space.palletCapacity} pallets`
+                                : ""}
+                            </p>
                           </div>
                         </div>
 
                         {/* Price & CTA Footer */}
-                        <div className="mt-3.5 flex items-center justify-between px-1 pt-1">
+                        <div className="mt-4 flex items-center justify-between px-1 pt-1">
                           <div>
-                            <div className="flex items-baseline gap-1.5">
+                            <div className="flex items-baseline gap-1">
                               <span className="text-base font-bold text-zinc-950 dark:text-white">
                                 RM {displayDailyPrice}
                               </span>
                               <span className="text-xs text-zinc-500">
                                 / day
                               </span>
-                              <span className="text-[10px] font-semibold text-lime-700 dark:text-lime-400">
-                                (0 Lock-in)
-                              </span>
                             </div>
-                            <p className="text-[10px] text-zinc-400">
-                              For {targetSqFt} sq.ft • RM{" "}
-                              {space.pricePerSqFtPerDay.toFixed(2)}/sq.ft
+                            <p className="text-[11px] text-zinc-400">
+                              {targetSqFt} sq.ft
+                              {space.instantBook ? " • Instant Book" : ""}
                             </p>
                           </div>
 
@@ -580,10 +524,6 @@ export function ExploreSpaces() {
                             <Badge className="bg-primary text-primary-foreground rounded-full border-0 px-2 py-0 text-[10px] font-bold">
                               {activeSpace.categoryLabel}
                             </Badge>
-                            <span className="hidden font-mono text-[10px] font-semibold text-zinc-500 sm:inline dark:text-zinc-400">
-                              {activeSpace.mapCoords.latLabel},{" "}
-                              {activeSpace.mapCoords.lngLabel}
-                            </span>
                           </div>
                           <h3 className="mt-1 truncate text-xs font-bold text-zinc-950 sm:text-sm dark:text-white">
                             {activeSpace.title}

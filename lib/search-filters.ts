@@ -75,7 +75,8 @@ export function filterSpaces(
           space.location,
           space.subtitle,
           space.region,
-          ...space.idealFor,
+          space.categoryLabel,
+          ...space.amenities,
         ]
           .join(" ")
           .toLowerCase()

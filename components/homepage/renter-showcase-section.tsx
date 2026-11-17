@@ -299,7 +299,7 @@ export function RenterShowcaseSection() {
               )}
               style={{
                 background:
-                  "radial-gradient(circle at 20% 16%, #d9f99d 0%, transparent 52%), linear-gradient(165deg, #bef264 0%, #65a30d 52%, #1a2e05 100%)",
+                  "radial-gradient(circle at 20% 16%, #7678ed 0%, transparent 50%), linear-gradient(165deg, #5956bd 0%, #3d348b 55%, #1e194d 100%)",
               }}
             >
               {/* Top Visual Area */}
@@ -431,13 +431,13 @@ export function RenterShowcaseSection() {
                   {/* Overhanging Box Lid */}
                   <div className="relative z-10 flex h-5 w-27 items-center justify-center rounded-t-lg rounded-b-[4px] bg-gradient-to-b from-zinc-700 to-zinc-800 shadow-[0_4px_8px_rgba(0,0,0,0.55)] ring-1 ring-inset ring-white/20">
                     {/* Center Lime Packing Tape Strip */}
-                    <div className="h-full w-5 bg-gradient-to-b from-[#d9f99d] via-[#bef264] to-[#84cc16] shadow-xs" />
+                    <div className="h-full w-5 bg-gradient-to-b from-[#ffe07d] via-[#f7b801] to-[#d99f00] shadow-xs" />
                   </div>
 
                   {/* Box Body */}
                   <div className="relative -mt-px flex h-18 w-24 flex-col items-center justify-between rounded-b-xl bg-gradient-to-b from-zinc-800 to-zinc-950 px-2.5 pt-3.5 pb-2 ring-1 ring-inset ring-white/12">
                     {/* Tape Overlap Tab under Lid */}
-                    <div className=" bg-[#84cc16]/90 absolute top-0 left-1/2 h-1.5 w-5 -translate-x-1/2 rounded-b-xs" />
+                    <div className=" bg-[#f7b801]/90 absolute top-0 left-1/2 h-1.5 w-5 -translate-x-1/2 rounded-b-xs" />
 
                     {/* Die-Cut Box Handle Cutout Hole */}
                     <div className="mt-1 h-4 w-11 rounded-full bg-[#040507] shadow-[inset_0_3px_6px_rgba(0,0,0,0.95)] ring-1 ring-lime-400/50" />
@@ -521,7 +521,7 @@ export function RenterShowcaseSection() {
                 {/* Middle Tilted Card: Clean QR Pass Card */}
                 <div
                   className={cn(
-                    "absolute top-7 left-1/2 z-20 flex h-40 w-33 -translate-x-1/2 -rotate-3 flex-col justify-between rounded-2xl bg-[#bef264] p-3 text-[#1a2e05] shadow-xl ring-1 ring-black/10 transition-transform duration-500 group-hover:-translate-y-2 sm:top-8 sm:h-42 sm:w-34 sm:p-3.5",
+                    "absolute top-7 left-1/2 z-20 flex h-40 w-33 -translate-x-1/2 -rotate-3 flex-col justify-between rounded-2xl bg-[#f7b801] p-3 text-[#1e194d] shadow-xl ring-1 ring-black/10 transition-transform duration-500 group-hover:-translate-y-2 sm:top-8 sm:h-42 sm:w-34 sm:p-3.5",
                     card3Active && "-translate-y-2"
                   )}
                 >

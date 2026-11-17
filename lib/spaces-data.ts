@@ -50,7 +50,6 @@ export interface StorageSpace {
     security: string
   }
   amenities: string[]
-  idealFor: string[]
   compatibleVehicles: string[]
   host: {
     name: string
@@ -298,12 +297,6 @@ export const STORAGE_SPACES: StorageSpace[] = [
       "24/7 CCTV",
       "Rack Shelving Included",
     ],
-    idealFor: [
-      "E-Commerce Campaign Stock",
-      "Electronics & Cosmetics",
-      "Palletized B2B Inventory",
-      "Last-Mile Penang Fulfillment",
-    ],
     compatibleVehicles: [
       "Motorcycle Courier",
       "4x4 Pickup",
@@ -402,12 +395,6 @@ export const STORAGE_SPACES: StorageSpace[] = [
       "24/7 CCTV",
       "Rack Shelving Included",
     ],
-    idealFor: [
-      "F&B Dry Packaging Stock",
-      "Boutique Retail Inventory",
-      "Pop-Up Event Gear",
-      "Same-Day Island Dispatch",
-    ],
     compatibleVehicles: [
       "Motorcycle Courier",
       "4x4 Pickup",
@@ -493,11 +480,6 @@ export const STORAGE_SPACES: StorageSpace[] = [
       "24/7 CCTV",
       "Rack Shelving Included",
     ],
-    idealFor: [
-      "Shopee & Lazada Parcel Staging",
-      "Central Island Distribution",
-      "Retail Promotion Stock",
-    ],
     compatibleVehicles: [
       "Motorcycle Courier",
       "4x4 Pickup",
@@ -569,12 +551,6 @@ export const STORAGE_SPACES: StorageSpace[] = [
       "Pallet Jack On-Site",
       "Lalamove Friendly",
       "24/7 CCTV",
-    ],
-    idealFor: [
-      "Bulk Pallet Storage",
-      "Mainland Distribution",
-      "Construction & Hardware",
-      "Cross-State Freight Staging",
     ],
     compatibleVehicles: [
       "4x4 Pickup",
@@ -658,12 +634,6 @@ export const STORAGE_SPACES: StorageSpace[] = [
       "24/7 CCTV",
       "Rack Shelving Included",
     ],
-    idealFor: [
-      "Home Renovation Furniture",
-      "Student Semester Luggage",
-      "Archive Documents & Books",
-      "Personal Collectibles",
-    ],
     compatibleVehicles: [
       "Sedan / SUV",
       "Motorcycle Courier",
@@ -744,12 +714,6 @@ export const STORAGE_SPACES: StorageSpace[] = [
       "24/7 CCTV",
       "Rack Shelving Included",
     ],
-    idealFor: [
-      "Online Seller Cartons",
-      "Seasonal Festive Decor",
-      "Business Accounting Archives",
-      "Home Moving Overflow",
-    ],
     compatibleVehicles: [
       "Sedan / SUV",
       "Motorcycle Courier",
@@ -824,12 +788,6 @@ export const STORAGE_SPACES: StorageSpace[] = [
       "Lalamove Friendly",
       "24/7 CCTV",
       "Rack Shelving Included",
-    ],
-    idealFor: [
-      "Klang Valley Same-Day Delivery",
-      "TikTok Live Studio Overflow",
-      "D2C Apparel & Footwear",
-      "Corporate Event Kits",
     ],
     compatibleVehicles: [
       "Motorcycle Courier",
@@ -915,12 +873,6 @@ export const STORAGE_SPACES: StorageSpace[] = [
       "24/7 CCTV",
       "Rack Shelving Included",
     ],
-    idealFor: [
-      "FMCG & Retail Pallets",
-      "Import Container De-vanning",
-      "Shopee Mall / Lazada Stock",
-      "Exhibition & Roadshow Crates",
-    ],
     compatibleVehicles: [
       "1.7m / 2.4m Van",
       "1-Ton & 3-Ton Lorry",
@@ -993,11 +945,6 @@ export const STORAGE_SPACES: StorageSpace[] = [
       "Pallet Jack On-Site",
       "Lalamove Friendly",
       "24/7 CCTV",
-    ],
-    idealFor: [
-      "MY-SG Cross-Border Sellers",
-      "Mount Austin Retail Overflow",
-      "Wholesale Cartons & Pallets",
     ],
     compatibleVehicles: [
       "Motorcycle Courier",
